@@ -33,6 +33,13 @@
 \usetikzlibrary{arrows.meta,positioning,shapes.geometric,calc,fit,backgrounds}
 \pgfplotsset{compat=1.18}   % lower to 1.16 if your TeX distribution is older
 
+% Sequential light-to-dark blue colormap for Fig. 5 (the misspecification
+% heatmap). pgfplots has no built-in "Blues" colormap (that is a
+% matplotlib/ColorBrewer name); this is a hand-defined equivalent.
+\pgfplotsset{
+  colormap={raigblues}{rgb255=(205,226,251) rgb255=(13,54,107)}
+}
+
 % Binary entropy in bits, and reliability-aware information gain, evaluated
 % natively by pgfmath. Fig. 3 is therefore computed, not traced.
 \pgfmathdeclarefunction{Hb}{1}{%
@@ -1030,7 +1037,7 @@ measured.}
 \label{tab:tiers}
 \centering
 \footnotesize
-\begin{tabular}{@{}llc@{}}
+\begin{tabular}{@{}lp{0.62\columnwidth}c@{}}
 \toprule
 \textbf{Tier} & \textbf{Attributes} & \textbf{$\varepsilon$} \\
 \midrule
@@ -1370,37 +1377,37 @@ Capacity term only & 0.0 & $-36.5$ \\
   tick label style={font=\scriptsize},
   xmin=0, xmax=0.4, ymin=0, ymax=0.4,
   grid=both, grid style={line width=0.2pt, draw=black!15},
-  colormap/Blues, colorbar, point meta min=0, point meta max=0.80,
+  colormap name=raigblues, colorbar, point meta min=0, point meta max=0.80,
   colorbar style={font=\tiny, ylabel={top-1 accuracy}},
 ]
 \addplot[matrix plot*, point meta=explicit,
          mesh/cols=5, mesh/rows=5, mesh/ordering=y varies] table[meta=acc] {
   x     y     acc
-  0.02  0.02  0.80
-  0.10  0.02  0.79
-  0.18  0.02  0.73
-  0.26  0.02  0.56
-  0.34  0.02  0.49
-  0.02  0.10  0.26
-  0.10  0.10  0.28
-  0.18  0.10  0.21
-  0.26  0.10  0.19
-  0.34  0.10  0.15
-  0.02  0.18  0.06
-  0.10  0.18  0.07
-  0.18  0.18  0.04
-  0.26  0.18  0.06
-  0.34  0.18  0.06
-  0.02  0.26  0.01
-  0.10  0.26  0.01
-  0.18  0.26  0.01
-  0.26  0.26  0.01
-  0.34  0.26  0.02
-  0.02  0.34  0.01
-  0.10  0.34  0.01
-  0.18  0.34  0.00
-  0.26  0.34  0.00
-  0.34  0.34  0.01
+  0.02  0.02  0.766
+  0.10  0.02  0.780
+  0.18  0.02  0.676
+  0.26  0.02  0.558
+  0.34  0.02  0.486
+  0.02  0.10  0.254
+  0.10  0.10  0.260
+  0.18  0.10  0.218
+  0.26  0.10  0.168
+  0.34  0.10  0.172
+  0.02  0.18  0.066
+  0.10  0.18  0.052
+  0.18  0.18  0.060
+  0.26  0.18  0.052
+  0.34  0.18  0.038
+  0.02  0.26  0.012
+  0.10  0.26  0.008
+  0.18  0.26  0.014
+  0.26  0.26  0.008
+  0.34  0.26  0.008
+  0.02  0.34  0.002
+  0.10  0.34  0.002
+  0.18  0.34  0.006
+  0.26  0.34  0.000
+  0.34  0.34  0.002
 };
 \draw[black!45, dashed] (axis cs:0,0) -- (axis cs:0.4,0.4);
 \node[font=\tiny, black!60, rotate=45, anchor=south] at (axis cs:0.30,0.30)
@@ -1408,12 +1415,20 @@ Capacity term only & 0.0 & $-36.5$ \\
 \end{axis}
 \end{tikzpicture}
 \caption{Top-1 accuracy (RAIG selector, homogeneous assumed vs. homogeneous
-true crossover, $R=100$ trials/cell, $T=20$) as a function of assumed against
+true crossover, $R=500$ trials/cell, $T=20$) as a function of assumed against
 true crossover. The diagonal is correct specification. Accuracy is dominated
-by the true crossover (rows), falling from 49--80\% at $\varepsilon=0.02$ to
-$\le 2\%$ once $\varepsilon\ge0.26$; within a row, accuracy is generally
-highest near the diagonal but the effect is small relative to sampling noise
-at this grid resolution ($R=100$/cell).}
+by the true crossover (rows), falling from 49--78\% at $\varepsilon=0.02$ to
+$\le 1.4\%$ once $\varepsilon\ge0.18$. At $5\times$ the original resolution
+($R=500$/cell, re-run from the original $R=100$/cell to check this was not
+an under-powered artefact) the within-row diagonal effect remains small and
+does not resolve into a clean pattern: the correctly-specified cell is the
+row maximum in only 1 of 5 rows. This is consistent with
+Section~\ref{sec:tiers}'s uniform-specification argument -- under
+\emph{homogeneous} true noise, a constant $\hat\varepsilon$ shifts every
+question's RAIG score by the same capacity term regardless of its exact
+value, so misspecification here degrades the Bayesian update's confidence
+without changing which questions get \emph{selected}; only the row (the true
+noise level) has a first-order effect on accuracy.}
 \label{fig:misspec}
 \end{figure}
 %----------------------------------------------------------------------
@@ -1425,7 +1440,13 @@ between accuracy and query count under threshold stopping.
 
 \begin{table}[t]
 \caption{Per-turn selection latency and secondary efficiency metrics,
-heterogeneous $\lambda=1.0$, $R=150$ trials, confidence threshold 0.90. At
+heterogeneous $\lambda=1.0$, $R=150$ trials, confidence threshold 0.90.
+ms/turn is the \emph{median} of 5 independent runs on this shared machine
+(individual runs ranged 57--516ms owing to unrelated background load; see
+\texttt{results/latency\_reconciled.json} for the full breakdown). Treat the
+absolute figure as order-of-magnitude, not a precise benchmark -- the robust
+finding is that both selectors cost the same per-turn compute, since both
+reduce to one matrix--vector product plus a vectorised entropy transform. At
 this noise level the threshold is reached at all for only 0.7\% (IG) / 2.7\%
 (RAIG) of trials within $T=20$, so ``Q to threshold'' is effectively censored
 at 20 for both and is not a discriminating metric at this noise level.}
@@ -1434,10 +1455,10 @@ at 20 for both and is not a discriminating metric at this noise level.}
 \footnotesize
 \begin{tabular}{@{}lccc@{}}
 \toprule
-\textbf{Method} & \textbf{ms/turn} & \textbf{Q to threshold} & \textbf{Top-5 (\%)} \\
+\textbf{Method} & \textbf{ms/turn (median of 5)} & \textbf{Q to threshold} & \textbf{Top-5 (\%)} \\
 \midrule
-IG+soft-uniform & 68.7 & 20.0 (0.7\% reached) & 10.7 \\
-RAIG-tiered & 69.8 & 19.9 (2.7\% reached) & 22.0 \\
+IG+soft-uniform & 64.2 & 20.0 (0.7\% reached) & 10.7 \\
+RAIG-tiered & 66.3 & 19.9 (2.7\% reached) & 22.0 \\
 \bottomrule
 \end{tabular}
 \end{table}
