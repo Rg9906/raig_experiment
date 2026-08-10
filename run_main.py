@@ -30,7 +30,9 @@ method_names = [m.name for m in methods]
 R = 300
 T = 20
 SEEDS = [0, 1, 2]
-BATCH = 150
+BATCH = 50  # reduced from 150: this machine has ~2GB free RAM, and MC=6*150=900
+            # columns of (N=79803,) float32 caused severe paging (36 s/trial vs.
+            # 0.28 s/trial at BATCH=50, i.e. MC=300); see timing notes in session.
 
 conditions = {
     "clean": lambda: raig.tiered_true_eps(cat, 0.0),
