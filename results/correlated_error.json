@@ -1,0 +1,29 @@
+{
+  "R": 300,
+  "T": 20,
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "subjective_attrs": [
+    "danceability_level",
+    "energy_level",
+    "key_category",
+    "mode_category",
+    "mood",
+    "tempo",
+    "time_signature_category",
+    "valence_level"
+  ],
+  "acc": {
+    "IG+soft-uniform": 0.024444444444444446,
+    "RAIG-tiered": 0.07222222222222222
+  },
+  "mcnemar_RAIGtiered_vs_IGsoftuniform": {
+    "n10": 56,
+    "n01": 13,
+    "delta_RAIG_minus_IG": 0.047777777777777766,
+    "p": 1.6837633430122172e-07
+  }
+}
