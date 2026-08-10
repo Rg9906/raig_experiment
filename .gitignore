@@ -2,3 +2,12 @@
 __pycache__/
 *.pyc
 run_main.log
+
+# LaTeX build artifacts -- paper.tex, refs.bib, and paper.pdf are tracked;
+# everything else here is regenerable by pdflatex -> bibtex -> pdflatex x2.
+paper/*.aux
+paper/*.bbl
+paper/*.blg
+paper/*.log
+paper/*.out
+paper/missfont.log
