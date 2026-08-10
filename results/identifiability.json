@@ -1,0 +1,12 @@
+{
+  "N": 79803,
+  "dropped": 0,
+  "M": 21,
+  "distinct_vectors": 77069,
+  "collision_rate": 0.06325576732704284,
+  "uniquely_identifiable_frac": 0.9367442326729571,
+  "largest_equivalence_class": 11,
+  "entropy_floor_bits": 16.233863051106187,
+  "budget_bound_T": 20.151066258355005,
+  "Q_compiled": 193
+}

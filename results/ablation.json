@@ -1,0 +1,27 @@
+[
+  {
+    "variant": "K=1 (uniform)",
+    "acc": 0.021111111111111112,
+    "pct_gap": 0.0
+  },
+  {
+    "variant": "K=2",
+    "acc": 0.06888888888888889,
+    "pct_gap": 82.6923076923077
+  },
+  {
+    "variant": "K=3 (tiered)",
+    "acc": 0.07888888888888888,
+    "pct_gap": 100.0
+  },
+  {
+    "variant": "K=M (oracle)",
+    "acc": 0.07888888888888888,
+    "pct_gap": 100.0
+  },
+  {
+    "variant": "Capacity term only",
+    "acc": 0.0,
+    "pct_gap": -36.53846153846154
+  }
+]

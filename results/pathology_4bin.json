@@ -1,0 +1,149 @@
+{
+  "rows": [
+    {
+      "attribute": "genre",
+      "tier": "objective",
+      "eps": 0.03,
+      "reliability": 0.97,
+      "max_ig": 0.09690214657410824
+    },
+    {
+      "attribute": "mood",
+      "tier": "subjective",
+      "eps": 0.3,
+      "reliability": 0.7,
+      "max_ig": 0.9997555591030975
+    },
+    {
+      "attribute": "tempo",
+      "tier": "subjective",
+      "eps": 0.3,
+      "reliability": 0.7,
+      "max_ig": 0.9018017266485868
+    },
+    {
+      "attribute": "language",
+      "tier": "objective",
+      "eps": 0.03,
+      "reliability": 0.97,
+      "max_ig": 0.4463358063557924
+    },
+    {
+      "attribute": "popularity_level",
+      "tier": "semi",
+      "eps": 0.15,
+      "reliability": 0.85,
+      "max_ig": 0.8112830841556197
+    },
+    {
+      "attribute": "duration_length",
+      "tier": "semi",
+      "eps": 0.15,
+      "reliability": 0.85,
+      "max_ig": 0.8112830841556197
+    },
+    {
+      "attribute": "danceability_level",
+      "tier": "subjective",
+      "eps": 0.3,
+      "reliability": 0.7,
+      "max_ig": 0.8112830841556197
+    },
+    {
+      "attribute": "energy_level",
+      "tier": "subjective",
+      "eps": 0.3,
+      "reliability": 0.7,
+      "max_ig": 0.8112830841556197
+    },
+    {
+      "attribute": "valence_level",
+      "tier": "subjective",
+      "eps": 0.3,
+      "reliability": 0.7,
+      "max_ig": 0.8112830841556197
+    },
+    {
+      "attribute": "acoustic_level",
+      "tier": "semi",
+      "eps": 0.15,
+      "reliability": 0.85,
+      "max_ig": 0.8112830841556197
+    },
+    {
+      "attribute": "instrumental_level",
+      "tier": "semi",
+      "eps": 0.15,
+      "reliability": 0.85,
+      "max_ig": 0.8112830841556197
+    },
+    {
+      "attribute": "liveness_level",
+      "tier": "semi",
+      "eps": 0.15,
+      "reliability": 0.85,
+      "max_ig": 0.8112830841556197
+    },
+    {
+      "attribute": "speechiness_level",
+      "tier": "semi",
+      "eps": 0.15,
+      "reliability": 0.85,
+      "max_ig": 0.8112830841556197
+    },
+    {
+      "attribute": "loudness_level",
+      "tier": "semi",
+      "eps": 0.15,
+      "reliability": 0.85,
+      "max_ig": 0.8112830841556197
+    },
+    {
+      "attribute": "key_category",
+      "tier": "subjective",
+      "eps": 0.3,
+      "reliability": 0.7,
+      "max_ig": 0.8961317406163984
+    },
+    {
+      "attribute": "mode_category",
+      "tier": "subjective",
+      "eps": 0.3,
+      "reliability": 0.7,
+      "max_ig": 0.947452831465462
+    },
+    {
+      "attribute": "time_signature_category",
+      "tier": "subjective",
+      "eps": 0.3,
+      "reliability": 0.7,
+      "max_ig": 0.49615008513739556
+    },
+    {
+      "attribute": "content_rating",
+      "tier": "objective",
+      "eps": 0.03,
+      "reliability": 0.97,
+      "max_ig": 0.4244668146448992
+    },
+    {
+      "attribute": "artist_type",
+      "tier": "objective",
+      "eps": 0.03,
+      "reliability": 0.97,
+      "max_ig": 0.834294115996043
+    },
+    {
+      "attribute": "track_version",
+      "tier": "objective",
+      "eps": 0.03,
+      "reliability": 0.97,
+      "max_ig": 0.4242534740151827
+    }
+  ],
+  "rho": -0.6128493707845726,
+  "p": 0.004066258320846111,
+  "eps_top5": 0.246,
+  "eps_all": 0.17999999999999994,
+  "Q_compiled": 185
+}
