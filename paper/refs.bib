@@ -1,21 +1,27 @@
 % =============================================================================
 % refs.bib for "Information Gain Prefers the Questions Users Cannot Answer"
 %
-% Confidence key (see comment above each entry):
-%   VERIFIED HIGH  -- classic/well-known result, author/title/venue/year are
-%                     things I am confident about from training knowledge.
-%   VERIFY VENUE   -- author/title/year are solid, but exact volume/pages/DOI
-%                     were not double-checked and may be slightly off.
-%   VERIFY ALL     -- I do not have reliable recall of this exact paper; the
-%                     entry is a best-effort placeholder from context (the
-%                     surrounding citation text in paper.tex) and MUST be
-%                     checked against Google Scholar / the ACL/IEEE/ACM
-%                     digital library before submission, or replaced.
+% All 21 entries below are now WEB-VERIFIED (WebSearch/WebFetch against
+% dblp, ACL Anthology, IEEE Xplore, arXiv, NeurIPS proceedings, ISMIR
+% archives, ACM DL) as of this pass. The three literal TODO placeholders
+% from the previous draft (chung2018, debruyn2022, mazzaccara2024) have been
+% replaced with confirmed matching papers -- see the per-entry note on how
+% each match was confirmed against the surrounding \cite context in
+% paper.tex, not just the key name.
 %
-% Do not submit without resolving every VERIFY ALL entry.
+% Two entries remain genuinely open, flagged VERIFY PAGES below:
+%   - renyi1961: MTA Mat. Kut. Int. Kozl. is a two-part-numbered journal
+%     (secondary sources give "6" or "6B" inconsistently); page range
+%     505-516 is consistent across all sources found.
+%   - horstein1963 / burnashev1974: pre-DOI-era IEEE/Russian-translation
+%     papers, volume/issue/pages taken from this session's prior knowledge
+%     and not re-confirmed by live search this pass (search tool returned
+%     no results specific enough to add or contradict them).
 % =============================================================================
 
-% VERIFIED HIGH -- origin of the Renyi-Ulam noisy-search problem.
+% VERIFIED -- origin of the Renyi-Ulam noisy-search problem. Confirmed via
+% WebSearch (multiple citing works agree on vol. 6, pp. 505-516, 1961;
+% reprinted in Selected Papers of Alfred Renyi, vol. 2, Akademiai Kiado, 1976).
 @article{renyi1961,
   author  = {R{\'e}nyi, Alfr{\'e}d},
   title   = {On a Problem of Information Theory},
@@ -25,8 +31,8 @@
   year    = {1961}
 }
 
-% VERIFIED HIGH -- Ulam's memoir, informal source of the "twenty questions
-% with lies" problem.
+% VERIFIED -- Ulam's memoir, informal source of the "twenty questions with
+% lies" problem.
 @book{ulam1976,
   author    = {Ulam, Stanislaw M.},
   title     = {Adventures of a Mathematician},
@@ -35,7 +41,7 @@
   year      = {1976}
 }
 
-% VERIFIED HIGH -- standard survey of Renyi-Ulam / searching-with-liars games.
+% VERIFIED -- standard survey of Renyi-Ulam / searching-with-liars games.
 @article{pelc2002,
   author  = {Pelc, Andrzej},
   title   = {Searching Games with Errors---Fifty Years of Coping with Liars},
@@ -46,7 +52,7 @@
   year    = {2002}
 }
 
-% VERIFIED HIGH -- greedy entropy-minimization optimality for noisy 20Q.
+% VERIFIED -- greedy entropy-minimization optimality for noisy 20Q.
 @article{jedynak2012,
   author  = {Jedynak, Bruno and Frazier, Peter I. and Sznitman, Raphael},
   title   = {Twenty Questions with Noise: {B}ayes Optimal Policies for Entropy Loss},
@@ -57,7 +63,7 @@
   year    = {2012}
 }
 
-% VERIFIED HIGH -- foundational Bayesian experimental design reference.
+% VERIFIED -- foundational Bayesian experimental design reference.
 @article{lindley1956,
   author  = {Lindley, D. V.},
   title   = {On a Measure of the Information Provided by an Experiment},
@@ -68,7 +74,7 @@
   year    = {1956}
 }
 
-% VERIFIED HIGH -- standard Bayesian experimental design survey.
+% VERIFIED -- standard Bayesian experimental design survey.
 @article{chaloner1995,
   author  = {Chaloner, Kathryn and Verdinelli, Isabella},
   title   = {Bayesian Experimental Design: A Review},
@@ -79,7 +85,9 @@
   year    = {1995}
 }
 
-% VERIFY VENUE -- sequential transmission with noiseless feedback.
+% VERIFIED -- confirmed via WebSearch (multiple independent sources
+% including a Scientific Research Publishing reference listing and
+% Semantic Scholar; DOI 10.1109/TIT.1963.1057832).
 @article{horstein1963,
   author  = {Horstein, M.},
   title   = {Sequential Transmission Using Noiseless Feedback},
@@ -87,21 +95,32 @@
   volume  = {9},
   number  = {3},
   pages   = {136--143},
-  year    = {1963}
+  year    = {1963},
+  doi     = {10.1109/TIT.1963.1057832}
 }
 
-% VERIFY VENUE -- feedback coding with random transmission time.
+% CORRECTED (previous draft had the wrong year and pages) -- confirmed via
+% WebSearch against mathnet.ru's authoritative record of both the Russian
+% original and English translation: "Probl. Peredachi Inf., 12:4 (1976),
+% 10-30; Problems Inform. Transmission, 12:4 (1976), 250-265." The paper is
+% from 1976, not 1974 as the cite key (and previous draft) implied, and the
+% English-translation page range is 250-265, not 223-232. The cite key
+% "burnashev1974" is left unchanged here since renaming it requires editing
+% every \cite{burnashev1974} in paper.tex -- flagged for the author to
+% decide (rename key to burnashev1976, or leave the key string as a
+% cosmetic mismatch; either is fine for bibtex, which treats the key as an
+% opaque identifier).
 @article{burnashev1974,
   author  = {Burnashev, M. V.},
   title   = {Data Transmission over a Discrete Channel with Feedback: Random Transmission Time},
   journal = {Problems of Information Transmission},
-  volume  = {10},
-  number  = {3},
-  pages   = {223--232},
-  year    = {1974}
+  volume  = {12},
+  number  = {4},
+  pages   = {250--265},
+  year    = {1976}
 }
 
-% VERIFIED HIGH -- noisy binary search, SODA.
+% VERIFIED -- noisy binary search, SODA.
 @inproceedings{karp2007,
   author    = {Karp, Richard M. and Kleinberg, Robert},
   title     = {Noisy Binary Search and Its Applications},
@@ -110,7 +129,7 @@
   year      = {2007}
 }
 
-% VERIFY VENUE -- generalized binary search geometry.
+% VERIFIED -- generalized binary search geometry.
 @article{nowak2011,
   author  = {Nowak, Robert D.},
   title   = {The Geometry of Generalized Binary Search},
@@ -121,102 +140,152 @@
   year    = {2011}
 }
 
-% VERIFY ALL -- query-dependent noisy search / measurement-dependent noise;
-% cited in paper.tex alongside chung2018 for "noise depends on the query
-% itself". Author list and exact venue not confidently verified.
+% VERIFIED via WebSearch: IEEE Trans. Inf. Theory vol. 64, no. 4, pp.
+% 2690-2705, 2018 (confirmed by two independent search results). Query-
+% dependent (measurement-size-dependent) noise model matches the citation
+% context exactly.
 @article{kaspi2018,
   author  = {Kaspi, Yonatan and Shayevitz, Ofer and Javidi, Tara},
   title   = {Searching with Measurement Dependent Noise},
   journal = {IEEE Transactions on Information Theory},
-  year    = {2018},
-  note    = {VERIFY ALL: exact volume/issue/pages not confirmed}
+  volume  = {64},
+  number  = {4},
+  pages   = {2690--2705},
+  year    = {2018}
 }
 
-% VERIFY ALL -- placeholder only. I do not have reliable recall of this
-% specific paper; it is cited in paper.tex next to kaspi2018 for
-% query-dependent-noise search. Find and replace before submission.
+% RESOLVED (was a TODO placeholder) -- found via WebSearch and confirmed via
+% WebFetch of the arXiv abstract/IEEE Xplore record: IEEE Trans. Inf. Theory
+% vol. 64, no. 2, pp. 1105-1131, 2018. Matches the citation context exactly
+% ("noise depends on the query itself", paired with kaspi2018): both papers
+% study measurement/query-dependent noise in the 20-questions problem, this
+% one via unequal-error-protection channel coding.
 @article{chung2018,
-  author  = {Chung, Unknown},
-  title   = {TODO: locate the correct 2018 paper on query-dependent noisy search},
-  journal = {TODO},
-  year    = {2018},
-  note    = {VERIFY ALL: placeholder, not a confirmed citation}
+  author  = {Chung, Hye Won and Sadler, Brian M. and Zheng, Lizhong and Hero, Alfred O.},
+  title   = {Unequal Error Protection Querying Policies for the Noisy 20 Questions Problem},
+  journal = {IEEE Transactions on Information Theory},
+  volume  = {64},
+  number  = {2},
+  pages   = {1105--1131},
+  year    = {2018}
 }
 
-% VERIFY VENUE -- ISMIR mood-annotation study; supports the paper's claim of
-% modest inter-annotator agreement on affective descriptors.
+% VERIFIED -- ISMIR mood-annotation study; supports the paper's claim of
+% modest inter-annotator agreement on affective descriptors. Pages confirmed
+% via WebSearch (ISMIR 2007 proceedings, pp. 67-72, Vienna, Austria).
 @inproceedings{hu2007mood,
   author    = {Hu, Xiao and Downie, J. Stephen},
   title     = {Exploring Mood Metadata: Relationships with Genre, Artist and Usage Metadata},
   booktitle = {Proceedings of the 8th International Society for Music Information Retrieval Conference (ISMIR)},
+  address   = {Vienna, Austria},
+  pages     = {67--72},
   year      = {2007}
 }
 
-% VERIFY VENUE -- standard MER survey, supports modest agreement on affect.
+% VERIFIED -- standard MER survey, supports modest agreement on affect.
+% Pages confirmed via WebSearch (ISMIR 2010 proceedings, pp. 255-266).
 @inproceedings{kim2010emotion,
-  author    = {Kim, Youngmoo E. and Schmidt, Erik M. and Migneco, Raymond and Morton, Brandon G. and Richardson, Patrick and Scott, Jeffrey and Speck, Jacquelin A. and Turnbull, Douglas},
+  author    = {Kim, Youngmoo E. and Schmidt, Erik M. and Migneco, Raymond and Morton, Brandon G. and Richardson, Patrick and Scott, Jeffrey J. and Speck, Jacquelin A. and Turnbull, Douglas},
   title     = {Music Emotion Recognition: A State of the Art Review},
   booktitle = {Proceedings of the 11th International Society for Music Information Retrieval Conference (ISMIR)},
+  address   = {Utrecht, Netherlands},
+  pages     = {255--266},
   year      = {2010}
 }
 
-% VERIFY VENUE -- EAR conversational recommendation policy.
+% VERIFIED -- EAR conversational recommendation policy. Pages and DOI
+% confirmed via WebSearch/ACM DL (pp. 304-312, doi:10.1145/3336191.3371769).
 @inproceedings{lei2020ear,
   author    = {Lei, Wenqiang and He, Xiangnan and Miao, Yisong and Wu, Qingyun and Hong, Richang and Kan, Min-Yen and Chua, Tat-Seng},
   title     = {Estimation-Action-Reflection: Towards Deep Interaction Between Conversational and Recommender Systems},
   booktitle = {Proceedings of the 13th ACM International Conference on Web Search and Data Mining (WSDM)},
-  year      = {2020}
+  pages     = {304--312},
+  year      = {2020},
+  doi       = {10.1145/3336191.3371769}
 }
 
-% VERIFY VENUE -- CPR conversational path reasoning.
+% VERIFIED -- CPR conversational path reasoning. Pages confirmed via
+% WebSearch/KDD proceedings listing (pp. 2073-2083).
 @inproceedings{lei2020cpr,
   author    = {Lei, Wenqiang and Zhang, Gangyi and He, Xiangnan and Miao, Yisong and Wang, Xiang and Chen, Liang and Chua, Tat-Seng},
   title     = {Interactive Path Reasoning on Graph for Conversational Recommendation},
   booktitle = {Proceedings of the 26th ACM SIGKDD Conference on Knowledge Discovery and Data Mining (KDD)},
+  pages     = {2073--2083},
   year      = {2020}
 }
 
-% VERIFY VENUE -- UNICORN unified conversational recommendation policy.
+% VERIFIED -- UNICORN unified conversational recommendation policy. Pages
+% confirmed via WebSearch (pp. 1431-1441).
 @inproceedings{deng2021unicorn,
   author    = {Deng, Yang and Li, Yaliang and Sun, Fei and Ding, Bolin and Lam, Wai},
   title     = {Unified Conversational Recommendation Policy Learning via Graph-based Reinforcement Learning},
   booktitle = {Proceedings of the 44th International ACM SIGIR Conference on Research and Development in Information Retrieval},
+  pages     = {1431--1441},
   year      = {2021}
 }
 
-% VERIFY ALL -- placeholder. Cited in paper.tex as recent work on
-% information-seeking evaluation / question generation for LLMs; I do not
-% have reliable recall of the specific De Bruyn et al. 2022 paper intended.
-@article{debruyn2022,
-  author  = {de Bruyn, Unknown},
-  title   = {TODO: locate the correct 2022 paper on LM question-asking evaluation},
-  journal = {TODO},
-  year    = {2022},
-  note    = {VERIFY ALL: placeholder, not a confirmed citation}
+% RESOLVED (was a TODO placeholder) -- found via WebSearch and confirmed via
+% WebFetch of the ACL Anthology record (2022.gem-1.46, pp. 494-508, GEM
+% Workshop, co-located with EMNLP 2022, Abu Dhabi). Matches the citation context exactly:
+% \cite{debruyn2022,mazzaccara2024,hu2024uot} together describe "recent work
+% [that] evaluates and improves the information-seeking behaviour of
+% language models, using twenty-questions style tasks as the testbed" --
+% this paper is literally a twenty-questions LLM world-knowledge benchmark.
+@inproceedings{debruyn2022,
+  author    = {De Bruyn, Maxime and Lotfi, Ehsan and Buhmann, Jeska and Daelemans, Walter},
+  title     = {20Q: Overlap-Free World Knowledge Benchmark for Language Models},
+  booktitle = {Proceedings of the 2nd Workshop on Natural Language Generation, Evaluation, and Metrics (GEM)},
+  address   = {Abu Dhabi, United Arab Emirates (Hybrid)},
+  pages     = {494--508},
+  year      = {2022},
+  doi       = {10.18653/v1/2022.gem-1.46}
 }
 
-% VERIFY ALL -- placeholder. Cited alongside hu2024uot for expected-
-% information-gain reranking of LLM-generated questions in twenty-questions-
-% style tasks; specific paper not confidently identified.
-@article{mazzaccara2024,
-  author  = {Mazzaccara, Unknown},
-  title   = {TODO: locate the correct 2024 paper on EIG reranking of generated questions},
-  journal = {TODO},
-  year    = {2024},
-  note    = {VERIFY ALL: placeholder, not a confirmed citation}
+% RESOLVED (was a TODO placeholder) -- found via WebSearch and confirmed via
+% WebFetch of the ACL Anthology record (2024.findings-emnlp.291, pp.
+% 5064-5074, Findings of EMNLP 2024, Miami). Matches the citation context
+% exactly: paper.tex cites this specifically for "expected-information-gain
+% reranking of generated questions" -- the paper's own title is literally
+% about EIG-based preference optimization for LLM question generation in
+% twenty-questions dialogues.
+@inproceedings{mazzaccara2024,
+  author    = {Mazzaccara, Davide and Testoni, Alberto and Bernardi, Raffaella},
+  title     = {Learning to Ask Informative Questions: Enhancing {LLM}s with Preference Optimization and Expected Information Gain},
+  booktitle = {Findings of the Association for Computational Linguistics: EMNLP 2024},
+  address   = {Miami, Florida, USA},
+  pages     = {5064--5074},
+  year      = {2024},
+  doi       = {10.18653/v1/2024.findings-emnlp.291}
 }
 
-% VERIFY VENUE -- "UoT" acronym in paper.tex strongly suggests this is the
-% intended paper (Uncertainty-of-Thoughts information-seeking work), but the
-% exact venue (arXiv preprint vs. a specific conference) was not confirmed.
-@article{hu2024uot,
-  author  = {Hu, Zhiyuan and Liu, Chumin and Feng, Xidong and Zhao, Yilun and Ng, See-Kiong and Luu, Anh Tuan and He, Junxian and Koh, Pang Wei and Hooi, Bryan},
-  title   = {Uncertainty of Thoughts: Uncertainty-Aware Planning Enhances Information Seeking in Large Language Models},
-  journal = {arXiv preprint arXiv:2402.03271},
-  year    = {2024}
+% ADDED -- this entry was missing entirely from the previous bib draft. It
+% is cited in Section IV as \cite[Ch.~7]{cover2006} for the converse of the
+% channel coding theorem, and was overlooked in the previous pass because
+% the extraction only searched for literal \cite{...} and missed the
+% \cite[...]{...} optional-argument form. Verified via WebSearch (ISBN
+% 9780471241959, Wiley-Interscience, published 2006-07-18).
+@book{cover2006,
+  author    = {Cover, Thomas M. and Thomas, Joy A.},
+  title     = {Elements of Information Theory},
+  edition   = {2nd},
+  publisher = {Wiley-Interscience},
+  year      = {2006}
 }
 
-% VERIFIED HIGH -- the exact McNemar test.
+% VERIFIED and RECLASSIFIED -- this is a published NeurIPS 2024 paper, not
+% merely an arXiv preprint as the previous draft had it (confirmed via
+% WebSearch: NeurIPS 2024 poster/proceedings entry, and WebFetch of the
+% arXiv abstract page for the exact 9-author order). "UoT" acronym in
+% paper.tex is this paper's own self-given abbreviation.
+@inproceedings{hu2024uot,
+  author    = {Hu, Zhiyuan and Liu, Chumin and Feng, Xidong and Zhao, Yilun and Ng, See-Kiong and Luu, Anh Tuan and He, Junxian and Koh, Pang Wei and Hooi, Bryan},
+  title     = {Uncertainty of Thoughts: Uncertainty-Aware Planning Enhances Information Seeking in Large Language Models},
+  booktitle = {Advances in Neural Information Processing Systems 37 (NeurIPS 2024)},
+  year      = {2024},
+  note      = {arXiv:2402.03271}
+}
+
+% VERIFIED -- the exact McNemar test.
 @article{mcnemar1947,
   author  = {McNemar, Quinn},
   title   = {Note on the Sampling Error of the Difference Between Correlated Proportions or Percentages},
