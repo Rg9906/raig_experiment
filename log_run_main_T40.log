@@ -1,0 +1,19 @@
+N=79803 Q=193 methods=9 T=40 batch=40 uniform_eps=0.098083
+to run: heterogeneous_1.0
+    heterogeneous_1.0 seed 0 done (349s into condition)
+    heterogeneous_1.0 seed 1 done (891s into condition)
+    heterogeneous_1.0 seed 2 done (1690s into condition)
+[ 1691.1s] heterogeneous_1.0 (1691s): Random+soft=0.2, IG+hard=2.1, IG+soft-uniform=16.6, IG+soft-objective=0.3, Learned-noiseblind=18.9, Learned-noiseaware=13.9, RAIG-empirical=10.2, RAIG-tiered=26.6, RAIG-oracle=26.6
+DONE in 1691s -> results/main_T40.json (1/7 conditions stored)
+resuming: 1 condition(s) already stored (heterogeneous_1.0)
+N=79803 Q=193 methods=9 T=40 batch=40 uniform_eps=0.098083
+to run: clean, homogeneous, heterogeneous_0.5, heterogeneous_1.5, randomised, adversarial
+    clean seed 0 done (616s into condition)
+    clean seed 1 done (804s into condition)
+    clean seed 2 done (1007s into condition)
+[ 1008.7s] clean (1009s): Random+soft=8.6, IG+hard=96.7, IG+soft-uniform=96.7, IG+soft-objective=0.8, Learned-noiseblind=96.7, Learned-noiseaware=96.7, RAIG-empirical=94.9, RAIG-tiered=88.0, RAIG-oracle=96.7
+    homogeneous seed 0 done (252s into condition)
+    homogeneous seed 1 done (2465s into condition)
+    homogeneous seed 2 done (2887s into condition)
+[ 3897.6s] homogeneous (2889s): Random+soft=1.6, IG+hard=19.1, IG+soft-uniform=70.8, IG+soft-objective=0.2, Learned-noiseblind=71.1, Learned-noiseaware=66.6, RAIG-empirical=49.6, RAIG-tiered=48.3, RAIG-oracle=70.8
+    heterogeneous_0.5 seed 0 done (1403s into condition)

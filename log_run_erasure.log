@@ -1,0 +1,14 @@
+[    49s] abstention=none: IG+soft-uniform=2.4, RAIG-tiered=7.8, RAIG+erasure=7.8
+      IG+soft-uniform    eps_asked=0.224 delta_asked=0.000 subj=53%
+      RAIG-tiered        eps_asked=0.106 delta_asked=0.000 subj=3%
+      RAIG+erasure       eps_asked=0.106 delta_asked=0.000 subj=3%
+[   100s] abstention=mild: IG+soft-uniform=1.6, RAIG-tiered=5.3, RAIG+erasure=4.0
+      IG+soft-uniform    eps_asked=0.227 delta_asked=0.151 subj=54%
+      RAIG-tiered        eps_asked=0.105 delta_asked=0.070 subj=2%
+      RAIG+erasure       eps_asked=0.102 delta_asked=0.068 subj=1%
+[   152s] abstention=strong: IG+soft-uniform=1.1, RAIG-tiered=4.0, RAIG+erasure=3.6
+      IG+soft-uniform    eps_asked=0.230 delta_asked=0.308 subj=56%
+      RAIG-tiered        eps_asked=0.107 delta_asked=0.146 subj=1%
+      RAIG+erasure       eps_asked=0.100 delta_asked=0.138 subj=1%
+
+wrote results/erasure.json (152s)

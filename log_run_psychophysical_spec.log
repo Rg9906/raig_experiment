@@ -1,0 +1,23 @@
+derived from a continuous column: 10  natively categorical (or source absent): 11
+  popularity_level         n_labels= 5 overlap=0.000  sig=0.1: 0.080  sig=0.25: 0.186  sig=0.5: 0.345
+  duration_length          n_labels= 5 overlap=0.004  sig=0.1: 0.097  sig=0.25: 0.239  sig=0.5: 0.441
+  danceability_level       n_labels= 5 overlap=0.003  sig=0.1: 0.071  sig=0.25: 0.175  sig=0.5: 0.340
+  energy_level             n_labels= 5 overlap=0.004  sig=0.1: 0.078  sig=0.25: 0.196  sig=0.5: 0.375
+  valence_level            n_labels= 5 overlap=0.001  sig=0.1: 0.090  sig=0.25: 0.226  sig=0.5: 0.416
+  acoustic_level           n_labels= 5 overlap=0.002  sig=0.1: 0.066  sig=0.25: 0.173  sig=0.5: 0.333
+  instrumental_level       n_labels= 5 overlap=0.004  sig=0.1: 0.045  sig=0.25: 0.188  sig=0.5: 0.344
+  liveness_level           n_labels= 5 overlap=0.002  sig=0.1: 0.039  sig=0.25: 0.115  sig=0.5: 0.257
+  speechiness_level        n_labels= 3 overlap=0.005  sig=0.1: 0.003  sig=0.25: 0.007  sig=0.5: 0.015
+  loudness_level           n_labels= 5 overlap=0.004  sig=0.1: 0.077  sig=0.25: 0.190  sig=0.5: 0.360
+[    92s] sigma=0.1 eps_cat=0.01: IG+soft-uniform=3.22, RAIG-psycho=3.33, RAIG-tiered=8.33   vs IG +0.11pp (p=1.00e+00)   vs tiered -5.00pp (p=3.30e-06)
+[   189s] sigma=0.1 eps_cat=0.03: IG+soft-uniform=3.22, RAIG-psycho=1.89, RAIG-tiered=8.33   vs IG -1.33pp (p=4.28e-02)   vs tiered -6.44pp (p=1.45e-10)
+[   284s] sigma=0.1 eps_cat=0.1: IG+soft-uniform=3.22, RAIG-psycho=4.33, RAIG-tiered=8.33   vs IG +1.11pp (p=1.74e-01)   vs tiered -4.00pp (p=1.30e-04)
+[   378s] sigma=0.25 eps_cat=0.01: IG+soft-uniform=3.22, RAIG-psycho=2.89, RAIG-tiered=8.33   vs IG -0.33pp (p=7.61e-01)   vs tiered -5.44pp (p=1.78e-07)
+[   470s] sigma=0.25 eps_cat=0.03: IG+soft-uniform=3.22, RAIG-psycho=2.44, RAIG-tiered=8.33   vs IG -0.78pp (p=3.24e-01)   vs tiered -5.89pp (p=1.30e-08)
+[   562s] sigma=0.25 eps_cat=0.1: IG+soft-uniform=3.22, RAIG-psycho=2.78, RAIG-tiered=8.33   vs IG -0.44pp (p=6.36e-01)   vs tiered -5.56pp (p=5.29e-08)
+[   656s] sigma=0.5 eps_cat=0.01: IG+soft-uniform=3.22, RAIG-psycho=1.89, RAIG-tiered=8.33   vs IG -1.33pp (p=8.84e-02)   vs tiered -6.44pp (p=7.86e-11)
+[   751s] sigma=0.5 eps_cat=0.03: IG+soft-uniform=3.22, RAIG-psycho=1.00, RAIG-tiered=8.33   vs IG -2.22pp (p=1.19e-03)   vs tiered -7.33pp (p=1.85e-15)
+[   848s] sigma=0.5 eps_cat=0.1: IG+soft-uniform=3.22, RAIG-psycho=0.78, RAIG-tiered=8.33   vs IG -2.44pp (p=1.13e-04)   vs tiered -7.56pp (p=5.40e-16)
+
+best cell: sigma=0.1 eps_cat=0.1 acc=4.33% (tiered 8.33%, IG 3.22%)
+wrote results/psychophysical_spec.json (848s)

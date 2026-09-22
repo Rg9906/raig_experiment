@@ -1,0 +1,16 @@
+full catalogue N=79803, subsetting to 5000
+to run: [0, 1, 2]
+    seed 0 done (21s) N=5000 Q=193 floor=12.28b ceiling=99.6% -> results/high_accuracy_N5000_seed0.npz
+    seed 1 done (21s) N=5000 Q=193 floor=12.28b ceiling=99.3% -> results/high_accuracy_N5000_seed1.npz
+    seed 2 done (22s) N=5000 Q=193 floor=12.28b ceiling=99.5% -> results/high_accuracy_N5000_seed2.npz
+
+[N=5000, floor=12.28b, ceiling=99.5%, n=900]
+accuracy by checkpoint:
+method                T20    T40    T60    T80   T100   T120   T150   T175   T200
+IG+soft-uniform     11.2%  41.3%  56.7%  58.4%  58.4%  58.2%  57.7%  57.7%  58.0%
+RAIG-tiered         33.8%  61.3%  69.6%  71.4%  72.9%  72.9%  72.6%  72.7%  72.7%
+RAIG-oracle         33.8%  61.3%  69.6%  71.4%  72.9%  72.9%  72.6%  72.7%  72.7%
+RAIG-streaming      17.9%  47.9%  64.9%  71.0%  72.1%  73.6%  73.4%  73.4%  73.9%
+
+DONE in 64s -> results/high_accuracy_N5000.json (3/3 seeds)
+EXIT:0

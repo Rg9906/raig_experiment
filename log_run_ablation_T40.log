@@ -1,0 +1,7 @@
+K=1 (uniform)          acc=16.56%  [14.11,19.00]  pct_of_oracle_gap=    0.0%   (main_T40)
+K=2                    acc=23.78%  [21.11,26.56]  pct_of_oracle_gap=   72.2%   (this run)
+K=3 (tiered)           acc=26.56%  [23.78,29.44]  pct_of_oracle_gap=  100.0%   (main_T40)
+K=M (oracle)           acc=26.56%  [23.78,29.44]  pct_of_oracle_gap=  100.0%   (main_T40)
+Capacity term only     acc= 0.11%  [0.00, 0.33]  pct_of_oracle_gap= -164.4%   (this run)
+
+wrote results/ablation_T40.json

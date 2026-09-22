@@ -1,0 +1,23 @@
+methods=['IG+soft-uniform', 'RAIG-tiered', 'RAIG-oracle']  draws=60  R=150
+[   529s] 10/60 draws: mean delta=+5.73pp  wins=10/10
+[   686s] 20/60 draws: mean delta=+5.40pp  wins=20/20
+[   844s] 30/60 draws: mean delta=+5.53pp  wins=30/30
+[  1002s] 40/60 draws: mean delta=+5.82pp  wins=40/40
+[  1773s] 50/60 draws: mean delta=+6.21pp  wins=50/50
+[  1945s] 60/60 draws: mean delta=+6.21pp  wins=60/60
+
+{
+  "n_draws": 60,
+  "R": 150,
+  "T": 20,
+  "n_per_draw": 150,
+  "mean_delta": 0.06211111111111111,
+  "median_delta": 0.05333333333333334,
+  "q025": 0.013333333333333332,
+  "q975": 0.13016666666666665,
+  "frac_raig_wins": 1.0,
+  "frac_raig_wins_significant": 0.5333333333333333,
+  "frac_ig_wins_significant": 0.0
+}
+
+wrote results/eps_ensemble.json (1945s)

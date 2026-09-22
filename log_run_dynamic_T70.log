@@ -1,0 +1,23 @@
+N=79803 Q=193 methods=13 T=70 batch=4 uniform_eps=0.098083
+methods: Random+soft, IG+hard, IG+soft-uniform, IG+soft-objective, Learned-noiseblind, Learned-noiseaware, RAIG-empirical, RAIG-tiered, RAIG-oracle, RAIG-streaming, RAIG-streaming+stop@0.5, RAIG-streaming+stop@0.7, RAIG-streaming+stop@0.9
+to run: [0, 1, 2]
+    seed 0 done (1104s) -> results/dynamic_T70_seed0.npz
+    seed 1 done (1147s) -> results/dynamic_T70_seed1.npz
+    seed 2 done (2213s) -> results/dynamic_T70_seed2.npz
+
+[T=70, n=900] Random+soft=3.0, IG+hard=2.4, IG+soft-uniform=27.1, IG+soft-objective=0.6, Learned-noiseblind=26.0, Learned-noiseaware=23.3, RAIG-empirical=18.3, RAIG-tiered=38.6, RAIG-oracle=38.6, RAIG-streaming=18.6, RAIG-streaming+stop@0.5=19.8, RAIG-streaming+stop@0.7=18.0, RAIG-streaming+stop@0.9=17.8
+[T=40 checkpoint within this run] Random+soft=0.7, IG+hard=2.4, IG+soft-uniform=17.4, IG+soft-objective=0.4, Learned-noiseblind=17.0, Learned-noiseaware=12.1, RAIG-empirical=9.0, RAIG-tiered=29.1, RAIG-oracle=29.1, RAIG-streaming=7.8, RAIG-streaming+stop@0.5=8.7, RAIG-streaming+stop@0.7=7.2, RAIG-streaming+stop@0.9=9.4
+
+paired comparisons (Holm-corrected):
+  dynamic vs static tiers, both T=70                      Delta=+20.00pp  p_holm=5.02e-27  *
+  dynamic vs classical, both T=70                         Delta=+8.56pp  p_holm=4.38e-06  *
+  static tiers vs classical, both T=70 (raise-the-cap-alone check) Delta=-11.44pp  p_holm=5.05e-09  *
+  cost of early stopping @ 0.5 vs. no-stop dynamic        Delta=-1.22pp  p_holm=1.00e+00   
+  combined proposal @ 0.5 vs. static baseline             Delta=+18.78pp  p_holm=5.18e-24  *
+  cost of early stopping @ 0.7 vs. no-stop dynamic        Delta=+0.56pp  p_holm=1.00e+00   
+  combined proposal @ 0.7 vs. static baseline             Delta=+20.56pp  p_holm=1.18e-28  *
+  cost of early stopping @ 0.9 vs. no-stop dynamic        Delta=+0.78pp  p_holm=1.00e+00   
+  combined proposal @ 0.9 vs. static baseline             Delta=+20.78pp  p_holm=1.18e-28  *
+
+DONE in 4466s -> results/dynamic_T70.json (3/3 seeds)
+EXIT:0

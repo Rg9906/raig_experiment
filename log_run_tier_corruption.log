@@ -1,0 +1,12 @@
+[    26s] phi=0.0  IG= 1.67 RAIG= 6.00  delta=+4.33pp
+[    95s] phi=0.1  IG= 1.67 RAIG= 5.44  delta=+3.78pp
+[   162s] phi=0.2  IG= 1.67 RAIG= 4.56  delta=+2.89pp
+[   231s] phi=0.3  IG= 1.67 RAIG= 4.00  delta=+2.33pp
+[   297s] phi=0.4  IG= 1.67 RAIG= 2.89  delta=+1.22pp
+[   371s] phi=0.5  IG= 1.67 RAIG= 4.22  delta=+2.56pp
+[   439s] phi=0.6  IG= 1.67 RAIG= 2.33  delta=+0.67pp
+[   507s] phi=0.8  IG= 1.67 RAIG= 1.22  delta=-0.44pp
+[   577s] phi=1.0  IG= 1.67 RAIG= 1.11  delta=-0.56pp
+
+break-even corruption fraction phi = 0.72
+wrote results/tier_corruption.json (577s)

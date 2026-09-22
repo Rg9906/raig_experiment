@@ -1,0 +1,10 @@
+[    34s] independent  IG+soft-uniform     2.78%  [1.78, 3.89]
+[    67s] independent  RAIG-tiered         7.78%  [6.00, 9.56]
+[   100s] correlated   IG+soft-uniform     2.00%  [1.11, 3.00]
+[   133s] correlated   RAIG-tiered         7.78%  [6.00, 9.56]
+independent  McNemar RAIG vs IG: delta=+5.00pp p=3.588e-07
+correlated   McNemar RAIG vs IG: delta=+5.78pp p=3.137e-09
+IG+soft-uniform    correlated - independent = -0.78pp  p=1.562e-02
+RAIG-tiered        correlated - independent = +0.00pp  p=1.000e+00
+
+wrote results/correlated_ext.json (133s)
