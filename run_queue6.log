@@ -1,0 +1,33 @@
+queue6: start Mon, Aug 31, 2026  9:13:46 PM
+
+=========== run_catalogue_size.py 1000 2500 5000 10000 T60  (21:13:46) ===========
+queue6: [1000 2500 5000 10000 T60] OK
+[    84s] N=10000 T=60: floor=13.28b ceiling= 99.1%  IG+soft-uniform= 48.3, RAIG-tiered= 63.0, RAIG-oracle= 63.0  delta=+14.7pp p=6.37e-09
+
+wrote results/catalogue_size.json (84s)
+
+=========== run_catalogue_size.py 20000 T20 T40  (21:15:14) ===========
+queue6: [20000 T20 T40] OK
+[    93s] N=20000 T=40: floor=14.27b ceiling= 98.1%  IG+soft-uniform= 28.3, RAIG-tiered= 44.3, RAIG-oracle= 44.3  delta=+16.0pp p=7.26e-12
+
+wrote results/catalogue_size.json (93s)
+
+=========== run_catalogue_size.py 40000 T20 T40  (21:16:50) ===========
+queue6: [40000 T20 T40] OK
+[   225s] N=40000 T=40: floor=15.26b ceiling= 96.5%  IG+soft-uniform= 24.8, RAIG-tiered= 39.2, RAIG-oracle= 39.2  delta=+14.3pp p=1.03e-09
+
+wrote results/catalogue_size.json (225s)
+
+=========== run_catalogue_size.py 20000 T60  (21:20:41) ===========
+queue6: [20000 T60] OK
+[   234s] N=20000 T=60: floor=14.27b ceiling= 98.1%  IG+soft-uniform= 41.8, RAIG-tiered= 53.7, RAIG-oracle= 53.7  delta=+11.8pp p=6.12e-07
+
+wrote results/catalogue_size.json (234s)
+
+=========== run_catalogue_size.py 40000 T60  (21:24:39) ===========
+queue6: [40000 T60] OK
+[  2110s] N=40000 T=60: floor=15.26b ceiling= 96.5%  IG+soft-uniform= 35.5, RAIG-tiered= 42.0, RAIG-oracle= 42.0  delta= +6.5pp p=4.38e-03
+
+wrote results/catalogue_size.json (2110s)
+
+queue6: all done at Mon, Aug 31, 2026  9:59:59 PM

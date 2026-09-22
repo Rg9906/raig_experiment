@@ -1,0 +1,36 @@
+queue3: waiting for queue2 to finish...
+queue3: starting at Mon, Aug 31, 2026  7:28:59 AM
+
+=========== run_ablation_ext.py  (07:28:59) ===========
+queue3: run_ablation_ext.py OK in 63s
+K=1 (uniform)          acc= 3.22%  [2.11, 4.44]  pct_of_oracle_gap=    0.0%   (main_ext)
+K=2                    acc= 7.22%  [5.56, 9.00]  pct_of_oracle_gap=   78.3%   (this run)
+K=3 (tiered)           acc= 8.33%  [6.56,10.22]  pct_of_oracle_gap=  100.0%   (main_ext)
+K=M (oracle)           acc= 8.33%  [6.56,10.22]  pct_of_oracle_gap=  100.0%   (main_ext)
+Capacity term only     acc= 0.00%  [0.00, 0.00]  pct_of_oracle_gap=  -63.0%   (this run)
+
+wrote results/ablation_ext.json
+
+=========== run_correlated_ext.py  (07:30:02) ===========
+queue3: run_correlated_ext.py OK in 135s
+[   100s] correlated   IG+soft-uniform     2.00%  [1.11, 3.00]
+[   133s] correlated   RAIG-tiered         7.78%  [6.00, 9.56]
+independent  McNemar RAIG vs IG: delta=+5.00pp p=3.588e-07
+correlated   McNemar RAIG vs IG: delta=+5.78pp p=3.137e-09
+IG+soft-uniform    correlated - independent = -0.78pp  p=1.562e-02
+RAIG-tiered        correlated - independent = +0.00pp  p=1.000e+00
+
+wrote results/correlated_ext.json (133s)
+
+=========== run_latency_ext.py  (07:32:17) ===========
+queue3: run_latency_ext.py OK in 2227s
+  RAIG-tiered        rep 1/5:   14.93 ms/turn
+  RAIG-tiered        rep 2/5:   51.83 ms/turn
+  RAIG-tiered        rep 3/5:   90.23 ms/turn
+  RAIG-tiered        rep 4/5:  116.11 ms/turn
+  RAIG-tiered        rep 5/5:  145.80 ms/turn
+RAIG-tiered        median=90.23 ms/turn  acc=7.78%  reached=0.7%
+
+wrote results/latency_ext.json
+
+queue3: all done at Mon, Aug 31, 2026  8:09:25 AM
