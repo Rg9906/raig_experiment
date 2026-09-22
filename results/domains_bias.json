@@ -1,0 +1,895 @@
+{
+  "music": {
+    "domain": "music",
+    "n_attributes": 20,
+    "kruskal_H": 7.226938775510206,
+    "kruskal_p": 0.02695815613878773,
+    "kendall_tau_b": -0.31058725593885395,
+    "kendall_p": 0.08775864213450507,
+    "spearman_rho": -0.4376973239219324,
+    "spearman_p": 0.05359847388578715,
+    "mannwhitney_obj_lower_U": 7.0,
+    "mannwhitney_p": 0.0027089783281733747,
+    "mean_max_ig_by_tier": {
+      "objective": 0.44525047151720515,
+      "semi": 0.8398649637331752,
+      "subjective": 0.8657588433147585
+    },
+    "mean_skew_by_tier": {
+      "objective": 0.696327199973166,
+      "semi": 0.5867609764848437,
+      "subjective": 0.4511374905705452
+    },
+    "mean_cardinality_by_tier": {
+      "objective": 25.2,
+      "semi": 4.714285714285714,
+      "subjective": 4.25
+    },
+    "discretisation": {
+      "n_binned": 11,
+      "n_categorical": 9,
+      "mean_max_ig_binned": 0.8605122978479947,
+      "mean_max_ig_categorical": 0.6184158415453754,
+      "mean_eps_binned": 0.2045454545454545,
+      "mean_eps_categorical": 0.15,
+      "mannwhitney_U": 72.0,
+      "mannwhitney_p": 0.047319197643547764,
+      "spearman_within_binned": [
+        0.2988071523335984,
+        0.372082288209964
+      ],
+      "spearman_within_categorical": [
+        -0.7794228634059946,
+        0.013273916948507143
+      ]
+    },
+    "identifiability": {
+      "N": 79803.0,
+      "dropped": 0.0,
+      "M": 21.0,
+      "distinct_vectors": 77069.0,
+      "collision_rate": 0.06325576732704284,
+      "uniquely_identifiable_frac": 0.9367442326729571,
+      "largest_equivalence_class": 11.0,
+      "entropy_floor_bits": 16.233863051106187,
+      "budget_bound_T": 20.151066258355005,
+      "Q_compiled": 193.0
+    }
+  },
+  "mushroom": {
+    "domain": "mushroom",
+    "n_attributes": 21,
+    "kruskal_H": 1.7520511234796885,
+    "kruskal_p": 0.4164347210883267,
+    "kendall_tau_b": 0.005770618103811177,
+    "kendall_p": 0.9740310699710185,
+    "spearman_rho": -0.011121413488021757,
+    "spearman_p": 0.961839601751378,
+    "mannwhitney_obj_lower_U": 46.0,
+    "mannwhitney_p": 0.29701617029952077,
+    "mean_max_ig_by_tier": {
+      "objective": 0.780172732930333,
+      "semi": 0.9755933516761722,
+      "subjective": 0.8028435153009148
+    },
+    "mean_skew_by_tier": {
+      "objective": 0.6568466623624166,
+      "semi": 0.5194485485553741,
+      "subjective": 0.46950834138052805
+    },
+    "mean_cardinality_by_tier": {
+      "objective": 3.5555555555555554,
+      "semi": 4.4,
+      "subjective": 8.857142857142858
+    },
+    "identifiability": {
+      "N": 8124.0,
+      "dropped": 0.0,
+      "M": 22.0,
+      "distinct_vectors": 8124.0,
+      "collision_rate": 0.0,
+      "uniquely_identifiable_frac": 1.0,
+      "largest_equivalence_class": 1.0,
+      "entropy_floor_bits": 12.987974524296153,
+      "budget_bound_T": 16.12195041790036,
+      "Q_compiled": 116.0
+    }
+  },
+  "dermatology": {
+    "domain": "dermatology",
+    "n_attributes": 34,
+    "kruskal_H": 6.214739376337527,
+    "kruskal_p": 0.04471842418290771,
+    "kendall_tau_b": 0.13522900815406305,
+    "kendall_p": 0.3350592202836423,
+    "spearman_rho": 0.18010904352663262,
+    "spearman_p": 0.30806482056219914,
+    "mannwhitney_obj_lower_U": 61.0,
+    "mannwhitney_p": 0.2963202186144383,
+    "mean_max_ig_by_tier": {
+      "objective": 0.7970570619336854,
+      "semi": 0.969212635581154,
+      "subjective": 0.7619335817856924
+    },
+    "mean_skew_by_tier": {
+      "objective": 0.6519125580787659,
+      "semi": 0.4754098355770111,
+      "subjective": 0.7187978100776672
+    },
+    "mean_cardinality_by_tier": {
+      "objective": 4.2,
+      "semi": 4.0,
+      "subjective": 3.88
+    },
+    "identifiability": {
+      "N": 366.0,
+      "dropped": 0.0,
+      "M": 34.0,
+      "distinct_vectors": 366.0,
+      "collision_rate": 0.0,
+      "uniquely_identifiable_frac": 1.0,
+      "largest_equivalence_class": 1.0,
+      "entropy_floor_bits": 8.515699838284043,
+      "budget_bound_T": 10.570523549281253,
+      "Q_compiled": 134.0
+    }
+  },
+  "_attribute_tables": {
+    "music": [
+      {
+        "attribute": "genre",
+        "tier": "objective",
+        "eps": 0.03,
+        "reliability": 0.97,
+        "max_ig": 0.09690214657410824,
+        "cardinality": 113,
+        "max_value_share": 0.012493264861404896,
+        "binned": false
+      },
+      {
+        "attribute": "mood",
+        "tier": "subjective",
+        "eps": 0.3,
+        "reliability": 0.7,
+        "max_ig": 0.9997555591030975,
+        "cardinality": 5,
+        "max_value_share": 0.4907960891723633,
+        "binned": false
+      },
+      {
+        "attribute": "tempo",
+        "tier": "subjective",
+        "eps": 0.3,
+        "reliability": 0.7,
+        "max_ig": 0.9018017266485868,
+        "cardinality": 5,
+        "max_value_share": 0.3176446855068207,
+        "binned": true
+      },
+      {
+        "attribute": "language",
+        "tier": "objective",
+        "eps": 0.03,
+        "reliability": 0.97,
+        "max_ig": 0.4463358063557924,
+        "cardinality": 2,
+        "max_value_share": 0.9070210456848145,
+        "binned": false
+      },
+      {
+        "attribute": "popularity_level",
+        "tier": "semi",
+        "eps": 0.15,
+        "reliability": 0.85,
+        "max_ig": 0.9581380693950223,
+        "cardinality": 5,
+        "max_value_share": 0.38013607263565063,
+        "binned": true
+      },
+      {
+        "attribute": "duration_length",
+        "tier": "semi",
+        "eps": 0.15,
+        "reliability": 0.85,
+        "max_ig": 0.9389814595502826,
+        "cardinality": 5,
+        "max_value_share": 0.35561320185661316,
+        "binned": true
+      },
+      {
+        "attribute": "danceability_level",
+        "tier": "subjective",
+        "eps": 0.3,
+        "reliability": 0.7,
+        "max_ig": 0.9565223277043924,
+        "cardinality": 5,
+        "max_value_share": 0.37786799669265747,
+        "binned": true
+      },
+      {
+        "attribute": "energy_level",
+        "tier": "subjective",
+        "eps": 0.3,
+        "reliability": 0.7,
+        "max_ig": 0.9241815199995342,
+        "cardinality": 5,
+        "max_value_share": 0.3393356204032898,
+        "binned": true
+      },
+      {
+        "attribute": "valence_level",
+        "tier": "subjective",
+        "eps": 0.3,
+        "reliability": 0.7,
+        "max_ig": 0.804074955843201,
+        "cardinality": 5,
+        "max_value_share": 0.24550455808639526,
+        "binned": true
+      },
+      {
+        "attribute": "acoustic_level",
+        "tier": "semi",
+        "eps": 0.15,
+        "reliability": 0.85,
+        "max_ig": 0.9993781098797161,
+        "cardinality": 5,
+        "max_value_share": 0.5146799087524414,
+        "binned": true
+      },
+      {
+        "attribute": "instrumental_level",
+        "tier": "semi",
+        "eps": 0.15,
+        "reliability": 0.85,
+        "max_ig": 0.8189178431959817,
+        "cardinality": 5,
+        "max_value_share": 0.7451223731040955,
+        "binned": true
+      },
+      {
+        "attribute": "liveness_level",
+        "tier": "semi",
+        "eps": 0.15,
+        "reliability": 0.85,
+        "max_ig": 0.9325702509294107,
+        "cardinality": 5,
+        "max_value_share": 0.6516672372817993,
+        "binned": true
+      },
+      {
+        "attribute": "speechiness_level",
+        "tier": "semi",
+        "eps": 0.15,
+        "reliability": 0.85,
+        "max_ig": 0.2310844359050141,
+        "cardinality": 3,
+        "max_value_share": 0.9624199867248535,
+        "binned": true
+      },
+      {
+        "attribute": "loudness_level",
+        "tier": "semi",
+        "eps": 0.15,
+        "reliability": 0.85,
+        "max_ig": 0.9999845772767979,
+        "cardinality": 5,
+        "max_value_share": 0.49768805503845215,
+        "binned": true
+      },
+      {
+        "attribute": "key_category",
+        "tier": "subjective",
+        "eps": 0.3,
+        "reliability": 0.7,
+        "max_ig": 0.8961317406163984,
+        "cardinality": 4,
+        "max_value_share": 0.31258222460746765,
+        "binned": false
+      },
+      {
+        "attribute": "mode_category",
+        "tier": "subjective",
+        "eps": 0.3,
+        "reliability": 0.7,
+        "max_ig": 0.947452831465462,
+        "cardinality": 2,
+        "max_value_share": 0.6341240406036377,
+        "binned": false
+      },
+      {
+        "attribute": "time_signature_category",
+        "tier": "subjective",
+        "eps": 0.3,
+        "reliability": 0.7,
+        "max_ig": 0.49615008513739556,
+        "cardinality": 3,
+        "max_value_share": 0.8912447094917297,
+        "binned": false
+      },
+      {
+        "attribute": "content_rating",
+        "tier": "objective",
+        "eps": 0.03,
+        "reliability": 0.97,
+        "max_ig": 0.4244668146448992,
+        "cardinality": 2,
+        "max_value_share": 0.9135621190071106,
+        "binned": false
+      },
+      {
+        "attribute": "artist_type",
+        "tier": "objective",
+        "eps": 0.03,
+        "reliability": 0.97,
+        "max_ig": 0.834294115996043,
+        "cardinality": 4,
+        "max_value_share": 0.7349347472190857,
+        "binned": false
+      },
+      {
+        "attribute": "track_version",
+        "tier": "objective",
+        "eps": 0.03,
+        "reliability": 0.97,
+        "max_ig": 0.4242534740151827,
+        "cardinality": 5,
+        "max_value_share": 0.9136248230934143,
+        "binned": false
+      }
+    ],
+    "mushroom": [
+      {
+        "attribute": "cap-shape",
+        "tier": "objective",
+        "eps": 0.03,
+        "reliability": 0.97,
+        "max_ig": 0.9927815754750173,
+        "cardinality": 6,
+        "max_value_share": 0.4500246047973633,
+        "binned": false
+      },
+      {
+        "attribute": "bruises",
+        "tier": "objective",
+        "eps": 0.03,
+        "reliability": 0.97,
+        "max_ig": 0.979327346947611,
+        "cardinality": 2,
+        "max_value_share": 0.5844411849975586,
+        "binned": false
+      },
+      {
+        "attribute": "gill-attachment",
+        "tier": "objective",
+        "eps": 0.03,
+        "reliability": 0.97,
+        "max_ig": 0.17312893064885745,
+        "cardinality": 2,
+        "max_value_share": 0.9741506576538086,
+        "binned": false
+      },
+      {
+        "attribute": "gill-spacing",
+        "tier": "objective",
+        "eps": 0.03,
+        "reliability": 0.97,
+        "max_ig": 0.6378784238351664,
+        "cardinality": 2,
+        "max_value_share": 0.8385031819343567,
+        "binned": false
+      },
+      {
+        "attribute": "gill-size",
+        "tier": "objective",
+        "eps": 0.03,
+        "reliability": 0.97,
+        "max_ig": 0.8922562912394492,
+        "cardinality": 2,
+        "max_value_share": 0.6907927393913269,
+        "binned": false
+      },
+      {
+        "attribute": "stalk-shape",
+        "tier": "objective",
+        "eps": 0.03,
+        "reliability": 0.97,
+        "max_ig": 0.9869273033571757,
+        "cardinality": 2,
+        "max_value_share": 0.5672082901000977,
+        "binned": false
+      },
+      {
+        "attribute": "ring-number",
+        "tier": "objective",
+        "eps": 0.03,
+        "reliability": 0.97,
+        "max_ig": 0.3961127025524825,
+        "cardinality": 3,
+        "max_value_share": 0.9217134714126587,
+        "binned": false
+      },
+      {
+        "attribute": "habitat",
+        "tier": "objective",
+        "eps": 0.03,
+        "reliability": 0.97,
+        "max_ig": 0.9631631820264728,
+        "cardinality": 7,
+        "max_value_share": 0.3874938488006592,
+        "binned": false
+      },
+      {
+        "attribute": "population",
+        "tier": "objective",
+        "eps": 0.03,
+        "reliability": 0.97,
+        "max_ig": 0.9999788402907648,
+        "cardinality": 6,
+        "max_value_share": 0.4972919821739197,
+        "binned": false
+      },
+      {
+        "attribute": "cap-surface",
+        "tier": "semi",
+        "eps": 0.15,
+        "reliability": 0.85,
+        "max_ig": 0.9705459386409107,
+        "cardinality": 4,
+        "max_value_share": 0.3993106782436371,
+        "binned": false
+      },
+      {
+        "attribute": "stalk-root",
+        "tier": "semi",
+        "eps": 0.15,
+        "reliability": 0.85,
+        "max_ig": 0.9964210479944284,
+        "cardinality": 5,
+        "max_value_share": 0.46479567885398865,
+        "binned": false
+      },
+      {
+        "attribute": "stalk-surface-above-ring",
+        "tier": "semi",
+        "eps": 0.15,
+        "reliability": 0.85,
+        "max_ig": 0.9450441328321013,
+        "cardinality": 4,
+        "max_value_share": 0.6371245980262756,
+        "binned": false
+      },
+      {
+        "attribute": "stalk-surface-below-ring",
+        "tier": "semi",
+        "eps": 0.15,
+        "reliability": 0.85,
+        "max_ig": 0.9663419700728869,
+        "cardinality": 4,
+        "max_value_share": 0.6075824499130249,
+        "binned": false
+      },
+      {
+        "attribute": "ring-type",
+        "tier": "semi",
+        "eps": 0.15,
+        "reliability": 0.85,
+        "max_ig": 0.9996136688405342,
+        "cardinality": 5,
+        "max_value_share": 0.48842933773994446,
+        "binned": false
+      },
+      {
+        "attribute": "odor",
+        "tier": "subjective",
+        "eps": 0.3,
+        "reliability": 0.7,
+        "max_ig": 0.9874972636243937,
+        "cardinality": 9,
+        "max_value_share": 0.4342688322067261,
+        "binned": false
+      },
+      {
+        "attribute": "cap-color",
+        "tier": "subjective",
+        "eps": 0.3,
+        "reliability": 0.7,
+        "max_ig": 0.8570026017588381,
+        "cardinality": 10,
+        "max_value_share": 0.28114229440689087,
+        "binned": false
+      },
+      {
+        "attribute": "gill-color",
+        "tier": "subjective",
+        "eps": 0.3,
+        "reliability": 0.7,
+        "max_ig": 0.7466179620382092,
+        "cardinality": 12,
+        "max_value_share": 0.21270310878753662,
+        "binned": false
+      },
+      {
+        "attribute": "stalk-color-above-ring",
+        "tier": "subjective",
+        "eps": 0.3,
+        "reliability": 0.7,
+        "max_ig": 0.9929233495867313,
+        "cardinality": 9,
+        "max_value_share": 0.5494830012321472,
+        "binned": false
+      },
+      {
+        "attribute": "stalk-color-below-ring",
+        "tier": "subjective",
+        "eps": 0.3,
+        "reliability": 0.7,
+        "max_ig": 0.9954623348983387,
+        "cardinality": 9,
+        "max_value_share": 0.5396356582641602,
+        "binned": false
+      },
+      {
+        "attribute": "veil-color",
+        "tier": "subjective",
+        "eps": 0.3,
+        "reliability": 0.7,
+        "max_ig": 0.16663962325671902,
+        "cardinality": 4,
+        "max_value_share": 0.97538161277771,
+        "binned": false
+      },
+      {
+        "attribute": "spore-print-color",
+        "tier": "subjective",
+        "eps": 0.3,
+        "reliability": 0.7,
+        "max_ig": 0.8737614719431738,
+        "cardinality": 9,
+        "max_value_share": 0.2939438819885254,
+        "binned": false
+      }
+    ],
+    "dermatology": [
+      {
+        "attribute": "family_history",
+        "tier": "objective",
+        "eps": 0.03,
+        "reliability": 0.97,
+        "max_ig": 0.7422132791462236,
+        "cardinality": 4,
+        "max_value_share": 0.7896174788475037,
+        "binned": false
+      },
+      {
+        "attribute": "age_band",
+        "tier": "objective",
+        "eps": 0.03,
+        "reliability": 0.97,
+        "max_ig": 0.8047175272195295,
+        "cardinality": 5,
+        "max_value_share": 0.24590164422988892,
+        "binned": false
+      },
+      {
+        "attribute": "knee_elbow",
+        "tier": "objective",
+        "eps": 0.03,
+        "reliability": 0.97,
+        "max_ig": 0.8979709352684007,
+        "cardinality": 4,
+        "max_value_share": 0.6857923269271851,
+        "binned": false
+      },
+      {
+        "attribute": "scalp_involvement",
+        "tier": "objective",
+        "eps": 0.03,
+        "reliability": 0.97,
+        "max_ig": 0.8536577081345504,
+        "cardinality": 4,
+        "max_value_share": 0.7213114500045776,
+        "binned": false
+      },
+      {
+        "attribute": "oral_mucosal",
+        "tier": "objective",
+        "eps": 0.03,
+        "reliability": 0.97,
+        "max_ig": 0.6867258598997229,
+        "cardinality": 4,
+        "max_value_share": 0.8169398903846741,
+        "binned": false
+      },
+      {
+        "attribute": "erythema",
+        "tier": "semi",
+        "eps": 0.15,
+        "reliability": 0.85,
+        "max_ig": 0.977829418390083,
+        "cardinality": 4,
+        "max_value_share": 0.5874316692352295,
+        "binned": false
+      },
+      {
+        "attribute": "scaling",
+        "tier": "semi",
+        "eps": 0.15,
+        "reliability": 0.85,
+        "max_ig": 0.9968960332302816,
+        "cardinality": 4,
+        "max_value_share": 0.5327869057655334,
+        "binned": false
+      },
+      {
+        "attribute": "definite_borders",
+        "tier": "semi",
+        "eps": 0.15,
+        "reliability": 0.85,
+        "max_ig": 0.9951480931062157,
+        "cardinality": 4,
+        "max_value_share": 0.4590163826942444,
+        "binned": false
+      },
+      {
+        "attribute": "itching",
+        "tier": "semi",
+        "eps": 0.15,
+        "reliability": 0.85,
+        "max_ig": 0.9069769975980359,
+        "cardinality": 4,
+        "max_value_share": 0.3224043846130371,
+        "binned": false
+      },
+      {
+        "attribute": "koebner",
+        "tier": "subjective",
+        "eps": 0.3,
+        "reliability": 0.7,
+        "max_ig": 0.9634823660347296,
+        "cardinality": 4,
+        "max_value_share": 0.6120218634605408,
+        "binned": false
+      },
+      {
+        "attribute": "polygonal_papules",
+        "tier": "subjective",
+        "eps": 0.3,
+        "reliability": 0.7,
+        "max_ig": 0.6983748222942899,
+        "cardinality": 4,
+        "max_value_share": 0.811475396156311,
+        "binned": false
+      },
+      {
+        "attribute": "follicular_papules",
+        "tier": "subjective",
+        "eps": 0.3,
+        "reliability": 0.7,
+        "max_ig": 0.43701681134043585,
+        "cardinality": 4,
+        "max_value_share": 0.9098360538482666,
+        "binned": false
+      },
+      {
+        "attribute": "melanin_incontinence",
+        "tier": "subjective",
+        "eps": 0.3,
+        "reliability": 0.7,
+        "max_ig": 0.5454789885517364,
+        "cardinality": 2,
+        "max_value_share": 0.874316930770874,
+        "binned": false
+      },
+      {
+        "attribute": "eosinophils",
+        "tier": "subjective",
+        "eps": 0.3,
+        "reliability": 0.7,
+        "max_ig": 0.7040932410064189,
+        "cardinality": 4,
+        "max_value_share": 0.8087431788444519,
+        "binned": false
+      },
+      {
+        "attribute": "PNL_infiltrate",
+        "tier": "subjective",
+        "eps": 0.3,
+        "reliability": 0.7,
+        "max_ig": 0.5140912271761642,
+        "cardinality": 3,
+        "max_value_share": 0.8852459192276001,
+        "binned": false
+      },
+      {
+        "attribute": "fibrosis_papillary_dermis",
+        "tier": "subjective",
+        "eps": 0.3,
+        "reliability": 0.7,
+        "max_ig": 0.9409460338358652,
+        "cardinality": 4,
+        "max_value_share": 0.6420764923095703,
+        "binned": false
+      },
+      {
+        "attribute": "exocytosis",
+        "tier": "subjective",
+        "eps": 0.3,
+        "reliability": 0.7,
+        "max_ig": 0.603652257172291,
+        "cardinality": 4,
+        "max_value_share": 0.8524590134620667,
+        "binned": false
+      },
+      {
+        "attribute": "acanthosis",
+        "tier": "subjective",
+        "eps": 0.3,
+        "reliability": 0.7,
+        "max_ig": 0.936245010743169,
+        "cardinality": 4,
+        "max_value_share": 0.35245901346206665,
+        "binned": false
+      },
+      {
+        "attribute": "hyperkeratosis",
+        "tier": "subjective",
+        "eps": 0.3,
+        "reliability": 0.7,
+        "max_ig": 0.9842400011125282,
+        "cardinality": 4,
+        "max_value_share": 0.5737704634666443,
+        "binned": false
+      },
+      {
+        "attribute": "parakeratosis",
+        "tier": "subjective",
+        "eps": 0.3,
+        "reliability": 0.7,
+        "max_ig": 0.9578875032375633,
+        "cardinality": 4,
+        "max_value_share": 0.6202185750007629,
+        "binned": false
+      },
+      {
+        "attribute": "clubbing_rete_ridges",
+        "tier": "subjective",
+        "eps": 0.3,
+        "reliability": 0.7,
+        "max_ig": 0.9432261443553428,
+        "cardinality": 4,
+        "max_value_share": 0.3606557250022888,
+        "binned": false
+      },
+      {
+        "attribute": "elongation_rete_ridges",
+        "tier": "subjective",
+        "eps": 0.3,
+        "reliability": 0.7,
+        "max_ig": 0.8948692151515838,
+        "cardinality": 4,
+        "max_value_share": 0.688524603843689,
+        "binned": false
+      },
+      {
+        "attribute": "thinning_suprapapillary",
+        "tier": "subjective",
+        "eps": 0.3,
+        "reliability": 0.7,
+        "max_ig": 0.9951480931062157,
+        "cardinality": 4,
+        "max_value_share": 0.5409836173057556,
+        "binned": false
+      },
+      {
+        "attribute": "spongiform_pustule",
+        "tier": "subjective",
+        "eps": 0.3,
+        "reliability": 0.7,
+        "max_ig": 0.8819578712988193,
+        "cardinality": 4,
+        "max_value_share": 0.6994535326957703,
+        "binned": false
+      },
+      {
+        "attribute": "munro_microabcess",
+        "tier": "subjective",
+        "eps": 0.3,
+        "reliability": 0.7,
+        "max_ig": 0.7040932410064189,
+        "cardinality": 4,
+        "max_value_share": 0.8087431788444519,
+        "binned": false
+      },
+      {
+        "attribute": "focal_hypergranulosis",
+        "tier": "subjective",
+        "eps": 0.3,
+        "reliability": 0.7,
+        "max_ig": 0.7575647250509612,
+        "cardinality": 4,
+        "max_value_share": 0.7814207673072815,
+        "binned": false
+      },
+      {
+        "attribute": "disappearance_granular_layer",
+        "tier": "subjective",
+        "eps": 0.3,
+        "reliability": 0.7,
+        "max_ig": 0.7097421532918091,
+        "cardinality": 4,
+        "max_value_share": 0.806010901927948,
+        "binned": false
+      },
+      {
+        "attribute": "vacuolisation_basal",
+        "tier": "subjective",
+        "eps": 0.3,
+        "reliability": 0.7,
+        "max_ig": 0.8177094784965644,
+        "cardinality": 4,
+        "max_value_share": 0.7459016442298889,
+        "binned": false
+      },
+      {
+        "attribute": "spongiosis",
+        "tier": "subjective",
+        "eps": 0.3,
+        "reliability": 0.7,
+        "max_ig": 0.7153220607371551,
+        "cardinality": 4,
+        "max_value_share": 0.8032786846160889,
+        "binned": false
+      },
+      {
+        "attribute": "saw_tooth_retes",
+        "tier": "subjective",
+        "eps": 0.3,
+        "reliability": 0.7,
+        "max_ig": 0.9944787585418682,
+        "cardinality": 4,
+        "max_value_share": 0.5437158346176147,
+        "binned": false
+      },
+      {
+        "attribute": "follicular_horn_plug",
+        "tier": "subjective",
+        "eps": 0.3,
+        "reliability": 0.7,
+        "max_ig": 0.7153220607371551,
+        "cardinality": 4,
+        "max_value_share": 0.8032786846160889,
+        "binned": false
+      },
+      {
+        "attribute": "perifollicular_parakeratosis",
+        "tier": "subjective",
+        "eps": 0.3,
+        "reliability": 0.7,
+        "max_ig": 0.3278787152445337,
+        "cardinality": 4,
+        "max_value_share": 0.9398906826972961,
+        "binned": false
+      },
+      {
+        "attribute": "inflammatory_infiltrate",
+        "tier": "subjective",
+        "eps": 0.3,
+        "reliability": 0.7,
+        "max_ig": 0.316943528993579,
+        "cardinality": 4,
+        "max_value_share": 0.9426229596138,
+        "binned": false
+      },
+      {
+        "attribute": "band_like_infiltrate",
+        "tier": "subjective",
+        "eps": 0.3,
+        "reliability": 0.7,
+        "max_ig": 0.9885752361251166,
+        "cardinality": 4,
+        "max_value_share": 0.562841534614563,
+        "binned": false
+      }
+    ]
+  }
+}

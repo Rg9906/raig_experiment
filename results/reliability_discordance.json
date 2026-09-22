@@ -1,0 +1,227 @@
+{
+  "n_groups": 3178,
+  "n_pairs": 5073,
+  "rows": [
+    {
+      "attribute": "popularity_level",
+      "tier": "semi",
+      "discordant": 2212,
+      "pairs": 5073,
+      "rate": 0.4360339049871871,
+      "lo": 0.4224412316147571,
+      "hi": 0.4497233834876718
+    },
+    {
+      "attribute": "genre",
+      "tier": "objective",
+      "discordant": 626,
+      "pairs": 5073,
+      "rate": 0.12339838359944806,
+      "lo": 0.11463164806823262,
+      "hi": 0.13273506118659226
+    },
+    {
+      "attribute": "loudness_level",
+      "tier": "semi",
+      "discordant": 560,
+      "pairs": 5073,
+      "rate": 0.11038833037650306,
+      "lo": 0.10205783183817227,
+      "hi": 0.11930846014935004
+    },
+    {
+      "attribute": "energy_level",
+      "tier": "subjective",
+      "discordant": 471,
+      "pairs": 5073,
+      "rate": 0.09284447072738025,
+      "lo": 0.08516339766465077,
+      "hi": 0.1011417255836302
+    },
+    {
+      "attribute": "liveness_level",
+      "tier": "semi",
+      "discordant": 462,
+      "pairs": 5073,
+      "rate": 0.09107037256061502,
+      "lo": 0.08345945103901647,
+      "hi": 0.09930016076372325
+    },
+    {
+      "attribute": "valence_level",
+      "tier": "subjective",
+      "discordant": 450,
+      "pairs": 5073,
+      "rate": 0.08870490833826139,
+      "lo": 0.0811889359969267,
+      "hi": 0.096843327211758
+    },
+    {
+      "attribute": "mood",
+      "tier": "subjective",
+      "discordant": 398,
+      "pairs": 5073,
+      "rate": 0.07845456337472896,
+      "lo": 0.07137015981953732,
+      "hi": 0.08617692614824235
+    },
+    {
+      "attribute": "acoustic_level",
+      "tier": "semi",
+      "discordant": 396,
+      "pairs": 5073,
+      "rate": 0.07806031933767002,
+      "lo": 0.07099321496954089,
+      "hi": 0.08576597956589627
+    },
+    {
+      "attribute": "danceability_level",
+      "tier": "subjective",
+      "discordant": 361,
+      "pairs": 5073,
+      "rate": 0.07116104868913857,
+      "lo": 0.06440596983054268,
+      "hi": 0.07856512463890065
+    },
+    {
+      "attribute": "tempo",
+      "tier": "subjective",
+      "discordant": 327,
+      "pairs": 5073,
+      "rate": 0.06445890005913661,
+      "lo": 0.05802532961399702,
+      "hi": 0.07155161050562382
+    },
+    {
+      "attribute": "key_category",
+      "tier": "subjective",
+      "discordant": 306,
+      "pairs": 5073,
+      "rate": 0.06031933767001774,
+      "lo": 0.05409455383152646,
+      "hi": 0.06720952624849809
+    },
+    {
+      "attribute": "mode_category",
+      "tier": "subjective",
+      "discordant": 237,
+      "pairs": 5073,
+      "rate": 0.04671791839148433,
+      "lo": 0.041245661842899566,
+      "hi": 0.05287616382130867
+    },
+    {
+      "attribute": "duration_length",
+      "tier": "semi",
+      "discordant": 190,
+      "pairs": 5073,
+      "rate": 0.03745318352059925,
+      "lo": 0.032568539855152775,
+      "hi": 0.043037837149006664
+    },
+    {
+      "attribute": "instrumental_level",
+      "tier": "semi",
+      "discordant": 141,
+      "pairs": 5073,
+      "rate": 0.027794204612655235,
+      "lo": 0.02361557990435837,
+      "hi": 0.03268745700740977
+    },
+    {
+      "attribute": "time_signature_category",
+      "tier": "subjective",
+      "discordant": 119,
+      "pairs": 5073,
+      "rate": 0.0234575202050069,
+      "lo": 0.01963915055307125,
+      "hi": 0.02799708060292936
+    },
+    {
+      "attribute": "content_rating",
+      "tier": "objective",
+      "discordant": 80,
+      "pairs": 5073,
+      "rate": 0.015769761482357578,
+      "lo": 0.012689593814246043,
+      "hi": 0.01958275441107577
+    },
+    {
+      "attribute": "speechiness_level",
+      "tier": "semi",
+      "discordant": 21,
+      "pairs": 5073,
+      "rate": 0.004139562389118865,
+      "lo": 0.0027091765405834307,
+      "hi": 0.0063203744306345785
+    },
+    {
+      "attribute": "language",
+      "tier": "objective",
+      "discordant": 0,
+      "pairs": 5073,
+      "rate": 0.0,
+      "lo": 0.0,
+      "hi": 0.0007566909316217388
+    },
+    {
+      "attribute": "artist_type",
+      "tier": "objective",
+      "discordant": 0,
+      "pairs": 5073,
+      "rate": 0.0,
+      "lo": 0.0,
+      "hi": 0.0007566909316217388
+    },
+    {
+      "attribute": "release_type",
+      "tier": "objective",
+      "discordant": 0,
+      "pairs": 5073,
+      "rate": 0.0,
+      "lo": 0.0,
+      "hi": 0.0007566909316217388
+    },
+    {
+      "attribute": "track_version",
+      "tier": "objective",
+      "discordant": 0,
+      "pairs": 5073,
+      "rate": 0.0,
+      "lo": 0.0,
+      "hi": 0.0007566909316217388
+    }
+  ],
+  "by_tier": {
+    "mean": {
+      "objective": 0.023194690846967608,
+      "semi": 0.11213426825490692,
+      "subjective": 0.06576483343189435
+    },
+    "median": {
+      "objective": 0.0,
+      "semi": 0.07806031933767002,
+      "subjective": 0.06780997437413759
+    },
+    "count": {
+      "objective": 6,
+      "semi": 7,
+      "subjective": 8
+    }
+  },
+  "spearman_annotated_vs_measured": {
+    "rho": 0.4151826621679646,
+    "p": 0.061261056241095596
+  },
+  "spearman_excluding_popularity_genre": {
+    "rho": 0.6412510868105408,
+    "p": 0.0030871312186010087,
+    "excluded": {
+      "popularity_level": 0.4360339049871871,
+      "genre": 0.12339838359944806
+    }
+  },
+  "objective_mean": 0.023194690846967608,
+  "non_objective_mean": 0.08740390301596689,
+  "ratio": 3.768271954674221
+}

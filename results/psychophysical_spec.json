@@ -1,0 +1,491 @@
+{
+  "sigmas": [
+    0.1,
+    0.25,
+    0.5
+  ],
+  "eps_cat": [
+    0.01,
+    0.03,
+    0.1
+  ],
+  "R": 300,
+  "T": 20,
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "n_total": 900,
+  "overlap_diagnostic": {
+    "popularity_level": 0.0,
+    "duration_length": 0.0037968497424908836,
+    "danceability_level": 0.002844504592559177,
+    "energy_level": 0.004373269175344285,
+    "valence_level": 0.0009398142926957633,
+    "acoustic_level": 0.002029998872222849,
+    "instrumental_level": 0.00374672631354711,
+    "liveness_level": 0.002205430873526058,
+    "speechiness_level": 0.004511108604939664,
+    "loudness_level": 0.004298084031928624
+  },
+  "flip_by_attr": {
+    "popularity_level": {
+      "0.1": 0.080325,
+      "0.25": 0.18617,
+      "0.5": 0.345
+    },
+    "duration_length": {
+      "0.1": 0.096765,
+      "0.25": 0.23921,
+      "0.5": 0.44092
+    },
+    "danceability_level": {
+      "0.1": 0.070985,
+      "0.25": 0.174805,
+      "0.5": 0.33996
+    },
+    "energy_level": {
+      "0.1": 0.078275,
+      "0.25": 0.196405,
+      "0.5": 0.37516
+    },
+    "valence_level": {
+      "0.1": 0.08959,
+      "0.25": 0.225695,
+      "0.5": 0.41572
+    },
+    "acoustic_level": {
+      "0.1": 0.06645,
+      "0.25": 0.172505,
+      "0.5": 0.332785
+    },
+    "instrumental_level": {
+      "0.1": 0.04526,
+      "0.25": 0.18776,
+      "0.5": 0.343995
+    },
+    "liveness_level": {
+      "0.1": 0.038715,
+      "0.25": 0.11457,
+      "0.5": 0.257105
+    },
+    "speechiness_level": {
+      "0.1": 0.003135,
+      "0.25": 0.00697,
+      "0.5": 0.01468
+    },
+    "loudness_level": {
+      "0.1": 0.07738,
+      "0.25": 0.189905,
+      "0.5": 0.360385
+    }
+  },
+  "rows": [
+    {
+      "sigma": 0.1,
+      "eps_cat": 0.01,
+      "acc": {
+        "IG+soft-uniform": 0.03222222222222222,
+        "RAIG-psycho": 0.03333333333333333,
+        "RAIG-tiered": 0.08333333333333333
+      },
+      "mean_eps_hat": 0.024239012971520424,
+      "vs_IG": {
+        "delta": 0.0011111111111111113,
+        "n10": 21,
+        "n01": 22,
+        "p": 1.0
+      },
+      "vs_tiered": {
+        "delta": -0.049999999999999996,
+        "n10": 69,
+        "n01": 24,
+        "p": 3.3028941070359494e-06
+      },
+      "eps_hat_by_attr": {
+        "genre": 0.01,
+        "mood": 0.01,
+        "tempo": 0.01,
+        "language": 0.01,
+        "popularity_level": 0.080325,
+        "duration_length": 0.096765,
+        "danceability_level": 0.070985,
+        "energy_level": 0.078275,
+        "valence_level": 0.08959,
+        "acoustic_level": 0.06645,
+        "instrumental_level": 0.04526,
+        "liveness_level": 0.038715,
+        "speechiness_level": 0.003135,
+        "loudness_level": 0.07738,
+        "key_category": 0.01,
+        "mode_category": 0.01,
+        "time_signature_category": 0.01,
+        "content_rating": 0.01,
+        "artist_type": 0.01,
+        "release_type": 0.01,
+        "track_version": 0.01
+      }
+    },
+    {
+      "sigma": 0.1,
+      "eps_cat": 0.03,
+      "acc": {
+        "IG+soft-uniform": 0.03222222222222222,
+        "RAIG-psycho": 0.01888888888888889,
+        "RAIG-tiered": 0.08333333333333333
+      },
+      "mean_eps_hat": 0.039264921098947525,
+      "vs_IG": {
+        "delta": -0.013333333333333332,
+        "n10": 21,
+        "n01": 9,
+        "p": 0.042773945257067694
+      },
+      "vs_tiered": {
+        "delta": -0.06444444444444444,
+        "n10": 72,
+        "n01": 14,
+        "p": 1.4450157667486737e-10
+      },
+      "eps_hat_by_attr": {
+        "genre": 0.03,
+        "mood": 0.03,
+        "tempo": 0.03,
+        "language": 0.03,
+        "popularity_level": 0.080325,
+        "duration_length": 0.096765,
+        "danceability_level": 0.070985,
+        "energy_level": 0.078275,
+        "valence_level": 0.08959,
+        "acoustic_level": 0.06645,
+        "instrumental_level": 0.04526,
+        "liveness_level": 0.038715,
+        "speechiness_level": 0.003135,
+        "loudness_level": 0.07738,
+        "key_category": 0.03,
+        "mode_category": 0.03,
+        "time_signature_category": 0.03,
+        "content_rating": 0.03,
+        "artist_type": 0.03,
+        "release_type": 0.03,
+        "track_version": 0.03
+      }
+    },
+    {
+      "sigma": 0.1,
+      "eps_cat": 0.1,
+      "acc": {
+        "IG+soft-uniform": 0.03222222222222222,
+        "RAIG-psycho": 0.043333333333333335,
+        "RAIG-tiered": 0.08333333333333333
+      },
+      "mean_eps_hat": 0.09185560792684555,
+      "vs_IG": {
+        "delta": 0.011111111111111113,
+        "n10": 17,
+        "n01": 27,
+        "p": 0.17417114727072658
+      },
+      "vs_tiered": {
+        "delta": -0.039999999999999994,
+        "n10": 61,
+        "n01": 25,
+        "p": 0.00013037942991199537
+      },
+      "eps_hat_by_attr": {
+        "genre": 0.1,
+        "mood": 0.1,
+        "tempo": 0.1,
+        "language": 0.1,
+        "popularity_level": 0.080325,
+        "duration_length": 0.096765,
+        "danceability_level": 0.070985,
+        "energy_level": 0.078275,
+        "valence_level": 0.08959,
+        "acoustic_level": 0.06645,
+        "instrumental_level": 0.04526,
+        "liveness_level": 0.038715,
+        "speechiness_level": 0.003135,
+        "loudness_level": 0.07738,
+        "key_category": 0.1,
+        "mode_category": 0.1,
+        "time_signature_category": 0.1,
+        "content_rating": 0.1,
+        "artist_type": 0.1,
+        "release_type": 0.1,
+        "track_version": 0.1
+      }
+    },
+    {
+      "sigma": 0.25,
+      "eps_cat": 0.01,
+      "acc": {
+        "IG+soft-uniform": 0.03222222222222222,
+        "RAIG-psycho": 0.028888888888888888,
+        "RAIG-tiered": 0.08333333333333333
+      },
+      "mean_eps_hat": 0.05132661014795303,
+      "vs_IG": {
+        "delta": -0.003333333333333334,
+        "n10": 23,
+        "n01": 20,
+        "p": 0.7607916425613439
+      },
+      "vs_tiered": {
+        "delta": -0.05444444444444444,
+        "n10": 69,
+        "n01": 20,
+        "p": 1.7769640600713887e-07
+      },
+      "eps_hat_by_attr": {
+        "genre": 0.01,
+        "mood": 0.01,
+        "tempo": 0.01,
+        "language": 0.01,
+        "popularity_level": 0.18617,
+        "duration_length": 0.23921,
+        "danceability_level": 0.174805,
+        "energy_level": 0.196405,
+        "valence_level": 0.225695,
+        "acoustic_level": 0.172505,
+        "instrumental_level": 0.18776,
+        "liveness_level": 0.11457,
+        "speechiness_level": 0.00697,
+        "loudness_level": 0.189905,
+        "key_category": 0.01,
+        "mode_category": 0.01,
+        "time_signature_category": 0.01,
+        "content_rating": 0.01,
+        "artist_type": 0.01,
+        "release_type": 0.01,
+        "track_version": 0.01
+      }
+    },
+    {
+      "sigma": 0.25,
+      "eps_cat": 0.03,
+      "acc": {
+        "IG+soft-uniform": 0.03222222222222222,
+        "RAIG-psycho": 0.024444444444444446,
+        "RAIG-tiered": 0.08333333333333333
+      },
+      "mean_eps_hat": 0.06635250896215439,
+      "vs_IG": {
+        "delta": -0.007777777777777776,
+        "n10": 22,
+        "n01": 15,
+        "p": 0.3240086000878364
+      },
+      "vs_tiered": {
+        "delta": -0.05888888888888888,
+        "n10": 71,
+        "n01": 18,
+        "p": 1.2968749869187788e-08
+      },
+      "eps_hat_by_attr": {
+        "genre": 0.03,
+        "mood": 0.03,
+        "tempo": 0.03,
+        "language": 0.03,
+        "popularity_level": 0.18617,
+        "duration_length": 0.23921,
+        "danceability_level": 0.174805,
+        "energy_level": 0.196405,
+        "valence_level": 0.225695,
+        "acoustic_level": 0.172505,
+        "instrumental_level": 0.18776,
+        "liveness_level": 0.11457,
+        "speechiness_level": 0.00697,
+        "loudness_level": 0.189905,
+        "key_category": 0.03,
+        "mode_category": 0.03,
+        "time_signature_category": 0.03,
+        "content_rating": 0.03,
+        "artist_type": 0.03,
+        "release_type": 0.03,
+        "track_version": 0.03
+      }
+    },
+    {
+      "sigma": 0.25,
+      "eps_cat": 0.1,
+      "acc": {
+        "IG+soft-uniform": 0.03222222222222222,
+        "RAIG-psycho": 0.027777777777777776,
+        "RAIG-tiered": 0.08333333333333333
+      },
+      "mean_eps_hat": 0.11894319951534271,
+      "vs_IG": {
+        "delta": -0.004444444444444445,
+        "n10": 22,
+        "n01": 18,
+        "p": 0.6358280026288412
+      },
+      "vs_tiered": {
+        "delta": -0.05555555555555555,
+        "n10": 68,
+        "n01": 18,
+        "p": 5.293689508572569e-08
+      },
+      "eps_hat_by_attr": {
+        "genre": 0.1,
+        "mood": 0.1,
+        "tempo": 0.1,
+        "language": 0.1,
+        "popularity_level": 0.18617,
+        "duration_length": 0.23921,
+        "danceability_level": 0.174805,
+        "energy_level": 0.196405,
+        "valence_level": 0.225695,
+        "acoustic_level": 0.172505,
+        "instrumental_level": 0.18776,
+        "liveness_level": 0.11457,
+        "speechiness_level": 0.00697,
+        "loudness_level": 0.189905,
+        "key_category": 0.1,
+        "mode_category": 0.1,
+        "time_signature_category": 0.1,
+        "content_rating": 0.1,
+        "artist_type": 0.1,
+        "release_type": 0.1,
+        "track_version": 0.1
+      }
+    },
+    {
+      "sigma": 0.5,
+      "eps_cat": 0.01,
+      "acc": {
+        "IG+soft-uniform": 0.03222222222222222,
+        "RAIG-psycho": 0.01888888888888889,
+        "RAIG-tiered": 0.08333333333333333
+      },
+      "mean_eps_hat": 0.09092843532562256,
+      "vs_IG": {
+        "delta": -0.013333333333333332,
+        "n10": 27,
+        "n01": 15,
+        "p": 0.08842954698775429
+      },
+      "vs_tiered": {
+        "delta": -0.06444444444444444,
+        "n10": 71,
+        "n01": 13,
+        "p": 7.863919065998752e-11
+      },
+      "eps_hat_by_attr": {
+        "genre": 0.01,
+        "mood": 0.01,
+        "tempo": 0.01,
+        "language": 0.01,
+        "popularity_level": 0.345,
+        "duration_length": 0.44092,
+        "danceability_level": 0.33996,
+        "energy_level": 0.37516,
+        "valence_level": 0.41572,
+        "acoustic_level": 0.332785,
+        "instrumental_level": 0.343995,
+        "liveness_level": 0.257105,
+        "speechiness_level": 0.01468,
+        "loudness_level": 0.360385,
+        "key_category": 0.01,
+        "mode_category": 0.01,
+        "time_signature_category": 0.01,
+        "content_rating": 0.01,
+        "artist_type": 0.01,
+        "release_type": 0.01,
+        "track_version": 0.01
+      }
+    },
+    {
+      "sigma": 0.5,
+      "eps_cat": 0.03,
+      "acc": {
+        "IG+soft-uniform": 0.03222222222222222,
+        "RAIG-psycho": 0.01,
+        "RAIG-tiered": 0.08333333333333333
+      },
+      "mean_eps_hat": 0.10595434159040451,
+      "vs_IG": {
+        "delta": -0.02222222222222222,
+        "n10": 28,
+        "n01": 8,
+        "p": 0.0011932429624721408
+      },
+      "vs_tiered": {
+        "delta": -0.07333333333333333,
+        "n10": 72,
+        "n01": 6,
+        "p": 1.8493658649069896e-15
+      },
+      "eps_hat_by_attr": {
+        "genre": 0.03,
+        "mood": 0.03,
+        "tempo": 0.03,
+        "language": 0.03,
+        "popularity_level": 0.345,
+        "duration_length": 0.44092,
+        "danceability_level": 0.33996,
+        "energy_level": 0.37516,
+        "valence_level": 0.41572,
+        "acoustic_level": 0.332785,
+        "instrumental_level": 0.343995,
+        "liveness_level": 0.257105,
+        "speechiness_level": 0.01468,
+        "loudness_level": 0.360385,
+        "key_category": 0.03,
+        "mode_category": 0.03,
+        "time_signature_category": 0.03,
+        "content_rating": 0.03,
+        "artist_type": 0.03,
+        "release_type": 0.03,
+        "track_version": 0.03
+      }
+    },
+    {
+      "sigma": 0.5,
+      "eps_cat": 0.1,
+      "acc": {
+        "IG+soft-uniform": 0.03222222222222222,
+        "RAIG-psycho": 0.0077777777777777776,
+        "RAIG-tiered": 0.08333333333333333
+      },
+      "mean_eps_hat": 0.15854501724243164,
+      "vs_IG": {
+        "delta": -0.024444444444444442,
+        "n10": 27,
+        "n01": 5,
+        "p": 0.00011307420209050179
+      },
+      "vs_tiered": {
+        "delta": -0.07555555555555556,
+        "n10": 74,
+        "n01": 6,
+        "p": 5.396645380673323e-16
+      },
+      "eps_hat_by_attr": {
+        "genre": 0.1,
+        "mood": 0.1,
+        "tempo": 0.1,
+        "language": 0.1,
+        "popularity_level": 0.345,
+        "duration_length": 0.44092,
+        "danceability_level": 0.33996,
+        "energy_level": 0.37516,
+        "valence_level": 0.41572,
+        "acoustic_level": 0.332785,
+        "instrumental_level": 0.343995,
+        "liveness_level": 0.257105,
+        "speechiness_level": 0.01468,
+        "loudness_level": 0.360385,
+        "key_category": 0.1,
+        "mode_category": 0.1,
+        "time_signature_category": 0.1,
+        "content_rating": 0.1,
+        "artist_type": 0.1,
+        "release_type": 0.1,
+        "track_version": 0.1
+      }
+    }
+  ]
+}
