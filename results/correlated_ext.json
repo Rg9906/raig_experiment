@@ -1,0 +1,73 @@
+{
+  "R": 300,
+  "T": 20,
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "batch_size": 30,
+  "n_total": 900,
+  "subjective_attrs": [
+    "danceability_level",
+    "energy_level",
+    "key_category",
+    "mode_category",
+    "mood",
+    "tempo",
+    "time_signature_category",
+    "valence_level"
+  ],
+  "variants": {
+    "independent": {
+      "IG+soft-uniform": {
+        "acc": 0.027777777777777776,
+        "lo": 0.017777777777777778,
+        "hi": 0.03888888888888889
+      },
+      "RAIG-tiered": {
+        "acc": 0.07777777777777778,
+        "lo": 0.06,
+        "hi": 0.09555555555555556
+      },
+      "mcnemar_RAIG_vs_IG": {
+        "n10_ig_only": 17,
+        "n01_raig_only": 62,
+        "delta": 0.05,
+        "p": 3.5883588815862885e-07
+      }
+    },
+    "correlated": {
+      "IG+soft-uniform": {
+        "acc": 0.02,
+        "lo": 0.011111111111111112,
+        "hi": 0.03
+      },
+      "RAIG-tiered": {
+        "acc": 0.07777777777777778,
+        "lo": 0.06,
+        "hi": 0.09555555555555556
+      },
+      "mcnemar_RAIG_vs_IG": {
+        "n10_ig_only": 14,
+        "n01_raig_only": 66,
+        "delta": 0.057777777777777775,
+        "p": 3.1365426901467503e-09
+      }
+    }
+  },
+  "correlated_vs_independent": {
+    "IG+soft-uniform": {
+      "delta": -0.007777777777777776,
+      "n10_indep_only": 7,
+      "n01_corr_only": 0,
+      "p": 0.015625
+    },
+    "RAIG-tiered": {
+      "delta": 0.0,
+      "n10_indep_only": 0,
+      "n01_corr_only": 0,
+      "p": 1.0
+    }
+  }
+}

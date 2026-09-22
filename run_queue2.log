@@ -1,0 +1,47 @@
+
+=========== run_eps_ensemble.py  (05:50:18) ===========
+queue: run_eps_ensemble.py OK in 1950s
+  "frac_raig_wins": 1.0,
+  "frac_raig_wins_significant": 0.5333333333333333,
+  "frac_ig_wins_significant": 0.0
+}
+
+wrote results/eps_ensemble.json (1945s)
+
+=========== run_lambda_sweep.py  (06:22:48) ===========
+queue: run_lambda_sweep.py OK in 1995s
+[  1883s] lam=1.25  IG+soft-uniform=0.9, Learned-noiseaware=0.2, RAIG-tiered=4.2, RAIG-oracle=4.4  delta=+3.3pp p=1.49e-03
+[  1936s] lam=1.5   IG+soft-uniform=0.2, Learned-noiseaware=0.2, RAIG-tiered=3.6, RAIG-oracle=2.2  delta=+3.3pp p=2.75e-04
+[  1989s] lam=2.0   IG+soft-uniform=0.0, Learned-noiseaware=0.0, RAIG-tiered=2.0, RAIG-oracle=1.6  delta=+2.0pp p=3.91e-03
+
+crossing at lambda=0.5862068965517242 (mean true eps=0.057496875524520874)
+wrote results/lambda_sweep.json (1989s)
+
+=========== run_synthetic.py  (06:56:03) ===========
+queue: run_synthetic.py OK in 1233s
+   rho=-0.020  delta=+25.50pp
+   rho=+0.232  delta=+24.83pp
+   rho=+0.481  delta=+19.83pp
+   rho=+0.729  delta=+19.67pp
+   rho=+0.989  delta=+9.67pp
+wrote results/synthetic_rho.json (1232s)
+
+=========== run_tier_corruption.py  (07:16:36) ===========
+queue: run_tier_corruption.py OK in 580s
+[   439s] phi=0.6  IG= 1.67 RAIG= 2.33  delta=+0.67pp
+[   507s] phi=0.8  IG= 1.67 RAIG= 1.22  delta=-0.44pp
+[   577s] phi=1.0  IG= 1.67 RAIG= 1.11  delta=-0.56pp
+
+break-even corruption fraction phi = 0.72
+wrote results/tier_corruption.json (577s)
+
+=========== run_erasure.py  (07:26:16) ===========
+queue: run_erasure.py OK in 155s
+[   152s] abstention=strong: IG+soft-uniform=1.1, RAIG-tiered=4.0, RAIG+erasure=3.6
+      IG+soft-uniform    eps_asked=0.230 delta_asked=0.308 subj=56%
+      RAIG-tiered        eps_asked=0.107 delta_asked=0.146 subj=1%
+      RAIG+erasure       eps_asked=0.100 delta_asked=0.138 subj=1%
+
+wrote results/erasure.json (152s)
+
+queue: all done at Mon, Aug 31, 2026  7:28:51 AM

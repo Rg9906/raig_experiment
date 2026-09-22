@@ -1,0 +1,17 @@
+{
+  "objective_attributes": [
+    "genre",
+    "language",
+    "content_rating",
+    "artist_type",
+    "release_type",
+    "track_version"
+  ],
+  "n_objective_attributes": 6,
+  "N": 79803,
+  "distinct_combinations": 1926,
+  "collision_rate": 0.9934588925228375,
+  "largest_equivalence_class": 932,
+  "top1_accuracy_ceiling": 0.006541107477162513,
+  "objective_only_questions": 126
+}

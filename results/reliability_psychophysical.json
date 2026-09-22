@@ -1,0 +1,362 @@
+[
+  {
+    "attribute": "popularity_level",
+    "bins": 2,
+    "sigma": 0.1,
+    "eps": 0.026125
+  },
+  {
+    "attribute": "popularity_level",
+    "bins": 2,
+    "sigma": 0.25,
+    "eps": 0.062815
+  },
+  {
+    "attribute": "popularity_level",
+    "bins": 2,
+    "sigma": 0.5,
+    "eps": 0.128225
+  },
+  {
+    "attribute": "popularity_level",
+    "bins": 4,
+    "sigma": 0.1,
+    "eps": 0.085805
+  },
+  {
+    "attribute": "popularity_level",
+    "bins": 4,
+    "sigma": 0.25,
+    "eps": 0.199015
+  },
+  {
+    "attribute": "popularity_level",
+    "bins": 4,
+    "sigma": 0.5,
+    "eps": 0.35209
+  },
+  {
+    "attribute": "duration_length",
+    "bins": 2,
+    "sigma": 0.1,
+    "eps": 0.04211
+  },
+  {
+    "attribute": "duration_length",
+    "bins": 2,
+    "sigma": 0.25,
+    "eps": 0.097635
+  },
+  {
+    "attribute": "duration_length",
+    "bins": 2,
+    "sigma": 0.5,
+    "eps": 0.17748
+  },
+  {
+    "attribute": "duration_length",
+    "bins": 4,
+    "sigma": 0.1,
+    "eps": 0.10068
+  },
+  {
+    "attribute": "duration_length",
+    "bins": 4,
+    "sigma": 0.25,
+    "eps": 0.241405
+  },
+  {
+    "attribute": "duration_length",
+    "bins": 4,
+    "sigma": 0.5,
+    "eps": 0.40232
+  },
+  {
+    "attribute": "danceability_level",
+    "bins": 2,
+    "sigma": 0.1,
+    "eps": 0.03039
+  },
+  {
+    "attribute": "danceability_level",
+    "bins": 2,
+    "sigma": 0.25,
+    "eps": 0.07753
+  },
+  {
+    "attribute": "danceability_level",
+    "bins": 2,
+    "sigma": 0.5,
+    "eps": 0.14627
+  },
+  {
+    "attribute": "danceability_level",
+    "bins": 4,
+    "sigma": 0.1,
+    "eps": 0.081985
+  },
+  {
+    "attribute": "danceability_level",
+    "bins": 4,
+    "sigma": 0.25,
+    "eps": 0.202475
+  },
+  {
+    "attribute": "danceability_level",
+    "bins": 4,
+    "sigma": 0.5,
+    "eps": 0.362795
+  },
+  {
+    "attribute": "energy_level",
+    "bins": 2,
+    "sigma": 0.1,
+    "eps": 0.027675
+  },
+  {
+    "attribute": "energy_level",
+    "bins": 2,
+    "sigma": 0.25,
+    "eps": 0.067725
+  },
+  {
+    "attribute": "energy_level",
+    "bins": 2,
+    "sigma": 0.5,
+    "eps": 0.13338
+  },
+  {
+    "attribute": "energy_level",
+    "bins": 4,
+    "sigma": 0.1,
+    "eps": 0.08037
+  },
+  {
+    "attribute": "energy_level",
+    "bins": 4,
+    "sigma": 0.25,
+    "eps": 0.198185
+  },
+  {
+    "attribute": "energy_level",
+    "bins": 4,
+    "sigma": 0.5,
+    "eps": 0.35461
+  },
+  {
+    "attribute": "valence_level",
+    "bins": 2,
+    "sigma": 0.1,
+    "eps": 0.024895
+  },
+  {
+    "attribute": "valence_level",
+    "bins": 2,
+    "sigma": 0.25,
+    "eps": 0.06183
+  },
+  {
+    "attribute": "valence_level",
+    "bins": 2,
+    "sigma": 0.5,
+    "eps": 0.122295
+  },
+  {
+    "attribute": "valence_level",
+    "bins": 4,
+    "sigma": 0.1,
+    "eps": 0.069925
+  },
+  {
+    "attribute": "valence_level",
+    "bins": 4,
+    "sigma": 0.25,
+    "eps": 0.17632
+  },
+  {
+    "attribute": "valence_level",
+    "bins": 4,
+    "sigma": 0.5,
+    "eps": 0.334265
+  },
+  {
+    "attribute": "acoustic_level",
+    "bins": 2,
+    "sigma": 0.1,
+    "eps": 0.02157
+  },
+  {
+    "attribute": "acoustic_level",
+    "bins": 2,
+    "sigma": 0.25,
+    "eps": 0.064175
+  },
+  {
+    "attribute": "acoustic_level",
+    "bins": 2,
+    "sigma": 0.5,
+    "eps": 0.148665
+  },
+  {
+    "attribute": "acoustic_level",
+    "bins": 4,
+    "sigma": 0.1,
+    "eps": 0.165135
+  },
+  {
+    "attribute": "acoustic_level",
+    "bins": 4,
+    "sigma": 0.25,
+    "eps": 0.271015
+  },
+  {
+    "attribute": "acoustic_level",
+    "bins": 4,
+    "sigma": 0.5,
+    "eps": 0.393935
+  },
+  {
+    "attribute": "instrumental_level",
+    "bins": 2,
+    "sigma": 0.1,
+    "eps": 0.346105
+  },
+  {
+    "attribute": "instrumental_level",
+    "bins": 2,
+    "sigma": 0.25,
+    "eps": 0.361335
+  },
+  {
+    "attribute": "instrumental_level",
+    "bins": 2,
+    "sigma": 0.5,
+    "eps": 0.37183
+  },
+  {
+    "attribute": "instrumental_level",
+    "bins": 4,
+    "sigma": 0.1,
+    "eps": 0.43895
+  },
+  {
+    "attribute": "instrumental_level",
+    "bins": 4,
+    "sigma": 0.25,
+    "eps": 0.481405
+  },
+  {
+    "attribute": "instrumental_level",
+    "bins": 4,
+    "sigma": 0.5,
+    "eps": 0.533
+  },
+  {
+    "attribute": "liveness_level",
+    "bins": 2,
+    "sigma": 0.1,
+    "eps": 0.07262
+  },
+  {
+    "attribute": "liveness_level",
+    "bins": 2,
+    "sigma": 0.25,
+    "eps": 0.16937
+  },
+  {
+    "attribute": "liveness_level",
+    "bins": 2,
+    "sigma": 0.5,
+    "eps": 0.254265
+  },
+  {
+    "attribute": "liveness_level",
+    "bins": 4,
+    "sigma": 0.1,
+    "eps": 0.2018
+  },
+  {
+    "attribute": "liveness_level",
+    "bins": 4,
+    "sigma": 0.25,
+    "eps": 0.363135
+  },
+  {
+    "attribute": "liveness_level",
+    "bins": 4,
+    "sigma": 0.5,
+    "eps": 0.48443
+  },
+  {
+    "attribute": "speechiness_level",
+    "bins": 2,
+    "sigma": 0.1,
+    "eps": 0.13061
+  },
+  {
+    "attribute": "speechiness_level",
+    "bins": 2,
+    "sigma": 0.25,
+    "eps": 0.24936
+  },
+  {
+    "attribute": "speechiness_level",
+    "bins": 2,
+    "sigma": 0.5,
+    "eps": 0.325555
+  },
+  {
+    "attribute": "speechiness_level",
+    "bins": 4,
+    "sigma": 0.1,
+    "eps": 0.31007
+  },
+  {
+    "attribute": "speechiness_level",
+    "bins": 4,
+    "sigma": 0.25,
+    "eps": 0.476695
+  },
+  {
+    "attribute": "speechiness_level",
+    "bins": 4,
+    "sigma": 0.5,
+    "eps": 0.572715
+  },
+  {
+    "attribute": "loudness_level",
+    "bins": 2,
+    "sigma": 0.1,
+    "eps": 0.04429
+  },
+  {
+    "attribute": "loudness_level",
+    "bins": 2,
+    "sigma": 0.25,
+    "eps": 0.107505
+  },
+  {
+    "attribute": "loudness_level",
+    "bins": 2,
+    "sigma": 0.5,
+    "eps": 0.19587
+  },
+  {
+    "attribute": "loudness_level",
+    "bins": 4,
+    "sigma": 0.1,
+    "eps": 0.116585
+  },
+  {
+    "attribute": "loudness_level",
+    "bins": 4,
+    "sigma": 0.25,
+    "eps": 0.274735
+  },
+  {
+    "attribute": "loudness_level",
+    "bins": 4,
+    "sigma": 0.5,
+    "eps": 0.436605
+  }
+]

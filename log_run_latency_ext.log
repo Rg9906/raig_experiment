@@ -1,0 +1,14 @@
+  IG+soft-uniform    rep 1/5:   12.64 ms/turn
+  IG+soft-uniform    rep 2/5:   13.03 ms/turn
+  IG+soft-uniform    rep 3/5:   12.19 ms/turn
+  IG+soft-uniform    rep 4/5:   13.56 ms/turn
+  IG+soft-uniform    rep 5/5:   13.16 ms/turn
+IG+soft-uniform    median=13.03 ms/turn  acc=2.78%  reached=0.4%
+  RAIG-tiered        rep 1/5:   14.93 ms/turn
+  RAIG-tiered        rep 2/5:   51.83 ms/turn
+  RAIG-tiered        rep 3/5:   90.23 ms/turn
+  RAIG-tiered        rep 4/5:  116.11 ms/turn
+  RAIG-tiered        rep 5/5:  145.80 ms/turn
+RAIG-tiered        median=90.23 ms/turn  acc=7.78%  reached=0.7%
+
+wrote results/latency_ext.json

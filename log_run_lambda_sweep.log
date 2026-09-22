@@ -1,0 +1,14 @@
+methods=['IG+soft-uniform', 'Learned-noiseaware', 'RAIG-tiered', 'RAIG-oracle']
+[    64s] lam=0.0   IG+soft-uniform=96.0, Learned-noiseaware=91.1, RAIG-tiered=42.4, RAIG-oracle=96.4  delta=-53.6pp p=5.66e-73
+[   127s] lam=0.25  IG+soft-uniform=50.9, Learned-noiseaware=43.1, RAIG-tiered=28.4, RAIG-oracle=56.0  delta=-22.4pp p=6.17e-14
+[  1226s] lam=0.5   IG+soft-uniform=24.0, Learned-noiseaware=19.1, RAIG-tiered=19.6, RAIG-oracle=31.1  delta=-4.4pp p=8.76e-02
+[  1633s] lam=0.625 IG+soft-uniform=14.2, Learned-noiseaware=12.0, RAIG-tiered=16.2, RAIG-oracle=20.7  delta=+2.0pp p=4.07e-01
+[  1686s] lam=0.75  IG+soft-uniform=7.1, Learned-noiseaware=7.1, RAIG-tiered=12.9, RAIG-oracle=14.7  delta=+5.8pp p=2.55e-03
+[  1751s] lam=0.875 IG+soft-uniform=4.2, Learned-noiseaware=4.7, RAIG-tiered=10.9, RAIG-oracle=10.0  delta=+6.7pp p=1.00e-04
+[  1825s] lam=1.0   IG+soft-uniform=2.4, Learned-noiseaware=1.8, RAIG-tiered=7.8, RAIG-oracle=7.8  delta=+5.3pp p=1.82e-04
+[  1883s] lam=1.25  IG+soft-uniform=0.9, Learned-noiseaware=0.2, RAIG-tiered=4.2, RAIG-oracle=4.4  delta=+3.3pp p=1.49e-03
+[  1936s] lam=1.5   IG+soft-uniform=0.2, Learned-noiseaware=0.2, RAIG-tiered=3.6, RAIG-oracle=2.2  delta=+3.3pp p=2.75e-04
+[  1989s] lam=2.0   IG+soft-uniform=0.0, Learned-noiseaware=0.0, RAIG-tiered=2.0, RAIG-oracle=1.6  delta=+2.0pp p=3.91e-03
+
+crossing at lambda=0.5862068965517242 (mean true eps=0.057496875524520874)
+wrote results/lambda_sweep.json (1989s)

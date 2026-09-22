@@ -1,0 +1,375 @@
+%=============================================================================
+\section{Problem Formulation and Analysis}
+\label{sec:method}
+%=============================================================================
+
+\subsection{Notation and Problem Formulation}
+
+Let $\Cat = \{c_1,\dots,c_N\}$ be a catalogue and
+$\Fset = \{f_1,\dots,f_M\}$ a set of categorical attributes, with $a_f(c)$
+denoting the value of attribute $f$ for item $c$. A question is a pair
+$q=(f,v)$ with answer function
+\begin{equation}
+x_q(c) \;=\; \mathbb{1}\!\left[a_f(c)=v\right] \in \{0,1\},
+\end{equation}
+and $\Qset$ collects all non-degenerate questions. Write $\bx_q \in \{0,1\}^N$
+for the column vector of answers and $f(q)$ for the attribute probed by $q$.
+
+The system maintains a belief $\bb_t \in \Delta^{N-1}$, initialised uniform. At
+each step it selects $q_t \in \Qset$, observes $y_t \in \{0,1\}$, and updates.
+A session runs for at most $T$ questions and terminates with the maximum a
+posteriori item. Table~\ref{tab:notation} collects the notation.
+
+\begin{table}[t]
+\caption{Notation.}
+\label{tab:notation}
+\centering
+\footnotesize
+\begin{tabular}{@{}ll@{}}
+\toprule
+\textbf{Symbol} & \textbf{Meaning} \\
+\midrule
+$\Cat$, $N$ & catalogue and its size \\
+$\Fset$, $M$ & attribute set and its size \\
+$q=(f,v)$, $\Qset$ & question and question space \\
+$x_q(c)$ & true answer to $q$ for item $c$ \\
+$\bb_t$ & belief over $\Cat$ at step $t$ \\
+$c^\ast$ & the user's target item \\
+$\varepsilon_f \in [0,\tfrac12)$ & answer error rate for attribute $f$ \\
+$\hat\varepsilon_f$ & the value the system assumes \\
+$\delta_f \in [0,1)$ & abstention (erasure) rate for attribute $f$ \\
+$y_t$ & observed answer at step $t$ \\
+$p_q$ & belief-weighted mass answering yes to $q$ \\
+$\Hb(\cdot)$ & binary entropy, bits \\
+$p \star \varepsilon$ & $p(1-\varepsilon)+(1-p)\varepsilon$ \\
+$T$ & query budget \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Observation Model}
+
+We model the user as a noisy channel whose crossover probability depends on the
+attribute being probed:
+\begin{equation}
+y_t \;=\; x_{q_t}(c^\ast) \oplus Z_t, \qquad
+Z_t \sim \mathrm{Bernoulli}\!\left(\varepsilon_{f(q_t)}\right),
+\label{eq:channel}
+\end{equation}
+with $Z_t$ independent across turns. The per-attribute index in
+\eqref{eq:channel} is the entire departure from the standard formulation, and
+everything that follows is a consequence of it.
+
+Three idealisations are worth naming now rather than in the limitations
+section. Errors are assumed independent across turns, whereas a user who
+misunderstands a category will err consistently within it;
+\eqref{eq:channel} admits no abstention, whereas real users decline to answer;
+and the channel is symmetric, whereas a user unsure of the answer may be
+readier to say yes than no. The first two are not left as caveats:
+Section~\ref{sec:erasure} extends the model to abstention and
+Section~\ref{sec:results-erasure} measures it, while
+Section~\ref{sec:results-correlated} replaces independence with a per-session
+absorbing failure and measures that. The third we do not test, and it is listed
+again among the threats in Section~\ref{sec:discussion}.
+
+\subsection{Belief Update and a Unification of Elimination Semantics}
+
+Under \eqref{eq:channel} the likelihood of the observed answer is
+\begin{equation}
+\ell(c \mid q,y) \;=\;
+\begin{cases}
+1-\hat\varepsilon_{f(q)}, & x_q(c) = y,\\[2pt]
+\hat\varepsilon_{f(q)}, & x_q(c) \neq y,
+\end{cases}
+\end{equation}
+and the posterior follows from Bayes' rule,
+\begin{equation}
+\bb_{t+1}(c) \;=\;
+\frac{\bb_t(c)\,\ell(c \mid q_t,y_t)}
+     {\sum_{c'\in\Cat} \bb_t(c')\,\ell(c' \mid q_t,y_t)}.
+\label{eq:update}
+\end{equation}
+
+\begin{proposition}[Elimination as a degenerate limit]
+\label{prop:limit}
+As $\hat\varepsilon \to 0^{+}$, \eqref{eq:update} converges pointwise to hard
+elimination, assigning zero mass to every candidate inconsistent with $y_t$.
+At $\hat\varepsilon = 0$ exactly, the normaliser vanishes whenever no candidate
+is consistent with the observed history, and the posterior is undefined.
+\end{proposition}
+
+\begin{proof}
+The likelihood ratio between an inconsistent and a consistent candidate is
+$\hat\varepsilon/(1-\hat\varepsilon) \to 0$, giving pointwise convergence. The
+normaliser is $\sum_c \bb_t(c)\mathbb{1}[x_q(c)=y]$, which is zero exactly when
+the surviving support is empty; since the target is removed from the support by
+its first flipped answer, and questions are never repeated, an empty support is
+reachable under any positive noise rate.
+\end{proof}
+
+Proposition~\ref{prop:limit} has a methodological consequence more important
+than its mathematical content. Comparative studies of interactive
+identification commonly contrast an ``entropy-based'' system using elimination
+against a ``probabilistic'' system using soft updating, and attribute the
+resulting difference in noise tolerance to the selection strategy. The two
+systems differ in two factors at once, and by Proposition~\ref{prop:limit} the
+second factor is not an alternative algorithm but a boundary value of the
+first. Any experiment intending to isolate the effect of selection must hold
+the update rule fixed. We do so in Section~\ref{sec:baselines}. We also note
+that the behaviour of an elimination system on an empty support is an
+implementation convention---restart uniformly, retain the prior, or fail---and
+that reported accuracies under noise depend on which convention is used, so it
+must be stated. Ours is to retain the prior.
+
+\subsection{Reliability-Aware Information Gain}
+
+Let the belief-weighted yes-mass of a question be
+\begin{equation}
+p_q \;=\; \sum_{c \in \Cat} \bb_t(c)\, x_q(c) \;=\; \bb_t^{\!\top} \bx_q .
+\end{equation}
+When answers are observed exactly, the expected reduction in belief entropy
+from asking $q$ is $\Hb(p_q)$, and maximising it is the classical criterion.
+Under \eqref{eq:channel} the system does not observe $x_q(c^\ast)$; it observes
+$Y_q$. The relevant quantity is therefore the mutual information between the
+target and the observation. Since $Y_q$ is conditionally a BSC output given the
+target,
+\begin{align}
+\RAIG(q)
+&= I(C; Y_q) \;=\; H(Y_q) - H(Y_q \mid C) \nonumber\\
+&= \Hb\!\left(p_q \star \varepsilon_{f(q)}\right) - \Hb\!\left(\varepsilon_{f(q)}\right).
+\label{eq:raig}
+\end{align}
+The subtracted term is the entropy the channel injects irrespective of the
+target and carries no information about it.
+
+We claim no novelty for \eqref{eq:raig} as mathematics: it is the mutual
+information of a binary symmetric channel and follows directly from the
+observation model~\cite[Ch.~7]{cover2006}. What we claim is that omitting it
+is prevailing practice in applied interactive identification, and that the
+omission is consequential in a way the next subsections make precise.
+
+\subsection{Analytical Properties}
+
+\begin{proposition}[Consistency and annihilation]
+\label{prop:limits}
+$\RAIG(q) = \Hb(p_q)$ when $\varepsilon_{f(q)}=0$, and $\RAIG(q)=0$ for every
+$p_q$ when $\varepsilon_{f(q)}=\tfrac12$. On $[0,\tfrac12)$, $\RAIG(q)$ is
+strictly decreasing in $\varepsilon_{f(q)}$ for $p_q \in (0,1)$.
+\end{proposition}
+
+The first limit establishes that classical information gain is the special case
+of \eqref{eq:raig} in which the user is assumed infallible, which is the sense
+in which the standard criterion is not merely imprecise but makes a specific
+and false assumption. The second establishes that a question answered at chance
+is worth nothing however well it splits the belief---a property classical
+information gain does not possess, since $\Hb(p)$ is blind to $\varepsilon$.
+
+\begin{proposition}[Rank reversal]
+\label{prop:reversal}
+There exist questions $q_1,q_2$ with $\Hb(p_{q_1}) > \Hb(p_{q_2})$ but
+$\RAIG(q_1) < \RAIG(q_2)$.
+\end{proposition}
+
+\begin{proof}
+Take $p_{q_1}=0.50$, $\varepsilon_{q_1}=0.30$ and $p_{q_2}=0.70$,
+$\varepsilon_{q_2}=0.03$, the subjective and objective tier values used
+throughout this paper. Then $\Hb(p_{q_1})=1.000 > \Hb(p_{q_2})=0.881$, while
+$\RAIG(q_1)=\Hb(0.500)-\Hb(0.30)=1.000-0.881=0.119$ and
+$\RAIG(q_2)=\Hb(0.688)-\Hb(0.03)=0.895-0.194=0.701$.
+\end{proof}
+
+Proposition~\ref{prop:reversal} is the operative one. Had \eqref{eq:raig}
+merely rescaled the classical scores, the argmax would be unchanged and the
+correction would be vacuous. It does not: in the instance above the two
+criteria disagree by a factor of $5.9$ in the opposite direction, and a system
+optimising $\Hb(p)$ will repeatedly spend turns on the question its user can
+barely answer. Fig.~\ref{fig:reversal} plots both criteria with this instance
+marked.
+
+%---------------------------------------------------------------- Fig. reversal
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+  width=0.94\columnwidth, height=5.1cm,
+  xlabel={split mass $p_q$}, ylabel={score (bits)},
+  xmin=0, xmax=1, ymin=0, ymax=1.05,
+  xtick={0,0.25,0.5,0.7,1}, xticklabels={0,.25,.5,.7,1},
+  ytick={0,0.25,0.5,0.75,1},
+  tick label style={font=\scriptsize}, label style={font=\scriptsize},
+  legend style={font=\tiny, at={(0.5,1.02)}, anchor=south,
+                legend columns=4, draw=none, column sep=3pt},
+  grid=major, grid style={black!12, very thin},
+  samples=201, domain=0.001:0.999,
+]
+\addplot[black, thick] {Hb(x)};
+\addlegendentry{$\Hb(p)$}
+\addplot[blue!70, thick, densely dashed] {RAIGf(x,0.03)};
+\addlegendentry{$\varepsilon{=}.03$}
+\addplot[orange!85!black, thick, densely dotted] {RAIGf(x,0.15)};
+\addlegendentry{$\varepsilon{=}.15$}
+\addplot[red!75!black, thick, dashdotted] {RAIGf(x,0.30)};
+\addlegendentry{$\varepsilon{=}.30$}
+% the rank-reversal instance of Proposition 3
+\addplot[only marks, mark=*, mark size=1.6pt, black]
+  coordinates {(0.5,1.0) (0.7,0.881)};
+\addplot[only marks, mark=square*, mark size=1.7pt, red!75!black]
+  coordinates {(0.5,0.119)};
+\addplot[only marks, mark=square*, mark size=1.7pt, blue!70]
+  coordinates {(0.7,0.701)};
+\node[font=\tiny, anchor=south] at (axis cs:0.5,1.0) {$q_1$};
+\node[font=\tiny, anchor=south west] at (axis cs:0.7,0.881) {$q_2$};
+\draw[->, gray, thin] (axis cs:0.5,0.97) -- (axis cs:0.5,0.16);
+\draw[->, gray, thin] (axis cs:0.7,0.855) -- (axis cs:0.7,0.73);
+\end{axis}
+\end{tikzpicture}
+\caption{Classical information gain (solid) against reliability-aware
+information gain at three crossover probabilities. Both curves are computed by
+the typesetter from \eqref{eq:raig}, not traced. The circles mark the two
+questions of Proposition~\ref{prop:reversal} as the classical criterion scores
+them, $q_1$ above $q_2$; the squares mark the same two questions once their
+attributes' reliabilities are taken into account, and the arrows show how far
+each falls. The ordering inverts: $q_1$ is the balanced question on an
+attribute answered at $\varepsilon=0.30$, $q_2$ the lopsided one on an
+attribute answered at $\varepsilon=0.03$. The $\varepsilon=0.30$ curve never
+exceeds $1-\Hb(0.30)=0.119$ bits at any split mass, which is
+Corollary~\ref{cor:budget}'s capacity ceiling.}
+\label{fig:reversal}
+\end{figure}
+%----------------------------------------------------------------------
+
+\begin{corollary}[Capacity ceiling and budget bound]
+\label{cor:budget}
+$\RAIG(q) \le 1 - \Hb(\varepsilon_{f(q)})$, the capacity of the corresponding
+channel. Consequently, identifying one of $N$ equiprobable items requires
+\begin{equation}
+T \;\ge\; \frac{\log_2 N}{\max_{f \in \Fset}\left(1 - \Hb(\varepsilon_f)\right)}
+\label{eq:budget}
+\end{equation}
+questions in expectation.
+\end{corollary}
+
+\begin{proof}
+The bound on $\RAIG$ is the capacity of BSC$(\varepsilon)$, attained at
+$p=\tfrac12$. Identification requires acquiring $\log_2 N$ bits, and no
+question delivers more than the largest available capacity; the converse of the
+channel coding theorem gives the result~\cite[Ch.~7]{cover2006}.
+\end{proof}
+
+Corollary~\ref{cor:budget} is useful in practice rather than deep. It says the
+familiar $\log_2 N$ intuition understates the required budget by a factor equal
+to the inverse capacity of the most reliable attribute available, and it
+supplies a principled way to set $T$ for a given catalogue instead of choosing
+it by convention. It is also what fixes the operating point of our experiments:
+on the music catalogue it yields $T \ge 20.15$, which is why the primary
+comparison is run at $T=20$.
+
+\subsection{Why Discretisation Manufactures the Bias}
+\label{sec:discretisation-theory}
+
+The informal claim in Section~I is that quantile binning assigns peak apparent
+informativeness to whichever attribute it is applied to, regardless of that
+attribute's semantics. That is exactly true, and stating it exactly explains
+several otherwise puzzling features of the measurements in
+Section~\ref{sec:results-bias}.
+
+\begin{proposition}[Discretisation fixes apparent informativeness]
+\label{prop:discretisation}
+Let attribute $f$ be obtained by partitioning a continuous variable into $k$
+quantile bins of equal population, and let the belief be uniform. Then every
+one-versus-rest question on $f$ has split mass exactly $1/k$, so
+\begin{equation}
+\max_{v}\ \Hb\!\left(p_{(f,v)}\right) \;=\; \Hb(1/k),
+\label{eq:binmax}
+\end{equation}
+which depends on $k$ alone. In particular $k=2$ gives exactly $1$ bit, the
+global maximum of $\Hb$, and no attribute of any kind can exceed it. For a
+natively categorical attribute with value distribution $\pi$, by contrast,
+$\max_v \Hb(\pi_v) = \Hb(1/2)$ only in the coincidental case that some value
+carries mass exactly one half, and is strictly smaller otherwise.
+\end{proposition}
+
+\begin{proof}
+Equal-population quantile binning gives $\pi_v = 1/k$ for every bin $v$, and at
+a uniform belief $p_{(f,v)} = \pi_v$. Since $\Hb$ is symmetric about $1/2$ and
+increasing on $[0,1/2]$, and $1/k \le 1/2$ for $k \ge 2$, the maximum over
+values is attained at any bin and equals $\Hb(1/k)$. The categorical statement
+follows because $\Hb$ attains $1$ only at $p=1/2$.
+\end{proof}
+
+Two consequences deserve emphasis. First, the apparent informativeness of a
+binned attribute is a property of the \emph{binning parameter}, not of the
+attribute: danceability and loudness are assigned identical maximum information
+gain because both were cut into the same number of bins, not because they are
+equally informative about the target. Second, the comparison between a binned
+and an unbinned attribute is not a like-for-like comparison of informativeness
+at all. A selector maximising $\Hb(p)$ therefore systematically prefers
+whichever attributes happened to pass through the discretiser --- and in a
+catalogue of perceptual descriptors, those are the subjective ones. This is
+what Section~\ref{sec:results-bias} measures, and \eqref{eq:binmax} is why
+every four-bin attribute in Table~\ref{tab:attributes} reports the same
+$\Hb(1/4)=0.811$ bits.
+
+\begin{corollary}[The cost of $\varepsilon$-blindness]
+\label{cor:deficit}
+Let $q^\ast = \arg\max_q \Hb(p_q)$ be the question a classical selector asks
+and $q^\dagger = \arg\max_q \RAIG(q)$ the reliability-aware choice. The
+per-question information deficit incurred by the classical selector is
+$D = \RAIG(q^\dagger) - \RAIG(q^\ast) \ge 0$, and
+\begin{equation}
+D \;\ge\; \Big[\Hb\!\left(p_{q^\dagger} \star \varepsilon_{q^\dagger}\right)
+- \Hb(\varepsilon_{q^\dagger})\Big] - \Big[1 - \Hb(\varepsilon_{q^\ast})\Big].
+\end{equation}
+\end{corollary}
+
+\begin{proof}
+Non-negativity is by definition of $q^\dagger$ as the $\RAIG$ maximiser. The
+bound substitutes the capacity ceiling of Corollary~\ref{cor:budget} for
+$\RAIG(q^\ast)$, which can only decrease the subtrahend.
+\end{proof}
+
+Instantiated on the reliability annotation used throughout, a classical
+selector that spends a turn on a perfectly balanced subjective question
+($\varepsilon = 0.30$) instead of a moderately balanced objective one
+($p = 0.7$, $\varepsilon = 0.03$) forgoes at least $0.75 - 0.12 = 0.63$ bits on
+that turn. Over a twenty-question budget against an entropy floor of $16.23$
+bits, deficits of that size are not a rounding error.
+
+\begin{remark}[Greedy optimality does not transfer automatically]
+\label{rem:greedy}
+Jedynak et al.~\cite{jedynak2012} establish that greedy one-step entropy
+minimisation is optimal over the full horizon for twenty questions with noise,
+and that result is often cited as licence to select greedily. It is proved
+under a single common crossover probability. We are not aware of an extension
+to the heterogeneous per-attribute channel of \eqref{eq:channel}, and we do not
+claim one: Corollary~\ref{cor:budget} makes the difficulty visible, since with
+heterogeneous capacities a horizon-optimal policy may wish to reserve a
+high-capacity attribute for a later turn at which the belief is better
+positioned to exploit it, and a myopic rule cannot express that preference. We
+select greedily throughout because that is what deployed systems do and because
+holding the policy class fixed is what isolates the effect of the acquisition
+function, not because optimality has been established in this setting.
+\end{remark}
+
+\subsection{Extension: Abstention}
+\label{sec:erasure}
+
+Real users decline to answer. Let attribute $f$ additionally carry an
+abstention probability $\delta_f$, so that with probability $\delta_f$ the
+question returns an erasure and with probability $1-\delta_f$ it returns a
+BSC output as before. The channel is then a cascade of a binary symmetric
+channel and a binary erasure channel, and because an erasure conveys nothing
+about the target while still consuming a turn, the value of the question
+becomes
+\begin{equation}
+\RAIG_\delta(q) \;=\; (1-\delta_{f(q)})
+\left[\Hb\!\left(p_q \star \varepsilon_{f(q)}\right) - \Hb(\varepsilon_{f(q)})\right].
+\label{eq:erasure}
+\end{equation}
+The belief update is unchanged on answered turns and is the identity on
+erasures. If abstention correlates with subjectivity in the same direction as
+error---a user who cannot judge an attribute reliably being also the user most
+likely to decline it---then the two penalties compound and the bias should be
+\emph{larger} than the pure-BSC analysis suggests. That is a prediction, and
+Section~\ref{sec:results-erasure} tests it rather than leaving it as an
+expectation.

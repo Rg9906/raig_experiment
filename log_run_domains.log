@@ -1,0 +1,43 @@
+
+=== music (n=20 attributes) ===
+  Kruskal-Wallis max-IG across tiers : H=7.23  p=0.0270   [primary]
+  Kendall tau-b(max-IG, reliability) : -0.311 p=0.0878  [tie-robust]
+  Spearman rho (as in the conf. ver.): -0.438 p=0.0536
+  Mann-Whitney objective max-IG lower: p=0.0027
+  mean max IG by tier : objective=0.445, semi=0.840, subjective=0.866
+  mean skew   by tier : objective=0.696, semi=0.587, subjective=0.451
+
+  [discretisation] binned max-IG=0.861 vs categorical=0.618, Mann-Whitney p=0.0473
+  [discretisation] binned mean eps=0.205 vs categorical=0.150
+
+=== mushroom (n=21 attributes) ===
+  Kruskal-Wallis max-IG across tiers : H=1.75  p=0.4164   [primary]
+  Kendall tau-b(max-IG, reliability) : +0.006 p=0.9740  [tie-robust]
+  Spearman rho (as in the conf. ver.): -0.011 p=0.9618
+  Mann-Whitney objective max-IG lower: p=0.2970
+  mean max IG by tier : objective=0.780, semi=0.976, subjective=0.803
+  mean skew   by tier : objective=0.657, semi=0.519, subjective=0.470
+
+=== dermatology (n=34 attributes) ===
+  Kruskal-Wallis max-IG across tiers : H=6.21  p=0.0447   [primary]
+  Kendall tau-b(max-IG, reliability) : +0.135 p=0.3351  [tie-robust]
+  Spearman rho (as in the conf. ver.): +0.180 p=0.3081
+  Mann-Whitney objective max-IG lower: p=0.2963
+  mean max IG by tier : objective=0.797, semi=0.969, subjective=0.762
+  mean skew   by tier : objective=0.652, semi=0.475, subjective=0.719
+
+  [music] N=79803 Q=193 distinct=77069 unique=93.7% floor=16.23 bits
+
+  [mushroom] N=8124 Q=116 distinct=8124 unique=100.0% floor=12.99 bits
+
+  [dermatology] N=366 Q=134 distinct=366 unique=100.0% floor=8.52 bits
+
+wrote results/domains_bias.json
+[    28s] mushroom lam=0.5: Random+soft=0.3, IG+hard=27.7, IG+soft-uniform=31.7, IG+soft-objective=1.7, RAIG-tiered=31.5, RAIG-oracle=35.7  | McNemar p=1.00e+00
+[    56s] mushroom lam=1.0: Random+soft=0.2, IG+hard=8.0, IG+soft-uniform=10.5, IG+soft-objective=1.2, RAIG-tiered=10.3, RAIG-oracle=10.3  | McNemar p=1.00e+00
+[    83s] mushroom lam=1.5: Random+soft=0.0, IG+hard=1.0, IG+soft-uniform=2.3, IG+soft-objective=0.8, RAIG-tiered=2.7, RAIG-oracle=3.8  | McNemar p=8.45e-01
+[    86s] dermatology lam=0.5: Random+soft=26.2, IG+hard=47.0, IG+soft-uniform=84.5, IG+soft-objective=18.5, RAIG-tiered=92.7, RAIG-oracle=94.5  | McNemar p=6.40e-07
+[    89s] dermatology lam=1.0: Random+soft=9.7, IG+hard=20.0, IG+soft-uniform=34.7, IG+soft-objective=17.3, RAIG-tiered=73.0, RAIG-oracle=73.0  | McNemar p=2.66e-52
+[    92s] dermatology lam=1.5: Random+soft=3.0, IG+hard=7.8, IG+soft-uniform=6.0, IG+soft-objective=15.8, RAIG-tiered=48.3, RAIG-oracle=46.3  | McNemar p=5.26e-71
+
+wrote results/domains_methods.json  (92s)

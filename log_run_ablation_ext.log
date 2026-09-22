@@ -1,0 +1,7 @@
+K=1 (uniform)          acc= 3.22%  [2.11, 4.44]  pct_of_oracle_gap=    0.0%   (main_ext)
+K=2                    acc= 7.22%  [5.56, 9.00]  pct_of_oracle_gap=   78.3%   (this run)
+K=3 (tiered)           acc= 8.33%  [6.56,10.22]  pct_of_oracle_gap=  100.0%   (main_ext)
+K=M (oracle)           acc= 8.33%  [6.56,10.22]  pct_of_oracle_gap=  100.0%   (main_ext)
+Capacity term only     acc= 0.00%  [0.00, 0.00]  pct_of_oracle_gap=  -63.0%   (this run)
+
+wrote results/ablation_ext.json

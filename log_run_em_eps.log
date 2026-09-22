@@ -1,0 +1,39 @@
+N=79803 Q=193 uniform_eps=0.0981  D=600 T=20
+
+=== exploration fraction 0.0 ===
+    EM iter 0: max shift 0.0628
+    EM iter 1: max shift 0.0288
+    EM iter 2: max shift 0.0246
+    EM iter 3: max shift 0.0226
+    EM iter 4: max shift 0.0230
+    EM iter 5: max shift 0.0230
+    EM iter 6: max shift 0.0225
+    EM iter 7: max shift 0.0214
+  attributes observed at all: 20/20   min obs 6   Spearman(hat, true) = +0.829 (p=6.41e-06)   MAE = 0.054
+  [explore=0.0] IG+soft-uniform=3.22, RAIG-EM=8.33, RAIG-tiered=8.33, RAIG-oracle=8.33
+
+=== exploration fraction 0.1 ===
+    EM iter 0: max shift 0.1261
+    EM iter 1: max shift 0.1020
+    EM iter 2: max shift 0.0672
+    EM iter 3: max shift 0.0662
+    EM iter 4: max shift 0.0745
+    EM iter 5: max shift 0.0692
+    EM iter 6: max shift 0.0159
+    EM iter 7: max shift 0.0153
+  attributes observed at all: 20/20   min obs 26   Spearman(hat, true) = +0.709 (p=0.000471)   MAE = 0.066
+  [explore=0.1] IG+soft-uniform=3.22, RAIG-EM=8.22, RAIG-tiered=8.33, RAIG-oracle=8.33
+
+=== exploration fraction 0.25 ===
+    EM iter 0: max shift 0.1447
+    EM iter 1: max shift 0.0927
+    EM iter 2: max shift 0.0456
+    EM iter 3: max shift 0.0188
+    EM iter 4: max shift 0.0157
+    EM iter 5: max shift 0.0146
+    EM iter 6: max shift 0.0136
+    EM iter 7: max shift 0.0126
+  attributes observed at all: 20/20   min obs 34   Spearman(hat, true) = +0.806 (p=1.81e-05)   MAE = 0.057
+  [explore=0.25] IG+soft-uniform=3.22, RAIG-EM=7.78, RAIG-tiered=8.33, RAIG-oracle=8.33
+
+wrote results/em_eps.json (987s)

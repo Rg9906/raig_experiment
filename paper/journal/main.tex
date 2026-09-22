@@ -1,0 +1,115 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  Information Gain Prefers the Questions Users Cannot Answer
+%  Reliability-Aware Query Selection for Interactive Identification
+%
+%  JOURNAL VERSION. Venue-neutral: written against IEEEtran in journal mode
+%  because that class is installed and the document compiles locally, which
+%  lets every table be checked against the result files by audit_paper.py.
+%  See PORTING.md for what changes when moving to elsarticle (Elsevier) or
+%  acmart (ACM TOIS / TIST).
+%
+%  BUILD:  pdflatex main -> bibtex main -> pdflatex main -> pdflatex main
+%  AUDIT:  py audit_paper.py     (checks every numeric cell against results/)
+%
+%  Packages deliberately avoided because they are not in the local TinyTeX
+%  installation: multirow, subcaption, threeparttable, siunitx.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[journal]{IEEEtran}
+\IEEEoverridecommandlockouts
+
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{url}
+\usepackage[hidelinks]{hyperref}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric,calc,fit,backgrounds}
+\pgfplotsset{compat=1.18}
+
+% Binary entropy and reliability-aware information gain, evaluated natively by
+% pgfmath, so the criterion figure is computed rather than traced.
+\pgfmathdeclarefunction{Hb}{1}{%
+  \pgfmathparse{-((#1)*ln(#1)+(1-(#1))*ln(1-(#1)))/ln(2)}%
+}
+\pgfmathdeclarefunction{RAIGf}{2}{%
+  \pgfmathparse{Hb((#1)*(1-(#2))+(1-(#1))*(#2)) - Hb(#2)}%
+}
+
+\newcommand{\bx}{\mathbf{x}}
+\newcommand{\bb}{\mathbf{b}}
+\newcommand{\Hb}{H_{\mathrm{b}}}
+\newcommand{\RAIG}{\mathrm{RAIG}}
+\newcommand{\IG}{\mathrm{IG}}
+\newcommand{\Cat}{\mathcal{C}}
+\newcommand{\Qset}{\mathcal{Q}}
+\newcommand{\Fset}{\mathcal{F}}
+\newcommand{\pp}{\,\text{pp}}
+
+% IEEEtran defines no proof environment and amsthm is not loaded (it would
+% override the class's theorem styling), so declare a minimal one here.
+\newenvironment{proof}[1][Proof]{\par\noindent\textit{#1.}\ }%
+  {\hfill$\blacksquare$\par\medskip}
+
+\newtheorem{proposition}{Proposition}
+\newtheorem{corollary}{Corollary}
+\newtheorem{definition}{Definition}
+\newtheorem{remark}{Remark}
+
+% Shared figure styles
+\tikzset{
+  fbox/.style   ={draw, rounded corners=1pt, align=center, inner sep=2pt,
+                  minimum height=4.6mm, font=\scriptsize},
+  fdata/.style  ={fbox, fill=black!5, draw=black!45},
+  fproc/.style  ={fbox, fill=blue!7, draw=blue!50},
+  frel/.style   ={fbox, fill=red!8,  draw=red!60, thick},
+  fuser/.style  ={fbox, ellipse, fill=black!3, draw=black!55, minimum height=4mm},
+  fdec/.style   ={draw, diamond, aspect=2.4, inner sep=1pt, align=center,
+                  fill=black!3, font=\scriptsize},
+  far/.style    ={-{Stealth[length=1.5mm]}, thin, black!70},
+  frar/.style   ={-{Stealth[length=1.5mm]}, red!65, thick, densely dashed},
+}
+
+\begin{document}
+
+\title{Information Gain Prefers the Questions Users\\
+Cannot Answer: Reliability-Aware Query Selection\\
+for Interactive Identification}
+
+% TODO-HUMAN: replace the bracketed fields with your department, institution,
+% city/country and contact email. If you submit somewhere double-blind,
+% replace this whole block with an anonymised one.
+\author{R.~G.~Saran Vishakan%
+\thanks{R.~G.~Saran Vishakan is with the \textcolor{red}{[Department]},
+\textcolor{red}{[Institution]}, \textcolor{red}{[City, Country]}
+(e-mail: \textcolor{red}{[email]}).}%
+\thanks{Reference implementation, catalogues and the complete result files
+needed to reproduce every number in this paper are available at
+\textcolor{red}{[repository URL]}.}}
+
+\markboth{Journal manuscript}%
+{Saran Vishakan: Reliability-Aware Query Selection for Interactive Identification}
+
+\maketitle
+
+\input{sec_abstract}
+\input{sec_intro}
+\input{sec_related}
+\input{sec_theory}
+\input{sec_reliability}
+\input{sec_system}
+\input{sec_setup}
+\input{sec_results}
+\input{sec_robustness}
+\input{sec_discussion}
+\input{sec_appendix}
+
+\bibliographystyle{IEEEtran}
+\bibliography{refs}
+
+\end{document}

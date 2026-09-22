@@ -1,0 +1,39 @@
+{
+  "note": "ms_per_turn reconciled over 5 independent runs on this shared/contended machine. Median is the recommended headline figure (robust to the run-2 RAIG-tiered outlier, which coincided with a concurrent unrelated background job stealing CPU). Treat ms/turn as order-of-magnitude, not a precise benchmark.",
+  "IG+soft-uniform": {
+    "runs_ms_per_turn": [
+      64.45941499841865,
+      64.22959000628907,
+      47.04770500829909,
+      106.32458000909537,
+      57.807529997080564
+    ],
+    "mean": 67.97376400383655,
+    "median": 64.22959000628907,
+    "stdev": 22.57435954290755,
+    "min": 47.04770500829909,
+    "max": 106.32458000909537,
+    "acc": 0.06666666666666667,
+    "top5": 0.10666666666666667,
+    "mean_q_to_thresh": 19.993333333333332,
+    "frac_reached": 0.006666666666666667
+  },
+  "RAIG-tiered": {
+    "runs_ms_per_turn": [
+      66.3058249920141,
+      515.9016000077827,
+      61.13471499993466,
+      79.4618249987252,
+      57.48042498889845
+    ],
+    "mean": 156.05687799747102,
+    "median": 66.3058249920141,
+    "stdev": 201.33169877966913,
+    "min": 57.48042498889845,
+    "max": 515.9016000077827,
+    "acc": 0.11333333333333333,
+    "top5": 0.22,
+    "mean_q_to_thresh": 19.946666666666665,
+    "frac_reached": 0.02666666666666667
+  }
+}

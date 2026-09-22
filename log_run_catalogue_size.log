@@ -1,0 +1,41 @@
+full catalogue N=79803
+[     3s] N= 1000 T=20: floor= 9.97b ceiling=100.0%  IG+soft-uniform= 28.5, RAIG-tiered= 60.7, RAIG-oracle= 60.7  delta=+32.2pp p=1.66e-40
+[    36s] N= 1000 T=40: floor= 9.97b ceiling=100.0%  IG+soft-uniform= 62.0, RAIG-tiered= 84.2, RAIG-oracle= 84.2  delta=+22.2pp p=4.69e-23
+[   122s] N= 2500 T=20: floor=11.29b ceiling= 99.7%  IG+soft-uniform= 17.5, RAIG-tiered= 44.2, RAIG-oracle= 44.2  delta=+26.7pp p=6.06e-33
+[   302s] N= 2500 T=40: floor=11.29b ceiling= 99.7%  IG+soft-uniform= 52.3, RAIG-tiered= 72.3, RAIG-oracle= 72.3  delta=+20.0pp p=2.44e-16
+[   532s] N= 5000 T=20: floor=12.28b ceiling= 99.5%  IG+soft-uniform= 10.0, RAIG-tiered= 35.5, RAIG-oracle= 35.5  delta=+25.5pp p=2.08e-33
+[   814s] N= 5000 T=40: floor=12.28b ceiling= 99.5%  IG+soft-uniform= 45.0, RAIG-tiered= 64.8, RAIG-oracle= 64.8  delta=+19.8pp p=2.68e-16
+[   994s] N=10000 T=20: floor=13.28b ceiling= 99.1%  IG+soft-uniform=  8.3, RAIG-tiered= 27.2, RAIG-oracle= 27.2  delta=+18.8pp p=2.02e-20
+[  1633s] N=10000 T=40: floor=13.28b ceiling= 99.1%  IG+soft-uniform= 34.7, RAIG-tiered= 54.7, RAIG-oracle= 54.7  delta=+20.0pp p=3.99e-17
+
+wrote results/catalogue_size.json (1633s)
+full catalogue N=79803
+resuming: 8 cell(s) already stored
+[     5s] N= 1000 T=60: floor= 9.97b ceiling=100.0%  IG+soft-uniform= 72.5, RAIG-tiered= 88.3, RAIG-oracle= 88.3  delta=+15.8pp p=3.42e-15
+[    21s] N= 2500 T=60: floor=11.29b ceiling= 99.7%  IG+soft-uniform= 64.5, RAIG-tiered= 78.5, RAIG-oracle= 78.5  delta=+14.0pp p=1.15e-09
+[    45s] N= 5000 T=60: floor=12.28b ceiling= 99.5%  IG+soft-uniform= 57.3, RAIG-tiered= 73.2, RAIG-oracle= 73.2  delta=+15.8pp p=3.67e-12
+[    84s] N=10000 T=60: floor=13.28b ceiling= 99.1%  IG+soft-uniform= 48.3, RAIG-tiered= 63.0, RAIG-oracle= 63.0  delta=+14.7pp p=6.37e-09
+
+wrote results/catalogue_size.json (84s)
+full catalogue N=79803
+resuming: 12 cell(s) already stored
+[    28s] N=20000 T=20: floor=14.27b ceiling= 98.1%  IG+soft-uniform=  4.8, RAIG-tiered= 16.0, RAIG-oracle= 16.0  delta=+11.2pp p=1.36e-11
+[    93s] N=20000 T=40: floor=14.27b ceiling= 98.1%  IG+soft-uniform= 28.3, RAIG-tiered= 44.3, RAIG-oracle= 44.3  delta=+16.0pp p=7.26e-12
+
+wrote results/catalogue_size.json (93s)
+full catalogue N=79803
+resuming: 14 cell(s) already stored
+[    74s] N=40000 T=20: floor=15.26b ceiling= 96.5%  IG+soft-uniform=  2.8, RAIG-tiered= 11.3, RAIG-oracle= 11.3  delta= +8.5pp p=1.69e-09
+[   225s] N=40000 T=40: floor=15.26b ceiling= 96.5%  IG+soft-uniform= 24.8, RAIG-tiered= 39.2, RAIG-oracle= 39.2  delta=+14.3pp p=1.03e-09
+
+wrote results/catalogue_size.json (225s)
+full catalogue N=79803
+resuming: 16 cell(s) already stored
+[   234s] N=20000 T=60: floor=14.27b ceiling= 98.1%  IG+soft-uniform= 41.8, RAIG-tiered= 53.7, RAIG-oracle= 53.7  delta=+11.8pp p=6.12e-07
+
+wrote results/catalogue_size.json (234s)
+full catalogue N=79803
+resuming: 17 cell(s) already stored
+[  2110s] N=40000 T=60: floor=15.26b ceiling= 96.5%  IG+soft-uniform= 35.5, RAIG-tiered= 42.0, RAIG-oracle= 42.0  delta= +6.5pp p=4.38e-03
+
+wrote results/catalogue_size.json (2110s)

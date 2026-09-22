@@ -1,0 +1,75 @@
+{
+  "R": 300,
+  "T": 20,
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "method_names": [
+    "Random+soft",
+    "IG+hard",
+    "IG+soft-uniform",
+    "IG+soft-objective",
+    "RAIG-tiered",
+    "RAIG-oracle"
+  ],
+  "results": {
+    "randomised": {
+      "per_seed": [
+        {
+          "Random+soft": 0.0,
+          "IG+hard": 0.02666666666666667,
+          "IG+soft-uniform": 0.06666666666666667,
+          "IG+soft-objective": 0.0,
+          "RAIG-tiered": 0.04,
+          "RAIG-oracle": 0.15333333333333332
+        },
+        {
+          "Random+soft": 0.0,
+          "IG+hard": 0.04666666666666667,
+          "IG+soft-uniform": 0.09,
+          "IG+soft-objective": 0.0,
+          "RAIG-tiered": 0.04,
+          "RAIG-oracle": 0.16666666666666666
+        },
+        {
+          "Random+soft": 0.0,
+          "IG+hard": 0.04,
+          "IG+soft-uniform": 0.09333333333333334,
+          "IG+soft-objective": 0.0033333333333333335,
+          "RAIG-tiered": 0.09,
+          "RAIG-oracle": 0.18666666666666668
+        }
+      ]
+    },
+    "adversarial": {
+      "per_seed": [
+        {
+          "Random+soft": 0.0,
+          "IG+hard": 0.07333333333333333,
+          "IG+soft-uniform": 0.16,
+          "IG+soft-objective": 0.0,
+          "RAIG-tiered": 0.03,
+          "RAIG-oracle": 0.21333333333333335
+        },
+        {
+          "Random+soft": 0.0,
+          "IG+hard": 0.11333333333333333,
+          "IG+soft-uniform": 0.16666666666666666,
+          "IG+soft-objective": 0.0,
+          "RAIG-tiered": 0.03333333333333333,
+          "RAIG-oracle": 0.25
+        },
+        {
+          "Random+soft": 0.0,
+          "IG+hard": 0.1,
+          "IG+soft-uniform": 0.17333333333333334,
+          "IG+soft-objective": 0.0033333333333333335,
+          "RAIG-tiered": 0.056666666666666664,
+          "RAIG-oracle": 0.22666666666666666
+        }
+      ]
+    }
+  }
+}

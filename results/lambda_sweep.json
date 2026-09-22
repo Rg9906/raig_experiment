@@ -1,0 +1,175 @@
+{
+  "lambdas": [
+    0.0,
+    0.25,
+    0.5,
+    0.625,
+    0.75,
+    0.875,
+    1.0,
+    1.25,
+    1.5,
+    2.0
+  ],
+  "R": 150,
+  "T": 20,
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "rows": [
+    {
+      "lambda": 0.0,
+      "n": 450,
+      "acc": {
+        "IG+soft-uniform": 0.96,
+        "Learned-noiseaware": 0.9111111111111111,
+        "RAIG-tiered": 0.42444444444444446,
+        "RAIG-oracle": 0.9644444444444444
+      },
+      "delta_raig_minus_ig": -0.5355555555555556,
+      "mcnemar_p": 5.659799424266695e-73,
+      "n10": 241,
+      "n01": 0,
+      "mean_true_eps": 0.0
+    },
+    {
+      "lambda": 0.25,
+      "n": 450,
+      "acc": {
+        "IG+soft-uniform": 0.5088888888888888,
+        "Learned-noiseaware": 0.4311111111111111,
+        "RAIG-tiered": 0.28444444444444444,
+        "RAIG-oracle": 0.56
+      },
+      "delta_raig_minus_ig": -0.2244444444444444,
+      "mcnemar_p": 6.166319657349993e-14,
+      "n10": 144,
+      "n01": 43,
+      "mean_true_eps": 0.02452072501182556
+    },
+    {
+      "lambda": 0.5,
+      "n": 450,
+      "acc": {
+        "IG+soft-uniform": 0.24,
+        "Learned-noiseaware": 0.19111111111111112,
+        "RAIG-tiered": 0.19555555555555557,
+        "RAIG-oracle": 0.3111111111111111
+      },
+      "delta_raig_minus_ig": -0.044444444444444425,
+      "mcnemar_p": 0.08755276689017033,
+      "n10": 72,
+      "n01": 52,
+      "mean_true_eps": 0.04904145002365112
+    },
+    {
+      "lambda": 0.625,
+      "n": 450,
+      "acc": {
+        "IG+soft-uniform": 0.14222222222222222,
+        "Learned-noiseaware": 0.12,
+        "RAIG-tiered": 0.1622222222222222,
+        "RAIG-oracle": 0.20666666666666667
+      },
+      "delta_raig_minus_ig": 0.01999999999999999,
+      "mcnemar_p": 0.40692436804613413,
+      "n10": 42,
+      "n01": 51,
+      "mean_true_eps": 0.0613018162548542
+    },
+    {
+      "lambda": 0.75,
+      "n": 450,
+      "acc": {
+        "IG+soft-uniform": 0.07111111111111111,
+        "Learned-noiseaware": 0.07111111111111111,
+        "RAIG-tiered": 0.1288888888888889,
+        "RAIG-oracle": 0.14666666666666667
+      },
+      "delta_raig_minus_ig": 0.057777777777777775,
+      "mcnemar_p": 0.0025475648982539578,
+      "n10": 22,
+      "n01": 48,
+      "mean_true_eps": 0.07356217503547668
+    },
+    {
+      "lambda": 0.875,
+      "n": 450,
+      "acc": {
+        "IG+soft-uniform": 0.042222222222222223,
+        "Learned-noiseaware": 0.04666666666666667,
+        "RAIG-tiered": 0.10888888888888888,
+        "RAIG-oracle": 0.1
+      },
+      "delta_raig_minus_ig": 0.06666666666666665,
+      "mcnemar_p": 0.00010049669926914809,
+      "n10": 14,
+      "n01": 44,
+      "mean_true_eps": 0.08582254499197006
+    },
+    {
+      "lambda": 1.0,
+      "n": 450,
+      "acc": {
+        "IG+soft-uniform": 0.024444444444444446,
+        "Learned-noiseaware": 0.017777777777777778,
+        "RAIG-tiered": 0.07777777777777778,
+        "RAIG-oracle": 0.07777777777777778
+      },
+      "delta_raig_minus_ig": 0.05333333333333333,
+      "mcnemar_p": 0.0001821658297558315,
+      "n10": 8,
+      "n01": 32,
+      "mean_true_eps": 0.09808290004730225
+    },
+    {
+      "lambda": 1.25,
+      "n": 450,
+      "acc": {
+        "IG+soft-uniform": 0.008888888888888889,
+        "Learned-noiseaware": 0.0022222222222222222,
+        "RAIG-tiered": 0.042222222222222223,
+        "RAIG-oracle": 0.044444444444444446
+      },
+      "delta_raig_minus_ig": 0.03333333333333333,
+      "mcnemar_p": 0.0014896392822265625,
+      "n10": 3,
+      "n01": 18,
+      "mean_true_eps": 0.1226036325097084
+    },
+    {
+      "lambda": 1.5,
+      "n": 450,
+      "acc": {
+        "IG+soft-uniform": 0.0022222222222222222,
+        "Learned-noiseaware": 0.0022222222222222222,
+        "RAIG-tiered": 0.035555555555555556,
+        "RAIG-oracle": 0.022222222222222223
+      },
+      "delta_raig_minus_ig": 0.03333333333333333,
+      "mcnemar_p": 0.000274658203125,
+      "n10": 1,
+      "n01": 16,
+      "mean_true_eps": 0.14712435007095337
+    },
+    {
+      "lambda": 2.0,
+      "n": 450,
+      "acc": {
+        "IG+soft-uniform": 0.0,
+        "Learned-noiseaware": 0.0,
+        "RAIG-tiered": 0.02,
+        "RAIG-oracle": 0.015555555555555555
+      },
+      "delta_raig_minus_ig": 0.02,
+      "mcnemar_p": 0.00390625,
+      "n10": 0,
+      "n01": 9,
+      "mean_true_eps": 0.1961658000946045
+    }
+  ],
+  "crossing_lambda": 0.5862068965517242,
+  "crossing_mean_true_eps": 0.057496875524520874
+}

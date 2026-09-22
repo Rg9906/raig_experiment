@@ -1,0 +1,336 @@
+%=============================================================================
+\section{Specifying and Estimating Reliability}
+\label{sec:reliability}
+%=============================================================================
+
+Equation~\eqref{eq:raig} requires $\hat\varepsilon_f$, which a deployed system
+does not know. This section is about how little one can get away with knowing,
+and it is the part of the argument on which the practical claim rests.
+
+It is also the part a reader should press hardest, because the specification we
+use throughout is three assumed constants. We therefore treat
+$\hat{\boldsymbol\varepsilon}$ as something to be \emph{obtained} rather than
+declared, and give five ways of obtaining it, in decreasing order of what they
+demand of the practitioner: the truth (unattainable, an upper reference); a
+three-tier curator annotation; a vector \emph{learned from the system's own
+interaction logs}, which requires no annotation, no labels and no user study; a
+vector computed from the catalogue's repeated items; and a single global
+constant, which we show is provably inert. The third of these is the one that
+answers the objection, and Section~\ref{sec:reliability-em} develops it.
+
+\subsection{Five Specifications}
+\label{sec:tiers}
+
+\emph{Oracle.} $\hat\varepsilon_f = \varepsilon_f$. Not attainable; reported as
+an upper reference.
+
+\emph{Tiered.} Each attribute is annotated into one of $K$ qualitative
+reliability tiers and assigned that tier's representative value. With $K=3$ the
+annotation (Table~\ref{tab:tiers}) asks only whether an attribute is objective
+(an unambiguous property
+of the item, such as language of the lyrics), semi-objective (well defined but
+imperfectly recalled, such as duration), or subjective (a perceptual judgement,
+such as energy). This requires no measurement and can be produced by a domain
+curator in minutes.
+
+\emph{Learned from logs.} $\hat\varepsilon_f$ is estimated from the questions a
+deployed system asked and the answers it received, by the procedure of
+Section~\ref{sec:reliability-em}. No annotation, no labels, no user study, and
+no knowledge of what any user was thinking of.
+
+\emph{Empirical.} $\hat\varepsilon_f$ is measured from the catalogue itself by
+the repeated-item estimator of Section~\ref{sec:reliability-empirical}. No
+annotation, no users.
+
+\emph{Uniform.} A single $\hat\varepsilon$ for all attributes. This is what a
+system does when it models noise in the likelihood but not per attribute. It is
+also, as the next proposition records, no correction at all.
+
+\begin{proposition}[Uniform specification is inert for selection]
+\label{prop:uniform}
+If $\hat\varepsilon_f = \hat\varepsilon$ for every $f$, with
+$\hat\varepsilon \in [0,\tfrac12)$, then
+$\arg\max_q \RAIG(q) = \arg\max_q \Hb(p_q)$.
+\end{proposition}
+
+\begin{proof}
+$\Hb(\hat\varepsilon)$ is then a constant additive offset, so it suffices that
+$p \mapsto \Hb(p \star \hat\varepsilon)$ and $p \mapsto \Hb(p)$ induce the same
+order. Both are symmetric about $p=\tfrac12$, so take $p_1 < p_2 \le \tfrac12$.
+Since $p \star \hat\varepsilon = \hat\varepsilon + p(1-2\hat\varepsilon)$ is
+strictly increasing in $p$ for $\hat\varepsilon < \tfrac12$, and maps
+$[0,\tfrac12]$ into $[\hat\varepsilon,\tfrac12]$, we get
+$p_1 \star \hat\varepsilon < p_2 \star \hat\varepsilon \le \tfrac12$, and $\Hb$
+is strictly increasing on $[0,\tfrac12]$. Hence
+$\Hb(p_1 \star \hat\varepsilon) < \Hb(p_2 \star \hat\varepsilon)$ exactly when
+$\Hb(p_1) < \Hb(p_2)$.
+\end{proof}
+
+Proposition~\ref{prop:uniform} is worth stating plainly because it delimits the
+contribution: heterogeneity is not a refinement of the method, it is the
+entirety of the method. A system that models answer noise with one global rate
+has corrected its belief update and left its selector exactly where it was.
+This also predicts an experimental invariant we use as an internal
+consistency check: RAIG with a uniform $\hat\varepsilon$ must reproduce
+classical IG's accuracy trial for trial, which it does
+(Section~\ref{sec:results-main}).
+
+\begin{table}[t]
+\caption{Attribute reliability annotation for the music catalogue. Crossover
+values are assumed, informed by reported inter-annotator agreement on
+perceptual music descriptors~\cite{hu2007mood,kim2010emotion}, and are not
+measured from users. Section~\ref{sec:reliability-empirical} measures a related
+quantity from the catalogue, and Section~\ref{sec:results-ensemble} reports the
+primary comparison across a distribution over these values rather than at the
+point values alone.}
+\label{tab:tiers}
+\centering
+\footnotesize
+\begin{tabular}{@{}lp{0.58\columnwidth}c@{}}
+\toprule
+\textbf{Tier} & \textbf{Attributes} & \textbf{$\varepsilon$} \\
+\midrule
+Objective & genre, language, content rating, artist type, release type, track version & 0.03 \\
+Semi-objective & popularity, duration, liveness, instrumentalness, acousticness, loudness, speechiness & 0.15 \\
+Subjective & mood, tempo, danceability, energy, valence, key, mode, time signature & 0.30 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Measuring Attribute Instability from Repeated Items}
+\label{sec:reliability-empirical}
+
+The most serious objection to the specification above is that its three numbers
+are assumed. We cannot remove that objection without a user study, and
+Appendix~\ref{app:protocol} specifies one. We can, however, measure something
+adjacent, for free, in any catalogue with the right structure.
+
+Many catalogues contain the same underlying entity more than once under
+different identifiers: a song released on a single and again on an album, a
+product listed by two vendors, a component under two part numbers. Those
+duplicates are independent renderings of one item, so the rate at which their
+\emph{discretised} attribute values disagree measures how fragile that
+attribute's boundary is. An attribute whose two renderings of the same song
+disagree nine per cent of the time has a boundary sitting inside the data,
+which is precisely the property that makes it hard for a person to answer.
+Formally, for attribute $f$ let $\mathcal{P}$ be the set of within-entity pairs;
+the estimator is
+\begin{equation}
+d_f \;=\; \frac{1}{|\mathcal{P}|}\sum_{(i,j)\in\mathcal{P}}
+          \mathbb{1}\!\left[a_f(c_i) \neq a_f(c_j)\right],
+\label{eq:discordance}
+\end{equation}
+reported with a Wilson score interval~\cite{wilson1927}. This is the
+repeated-observation logic of Dawid and Skene~\cite{dawid1979} applied to the
+catalogue rather than to annotators.
+
+In the music catalogue, $3{,}178$ (title, artist) groups contain two or more
+distinct track identifiers, yielding $5{,}073$ within-group pairs.
+Table~\ref{tab:discordance} reports the result.
+
+\begin{table}[t]
+\caption{Measured attribute instability $d_f$ from $5{,}073$ repeated-item
+pairs, with Wilson 95\% intervals. This is a measurement, not an assumption.
+It is not a user error rate: it is the rate at which the catalogue itself
+disagrees with the catalogue about the same song.}
+\label{tab:discordance}
+\centering
+\footnotesize
+\begin{tabular}{@{}llcc@{}}
+\toprule
+\textbf{Attribute} & \textbf{Tier} & \textbf{$d_f$} & \textbf{95\% CI} \\
+\midrule
+language                & objective & 0.0000 & [0.0000, 0.0008] \\
+artist type             & objective & 0.0000 & [0.0000, 0.0008] \\
+release type            & objective & 0.0000 & [0.0000, 0.0008] \\
+track version           & objective & 0.0000 & [0.0000, 0.0008] \\
+content rating          & objective & 0.0158 & [0.0127, 0.0196] \\
+genre                   & objective & 0.1234 & [0.1146, 0.1327] \\
+\midrule
+speechiness             & semi & 0.0041 & [0.0027, 0.0063] \\
+instrumentalness        & semi & 0.0278 & [0.0236, 0.0327] \\
+duration                & semi & 0.0375 & [0.0326, 0.0430] \\
+acousticness            & semi & 0.0781 & [0.0710, 0.0858] \\
+liveness                & semi & 0.0911 & [0.0835, 0.0993] \\
+loudness                & semi & 0.1104 & [0.1021, 0.1193] \\
+popularity              & semi & 0.4360 & [0.4224, 0.4497] \\
+\midrule
+time signature          & subjective & 0.0235 & [0.0196, 0.0280] \\
+mode                    & subjective & 0.0467 & [0.0412, 0.0529] \\
+key                     & subjective & 0.0603 & [0.0541, 0.0672] \\
+tempo                   & subjective & 0.0645 & [0.0580, 0.0716] \\
+danceability            & subjective & 0.0712 & [0.0644, 0.0786] \\
+mood                    & subjective & 0.0785 & [0.0714, 0.0862] \\
+valence                 & subjective & 0.0887 & [0.0812, 0.0968] \\
+energy                  & subjective & 0.0928 & [0.0852, 0.1011] \\
+\midrule
+\multicolumn{2}{@{}l}{\emph{objective mean}}      & 0.0232 & \\
+\multicolumn{2}{@{}l}{\emph{non-objective mean}}  & 0.0874 & \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The measurement partially corroborates the annotation and partially challenges
+it, and both halves are informative. Objective attributes are $3.8\times$ more
+stable than the rest ($0.0232$ against $0.0874$), which is the contrast the
+two-tier ablation of Section~\ref{sec:results-ablation} depends on, and four of
+the six objective attributes never disagree at all across five thousand pairs.
+The rank correlation between the annotated $\varepsilon$ and the measured
+$d_f$ is $\rho = 0.42$ ($p = 0.061$), positive as the annotation predicts but
+not decisive.
+
+The two attributes responsible for most of the disagreement are diagnosable
+rather than mysterious, and neither is a perceptual judgement.
+\emph{Popularity} is release-dependent by construction: a single and an album
+cut of the same song genuinely have different popularity scores, so its
+instability of $0.436$ measures a real property of the catalogue that has
+nothing to do with whether a listener can answer the question. \emph{Genre} is
+assigned per playlist rather than per track in this catalogue, so the same
+recording appearing under two genre labels is a labelling convention, not a
+boundary effect. Excluding those two, the correlation between annotation and
+measurement rises to $\rho = 0.64$ ($p = 0.003$).
+
+The honest reading is therefore: the estimator validates the objective versus
+non-objective distinction strongly, does not by itself separate semi-objective
+from subjective, and is confounded wherever an attribute varies across
+renderings of an entity for reasons unrelated to perceptual vagueness. It is a
+lower bound and a cross-check, not a replacement for measuring users.
+
+\emph{As a specification.} We nonetheless evaluate it as one. RAIG-empirical
+sets $\hat\varepsilon_f = \mathrm{clip}(\kappa d_f, 0.01, 0.45)$, where the
+single global constant $\kappa$ is fixed so that the mean of
+$\hat{\boldsymbol\varepsilon}$ matches the mean of the tier annotation
+($\kappa = 2.50$). The shape then comes entirely from data and exactly one
+number is assumed, against three for the tiered specification.
+Section~\ref{sec:results-main} reports how it performs, and the answer is
+instructive.
+
+\subsection{Learning the Crossover from Interaction Logs}
+\label{sec:reliability-em}
+
+The tier values are assumed. The measurement of the previous subsection is free
+but, as we reported, does not work well enough to deploy. This subsection gives
+the specification that resolves the tension, and it requires nothing that a
+running system does not already have.
+
+\emph{Setting.} A system has been deployed with the incumbent selector---
+classical information gain at a single global crossover, which is what a system
+that has never heard of this paper would ship. It has logged, for each session
+$d$, the questions it asked, $q_{d,1:T}$, and the answers it received,
+$y_{d,1:T}$. It has \emph{not} logged what the user was thinking of, because it
+does not know: the target item is latent. The question is whether
+$\boldsymbol\varepsilon$ can be recovered from these logs alone.
+
+It can, by the same argument Dawid and Skene use to recover annotator error
+rates without ground truth~\cite{dawid1979}, with the item playing the role of
+the latent label. Let $\bb_d$ be the posterior over items implied by session
+$d$'s log under a current estimate $\hat{\boldsymbol\varepsilon}$. The
+probability that the answer given at turn $t$ disagrees with the (unknown) true
+item is then computable in closed form from the split mass
+$p_{q} = \sum_c \bb_d(c)\,x_{q}(c)$:
+\begin{equation}
+\Pr\!\left[\,y_{d,t} \neq x_{q_{d,t}}(c^\ast)\,\right] =
+\begin{cases} 1 - p_{q_{d,t}}, & y_{d,t} = 1,\\ p_{q_{d,t}}, & y_{d,t} = 0.\end{cases}
+\label{eq:em-disagree}
+\end{equation}
+Averaging \eqref{eq:em-disagree} over every logged turn that probed attribute
+$f$ gives the M-step,
+\begin{equation}
+\hat\varepsilon_f \;\leftarrow\;
+\frac{1}{|\mathcal{T}_f|}\sum_{(d,t)\in\mathcal{T}_f}
+  \Pr\!\left[\,y_{d,t} \neq x_{q_{d,t}}(c^\ast)\,\right],
+\label{eq:em-mstep}
+\end{equation}
+and recomputing the posteriors under the updated estimate is the E-step.
+Alternating the two is EM. The fixed point is a self-consistent account of the
+logs: the crossover vector under which the answers actually received are as
+likely as possible, given that nobody ever observed what anyone meant.
+
+Two properties of this estimator matter more than its derivation.
+
+\emph{It needs the ordering, not the level.} Proposition~\ref{prop:uniform}
+says a constant added to every $\hat\varepsilon_f$ changes no selection.
+An estimator that is systematically attenuated but correctly ordered is
+therefore as good for selection as the truth, and this is not a hypothetical
+concession: our estimates \emph{are} attenuated, systematically, on exactly the
+tier where it would matter most (Section~\ref{sec:results-em}). That they work
+anyway is a consequence of Proposition~\ref{prop:uniform}, not an accident.
+
+\emph{Coverage is a design variable.} A greedy incumbent concentrates its
+questions on a few attributes, so its logs may contain almost no observations
+of the attributes it dislikes---which, by the bias this paper describes, are
+precisely the reliable ones. A system can buy coverage by asking a small
+fraction of its questions uniformly at random. We treat that fraction as a
+parameter and sweep it, because whether it is necessary is an empirical
+question rather than an obvious one, and the answer surprised us.
+
+\subsection{A Distribution over the Tier Values}
+\label{sec:priors}
+
+Reporting a result at three assumed point values invites the question of
+whether it survives different ones. We therefore place a prior on each tier and
+report the primary comparison across draws from it
+(Section~\ref{sec:results-ensemble}).
+
+The prior is a scaled Beta on $[0,\tfrac12)$, not a Beta on $[0,1]$: the model
+constrains $\varepsilon < \tfrac12$, since at $\tfrac12$ the answer is
+independent of the item and beyond it the user is systematically
+anti-correlated, which is a different phenomenon and not something a crossover
+probability should represent. We draw
+$\varepsilon = \tfrac12 X$ with $X \sim \mathrm{Beta}(2mc,\,(1-2m)c)$, giving
+mean $m$ equal to the tier's point value and support where the model allows.
+Concentrations are chosen low, since a tight prior would beg the question. The
+resulting 95\% intervals are $[0.000,0.121]$ for objective,
+$[0.037,0.300]$ for semi-objective and $[0.142,0.437]$ for subjective; note
+that the semi-objective and subjective intervals overlap substantially, so the
+ensemble includes many worlds in which the tier ordering the system assumes is
+locally violated.
+
+Crucially, the \emph{deployed} system is held fixed across the ensemble: it
+always assumes the point values $(0.03, 0.15, 0.30)$, because that is what a
+practitioner following this paper would ship. Only the truth varies, and it
+varies per attribute, producing within-tier heterogeneity that the tiered
+specification cannot represent. The question the ensemble answers is therefore
+not whether the method works when it knows the answer, but whether a system
+built on three guessed numbers still beats current practice when the world does
+not match those numbers.
+
+\subsection{Why Binning Makes Perceptual Attributes Fragile}
+\label{sec:psychophysical}
+
+Proposition~\ref{prop:discretisation} says binning fixes apparent
+informativeness. A companion question is what binning does to
+\emph{answerability}, and it admits a direct calculation. Suppose a listener
+perceives a $z$-scored feature as $v + \sigma\zeta$ with
+$\zeta \sim \mathcal{N}(0,1)$, and reports the quantile bin of that perceived
+value. Because equal-population quantile binning necessarily places every
+boundary in the densest region of the distribution, the mass lying within one
+perceptual standard deviation of a boundary---and hence the probability of
+reporting the wrong bin---is close to maximal by construction.
+
+Evaluating this by Monte Carlo over the actual feature columns gives a bin-flip
+probability, averaged over the ten continuous attributes whose raw column is
+present in the shipped catalogue, of $0.077$ at $k=2$ and $\sigma=0.10$, rising
+to $0.132$ at $\sigma=0.25$ and $0.200$ at $\sigma=0.50$. At $k=4$ the same
+perceptual noise produces $0.165$, $0.288$ and $0.423$. The two mechanisms
+therefore pull in the same direction as the discretiser is refined: finer
+binning raises apparent informativeness towards $\Hb(1/k)$ while simultaneously
+roughly doubling the error rate, which is exactly the trade a criterion blind
+to $\varepsilon$ cannot see. It is also why the measured bias strengthens
+rather than weakens under four-bin discretisation in
+Section~\ref{sec:results-bias}.
+
+This calculation is worth reading a second time as a partial defence of the
+assumed tier values, because it is derived from the catalogue's own feature
+distributions rather than borrowed. A listener with perceptual noise of a
+quarter of a standard deviation, answering four-bin questions, misreports the
+bin $0.288$ of the time on average---which brackets the subjective tier's
+assumed $0.30$ from a direction entirely independent of the annotation. The
+same listener answering two-bin questions misreports $0.132$ of the time,
+against the semi-objective tier's assumed $0.15$. We do not present this as a
+measurement of $\varepsilon$: it assumes a Gaussian perceptual noise level that
+is itself unmeasured, and it says nothing about the objective tier, where the
+error is one of recall rather than of perception. What it does establish is
+that the assumed values are not arbitrary numbers chosen to make the method
+work---they are what a standard psychophysical model produces on these
+columns at a plausible noise level.

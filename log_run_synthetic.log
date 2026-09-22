@@ -1,0 +1,21 @@
+[   341s] rho=-1.00 (actual +0.99) IG= 37.7 RAIG= 47.3 oracle= 52.3 delta=+9.7pp
+[   396s] rho=-0.75 (actual +0.73) IG= 28.5 RAIG= 48.2 oracle= 50.7 delta=+19.7pp
+[   401s] rho=-0.50 (actual +0.48) IG= 27.2 RAIG= 47.0 oracle= 51.7 delta=+19.8pp
+[   515s] rho=-0.25 (actual +0.23) IG= 22.3 RAIG= 47.2 oracle= 50.8 delta=+24.8pp
+[   644s] rho=+0.00 (actual -0.02) IG= 20.3 RAIG= 45.8 oracle= 49.7 delta=+25.5pp
+[   755s] rho=+0.25 (actual -0.22) IG= 18.3 RAIG= 42.2 oracle= 49.0 delta=+23.8pp
+[   885s] rho=+0.50 (actual -0.44) IG= 16.3 RAIG= 44.7 oracle= 47.7 delta=+28.3pp
+[  1041s] rho=+0.75 (actual -0.68) IG= 11.7 RAIG= 41.8 oracle= 43.8 delta=+30.2pp
+[  1232s] rho=+1.00 (actual -0.99) IG= 12.0 RAIG= 37.3 oracle= 42.3 delta=+25.3pp
+
+break-even corr(max-IG, 1-eps) = None
+   rho=-0.989  delta=+25.33pp
+   rho=-0.682  delta=+30.17pp
+   rho=-0.438  delta=+28.33pp
+   rho=-0.220  delta=+23.83pp
+   rho=-0.020  delta=+25.50pp
+   rho=+0.232  delta=+24.83pp
+   rho=+0.481  delta=+19.83pp
+   rho=+0.729  delta=+19.67pp
+   rho=+0.989  delta=+9.67pp
+wrote results/synthetic_rho.json (1232s)

@@ -1,0 +1,58 @@
+{
+  "condition": "heterogeneous_1.0",
+  "R": 300,
+  "T": 20,
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "batch_size": 30,
+  "n_total": 900,
+  "eps2": {
+    "reliable": 0.09,
+    "subjective": 0.3
+  },
+  "rows": [
+    {
+      "variant": "K=1 (uniform)",
+      "source": "main_ext",
+      "acc": 0.03222222222222222,
+      "lo": 0.021111111111111112,
+      "hi": 0.044444444444444446,
+      "pct_gap": 0.0
+    },
+    {
+      "variant": "K=2",
+      "source": "this run",
+      "acc": 0.07222222222222222,
+      "lo": 0.05555555555555555,
+      "hi": 0.09,
+      "pct_gap": 78.26086956521739
+    },
+    {
+      "variant": "K=3 (tiered)",
+      "source": "main_ext",
+      "acc": 0.08333333333333333,
+      "lo": 0.06555555555555556,
+      "hi": 0.10222222222222223,
+      "pct_gap": 100.0
+    },
+    {
+      "variant": "K=M (oracle)",
+      "source": "main_ext",
+      "acc": 0.08333333333333333,
+      "lo": 0.06555555555555556,
+      "hi": 0.10222222222222223,
+      "pct_gap": 100.0
+    },
+    {
+      "variant": "Capacity term only",
+      "source": "this run",
+      "acc": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "pct_gap": -63.04347826086957
+    }
+  ]
+}

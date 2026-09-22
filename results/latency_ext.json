@@ -1,0 +1,69 @@
+{
+  "R": 300,
+  "T": 20,
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "batch_size": 30,
+  "threshold": 0.9,
+  "repeats": 5,
+  "interleaved": true,
+  "ratio_runs": [
+    1.3293137037266083,
+    0.24762925221093302,
+    0.9871813046079496,
+    2.1350810390811845,
+    0.26438796519163027
+  ],
+  "ratio_median": 0.9871813046079496,
+  "ratio_min": 0.24762925221093302,
+  "ratio_max": 2.1350810390811845,
+  "analytic": {
+    "N": 79803,
+    "Q": 193,
+    "extra_flops_ratio_raig_over_ig": 1.253085723594351e-05,
+    "note": "RAIG adds O(|Q|) elementwise work to an O(N|Q|) matmul, so the expected overhead is 1/N. Measured differences above that are machine noise on a shared machine, not method cost."
+  },
+  "methods": {
+    "IG+soft-uniform": {
+      "ms_per_turn_runs": [
+        118.36156900026253,
+        157.1621203328444,
+        63.33244600066488,
+        28.21540333359735,
+        53.92714133311529
+      ],
+      "ms_per_turn_median": 63.33244600066488,
+      "ms_per_turn_min": 28.21540333359735,
+      "ms_per_turn_max": 157.1621203328444,
+      "acc": 0.027777777777777776,
+      "lo": 0.017777777777777778,
+      "hi": 0.03888888888888889,
+      "top5": 0.058888888888888886,
+      "frac_reached_thresh": 0.0044444444444444444,
+      "mean_q_to_thresh_given_reached": 19.25,
+      "n_total": 900
+    },
+    "RAIG-tiered": {
+      "ms_per_turn_runs": [
+        157.3396556666315,
+        38.91793833390693,
+        62.52060666694888,
+        60.24217266759175,
+        14.25768716566381
+      ],
+      "ms_per_turn_median": 60.24217266759175,
+      "ms_per_turn_min": 14.25768716566381,
+      "ms_per_turn_max": 157.3396556666315,
+      "acc": 0.07777777777777778,
+      "lo": 0.06,
+      "hi": 0.09555555555555556,
+      "top5": 0.19,
+      "frac_reached_thresh": 0.006666666666666667,
+      "mean_q_to_thresh_given_reached": 19.0,
+      "n_total": 900
+    }
+  }
+}

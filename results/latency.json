@@ -2,15 +2,16 @@
   "IG+soft-uniform": {
     "acc": 0.06666666666666667,
     "top5": 0.10666666666666667,
-    "ms_per_turn": 68.6988149973331,
+    "ms_per_turn": 64.22959000628907,
     "mean_q_to_thresh": 19.993333333333332,
     "frac_reached": 0.006666666666666667
   },
   "RAIG-tiered": {
     "acc": 0.11333333333333333,
     "top5": 0.22,
-    "ms_per_turn": 69.78141499275807,
+    "ms_per_turn": 66.3058249920141,
     "mean_q_to_thresh": 19.946666666666665,
     "frac_reached": 0.02666666666666667
-  }
+  },
+  "_note": "ms_per_turn is the median of 5 independent runs; see results/latency_reconciled.json for the full per-run breakdown, mean/stdev, and contention caveat."
 }

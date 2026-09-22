@@ -1,0 +1,12 @@
+=== heterogeneous_1.0 (n=900 paired trials), reference = RAIG-tiered ===
+comparator                acc    ref    delta           95% CI  disc      p_raw     p_holm
+Random+soft              0.2%   8.3%   +8.11pp [+6.33,+10.00]    77   3.98e-20   3.18e-19  *
+IG+soft-objective        0.3%   8.3%   +8.00pp [+6.22,+9.89]    76   7.75e-20   5.42e-19  *
+RAIG-empirical           2.0%   8.3%   +6.33pp [+4.56,+8.11]    71   1.26e-12   7.56e-12  *
+IG+hard                  2.0%   8.3%   +6.33pp [+4.44,+8.33]    85   2.43e-10   1.21e-09  *
+Learned-noiseaware       3.1%   8.3%   +5.22pp [+3.33,+7.22]    83   2.11e-07   8.42e-07  *
+IG+soft-uniform          3.2%   8.3%   +5.11pp [+3.11,+7.22]    94   2.20e-06   6.61e-06  *
+Learned-noiseblind       4.0%   8.3%   +4.33pp [+2.33,+6.44]    89   4.32e-05   8.64e-05  *
+RAIG-oracle              8.3%   8.3%   +0.00pp [+0.00,+0.00]     0   1.00e+00   1.00e+00
+
+wrote results/stats_ext.json

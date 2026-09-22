@@ -1,0 +1,125 @@
+{
+  "method_names": [
+    "Random+soft",
+    "IG+hard",
+    "IG+soft-uniform",
+    "IG+soft-objective",
+    "RAIG-tiered",
+    "RAIG-oracle"
+  ],
+  "new_seeds": [
+    3,
+    4,
+    5,
+    6,
+    7
+  ],
+  "R": 300,
+  "T": 20,
+  "results": {
+    "randomised": {
+      "per_seed": [
+        {
+          "Random+soft": 0.0,
+          "IG+hard": 0.02666666666666667,
+          "IG+soft-uniform": 0.05333333333333334,
+          "IG+soft-objective": 0.0033333333333333335,
+          "RAIG-tiered": 0.05333333333333334,
+          "RAIG-oracle": 0.14333333333333334
+        },
+        {
+          "Random+soft": 0.0033333333333333335,
+          "IG+hard": 0.056666666666666664,
+          "IG+soft-uniform": 0.09,
+          "IG+soft-objective": 0.0,
+          "RAIG-tiered": 0.056666666666666664,
+          "RAIG-oracle": 0.20333333333333334
+        },
+        {
+          "Random+soft": 0.0,
+          "IG+hard": 0.05,
+          "IG+soft-uniform": 0.09,
+          "IG+soft-objective": 0.0,
+          "RAIG-tiered": 0.07666666666666666,
+          "RAIG-oracle": 0.21666666666666667
+        },
+        {
+          "Random+soft": 0.0,
+          "IG+hard": 0.05,
+          "IG+soft-uniform": 0.07,
+          "IG+soft-objective": 0.0,
+          "RAIG-tiered": 0.06333333333333334,
+          "RAIG-oracle": 0.21666666666666667
+        },
+        {
+          "Random+soft": 0.0,
+          "IG+hard": 0.02666666666666667,
+          "IG+soft-uniform": 0.1,
+          "IG+soft-objective": 0.0033333333333333335,
+          "RAIG-tiered": 0.04666666666666667,
+          "RAIG-oracle": 0.15333333333333332
+        }
+      ],
+      "new_seeds_pooled": {
+        "Random+soft": 0.0006666666666666666,
+        "IG+hard": 0.042,
+        "IG+soft-uniform": 0.08066666666666666,
+        "IG+soft-objective": 0.0013333333333333333,
+        "RAIG-tiered": 0.059333333333333335,
+        "RAIG-oracle": 0.18666666666666668
+      }
+    },
+    "adversarial": {
+      "per_seed": [
+        {
+          "Random+soft": 0.0033333333333333335,
+          "IG+hard": 0.07,
+          "IG+soft-uniform": 0.14,
+          "IG+soft-objective": 0.0033333333333333335,
+          "RAIG-tiered": 0.03,
+          "RAIG-oracle": 0.18333333333333332
+        },
+        {
+          "Random+soft": 0.006666666666666667,
+          "IG+hard": 0.11333333333333333,
+          "IG+soft-uniform": 0.16,
+          "IG+soft-objective": 0.0,
+          "RAIG-tiered": 0.03333333333333333,
+          "RAIG-oracle": 0.20333333333333334
+        },
+        {
+          "Random+soft": 0.0033333333333333335,
+          "IG+hard": 0.11666666666666667,
+          "IG+soft-uniform": 0.19,
+          "IG+soft-objective": 0.0,
+          "RAIG-tiered": 0.04,
+          "RAIG-oracle": 0.25333333333333335
+        },
+        {
+          "Random+soft": 0.0,
+          "IG+hard": 0.10666666666666667,
+          "IG+soft-uniform": 0.2,
+          "IG+soft-objective": 0.0,
+          "RAIG-tiered": 0.03333333333333333,
+          "RAIG-oracle": 0.2833333333333333
+        },
+        {
+          "Random+soft": 0.0,
+          "IG+hard": 0.08333333333333333,
+          "IG+soft-uniform": 0.16,
+          "IG+soft-objective": 0.0033333333333333335,
+          "RAIG-tiered": 0.03333333333333333,
+          "RAIG-oracle": 0.26
+        }
+      ],
+      "new_seeds_pooled": {
+        "Random+soft": 0.0026666666666666666,
+        "IG+hard": 0.098,
+        "IG+soft-uniform": 0.17,
+        "IG+soft-objective": 0.0013333333333333333,
+        "RAIG-tiered": 0.034,
+        "RAIG-oracle": 0.23666666666666666
+      }
+    }
+  }
+}

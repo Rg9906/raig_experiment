@@ -1,0 +1,26 @@
+{
+  "kappa": 2.5030569525621846,
+  "eps": {
+    "popularity_level": 0.45,
+    "genre": 0.3088731820035339,
+    "loudness_level": 0.2763082778306374,
+    "energy_level": 0.23239499796112537,
+    "liveness_level": 0.22795432921027584,
+    "valence_level": 0.22203343754247648,
+    "mood": 0.19637624031534587,
+    "acoustic_level": 0.1953894250373793,
+    "danceability_level": 0.17812015767296444,
+    "tempo": 0.1613442979475329,
+    "key_category": 0.150982737528884,
+    "mode_category": 0.1169376104390376,
+    "duration_length": 0.0937474514068234,
+    "instrumental_level": 0.06957047709664263,
+    "time_signature_category": 0.05871550903901044,
+    "content_rating": 0.03947261111866248,
+    "speechiness_level": 0.010361560418648903,
+    "language": 0.01,
+    "artist_type": 0.01,
+    "release_type": 0.01,
+    "track_version": 0.01
+  }
+}

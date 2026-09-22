@@ -1,0 +1,28 @@
+{
+  "rows": [
+    {
+      "rho_arg": -1.0,
+      "n_reliable_attrs": 12,
+      "floor_all": 12.550746785383243,
+      "ceiling_all": 1.0,
+      "floor_reliable": 12.502583213553354,
+      "ceiling_reliable": 0.937
+    },
+    {
+      "rho_arg": 0.0,
+      "n_reliable_attrs": 12,
+      "floor_all": 12.550746785383243,
+      "ceiling_all": 1.0,
+      "floor_reliable": 12.336785476203755,
+      "ceiling_reliable": 0.7626666666666667
+    },
+    {
+      "rho_arg": 1.0,
+      "n_reliable_attrs": 12,
+      "floor_all": 12.550746785383243,
+      "ceiling_all": 1.0,
+      "floor_reliable": 12.500592945893834,
+      "ceiling_reliable": 0.934
+    }
+  ]
+}

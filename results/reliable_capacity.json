@@ -1,0 +1,113 @@
+{
+  "T_budget": 20,
+  "rows": [
+    {
+      "catalogue": "music",
+      "N": 79803,
+      "M": 21,
+      "subsets": {
+        "all": {
+          "n_attributes": 21,
+          "distinct_vectors": 77069,
+          "entropy_floor_bits": 16.233863051106187,
+          "unique_frac": 0.9367442326729571,
+          "largest_class": 11,
+          "top1_ceiling": 0.9367442326729571,
+          "T_min": 20.151066258355005
+        },
+        "objective": {
+          "n_attributes": 6,
+          "distinct_vectors": 1926,
+          "entropy_floor_bits": 10.911391987843459,
+          "unique_frac": 0.006541107477162513,
+          "largest_class": 932,
+          "top1_ceiling": 0.006541107477162513,
+          "T_min": 13.544292090288081
+        },
+        "objective+semi": {
+          "n_attributes": 13,
+          "distinct_vectors": 41804,
+          "entropy_floor_bits": 15.351353372192145,
+          "unique_frac": 0.37128929990100623,
+          "largest_class": 101,
+          "top1_ceiling": 0.37128929990100623,
+          "T_min": 19.055608513180502
+        }
+      },
+      "reliable_information_share": 0.9456377279926661,
+      "reliable_subset_fits_budget": true
+    },
+    {
+      "catalogue": "mushroom",
+      "N": 8124,
+      "M": 22,
+      "subsets": {
+        "all": {
+          "n_attributes": 22,
+          "distinct_vectors": 8124,
+          "entropy_floor_bits": 12.987974524296153,
+          "unique_frac": 1.0,
+          "largest_class": 1,
+          "top1_ceiling": 1.0,
+          "T_min": 16.12195041790036
+        },
+        "objective": {
+          "n_attributes": 9,
+          "distinct_vectors": 127,
+          "entropy_floor_bits": 6.9886846867721655,
+          "unique_frac": 0.0,
+          "largest_class": 432,
+          "top1_ceiling": 0.0,
+          "T_min": 8.675042270502626
+        },
+        "objective+semi": {
+          "n_attributes": 15,
+          "distinct_vectors": 374,
+          "entropy_floor_bits": 8.546894459887637,
+          "unique_frac": 0.0029542097488921715,
+          "largest_class": 216,
+          "top1_ceiling": 0.0029542097488921715,
+          "T_min": 10.609245379375508
+        }
+      },
+      "reliable_information_share": 0.6580621515617588,
+      "reliable_subset_fits_budget": true
+    },
+    {
+      "catalogue": "dermatology",
+      "N": 366,
+      "M": 34,
+      "subsets": {
+        "all": {
+          "n_attributes": 34,
+          "distinct_vectors": 366,
+          "entropy_floor_bits": 8.515699838284043,
+          "unique_frac": 1.0,
+          "largest_class": 1,
+          "top1_ceiling": 1.0,
+          "T_min": 10.570523549281253
+        },
+        "objective": {
+          "n_attributes": 5,
+          "distinct_vectors": 76,
+          "entropy_floor_bits": 6.247927513443585,
+          "unique_frac": 0.07377049180327869,
+          "largest_class": 46,
+          "top1_ceiling": 0.07377049180327869,
+          "T_min": 7.755541666481031
+        },
+        "objective+semi": {
+          "n_attributes": 9,
+          "distinct_vectors": 302,
+          "entropy_floor_bits": 8.238404739325079,
+          "unique_frac": 0.7076502732240437,
+          "largest_class": 4,
+          "top1_ceiling": 0.7076502732240437,
+          "T_min": 10.226317620313628
+        }
+      },
+      "reliable_information_share": 0.9674371919836432,
+      "reliable_subset_fits_budget": true
+    }
+  ]
+}

@@ -4,8 +4,29 @@ Cannot Answer: Reliability-Aware Query Selection for Interactive Identification"
 
 Implements Algorithms 1-4 and the analysis functions (measure_pathology,
 identifiability audit, mcnemar, paired bootstrap CI) against the real
-Music-Akenator catalogue (dataset_final.csv, ~79.8k songs x 21 attributes).
+Music-Akenator catalogue (dataset_final.csv, ~79.8k songs x 21 attributes)
+and, via datasets.py, against the UCI Mushroom and Dermatology catalogues and
+a synthetic catalogue family.
+
+DETERMINISM. The BLAS thread count is pinned to 1 below, BEFORE numpy is
+imported. This is not a performance tweak, it is a correctness requirement.
+A multi-threaded matmul sums (Q,N)x(N,MC) in a shape-dependent order, so
+P = XT @ B differs in the last float32 ulp between runs with different batch
+shapes. Selection is an argmax over P, near-ties are common in a catalogue
+with many equal-mass questions, and a single different question at turn 1
+sends the whole session down a different path. Pinning to one thread makes
+run_paired_trials bitwise reproducible and -- verified empirically -- makes
+the per-method results of a run with M methods identical to those of a run
+with any subset of them, which is what licenses adding a new method to a
+comparison without re-running the incumbents. On the reference machine it is
+also ~1.6x faster: the matmul is memory-bound and the threads were contending.
 """
+import os
+
+for _v in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS",
+           "NUMEXPR_NUM_THREADS", "VECLIB_MAXIMUM_THREADS"):
+    os.environ.setdefault(_v, "1")
+
 import math
 import time
 import numpy as np
@@ -89,6 +110,22 @@ TIER_EPS = {"objective": 0.03, "semi": 0.15, "subjective": 0.30}
 
 assert set(ATTR_TIER) == set(FEATURES)
 
+# ---------------------------------------------------------------------------
+# Streaming (online, population-level) reliability estimation -- see
+# run_paired_trials's "raig-streaming" select mode. Same constants
+# run_em_eps.py uses for the identical, offline, per-attribute M-step;
+# duplicated here (not imported) so raig.py stays the module everything else
+# imports FROM rather than acquiring a dependency on a standalone script.
+# ---------------------------------------------------------------------------
+STREAM_EPS_INIT = 0.10
+STREAM_EPS_CLIP = (0.005, 0.45)
+# Bayesian shrinkage pseudo-count toward STREAM_EPS_INIT for the M-step below:
+# an attribute's live estimate only departs from the neutral prior once it has
+# accumulated real evidence, which is what keeps a rarely-asked attribute's
+# noisy early reading from swinging to the eps ceiling and getting crowded out
+# even further (see run_dynamic_T70's diagnosis of exactly that failure mode).
+STREAM_PRIOR_PSEUDO_N = 60.0
+
 
 # ---------------------------------------------------------------------------
 # Data loading / discretisation
@@ -123,6 +160,7 @@ class Catalogue:
         self.df = df
         self.N = len(df)
         self.features = features
+        self.attr_tier = attr_tier
         cols, attr_of_q, val_of_q = [], [], []
         for f in features:
             vals = df[f].unique()
@@ -141,12 +179,15 @@ class Catalogue:
         self.feature_qidx = {
             f: np.where(self.attr_of_q == f)[0] for f in features
         }
+        # tier of the attribute each compiled question probes; used by the
+        # allowed-set baselines and by the tier-mix reporting of Sec. VIII-B.
+        self.tier_of_q = np.array([attr_tier[a] for a in self.attr_of_q])
 
     def eps_vector(self, per_attr_eps: dict) -> np.ndarray:
         return np.array([per_attr_eps[a] for a in self.attr_of_q], dtype=np.float32)
 
     def allowed_mask(self, tiers_allowed) -> np.ndarray:
-        return np.array([ATTR_TIER[a] in tiers_allowed for a in self.attr_of_q])
+        return np.isin(self.tier_of_q, list(tiers_allowed))
 
 
 # ---------------------------------------------------------------------------
@@ -167,11 +208,31 @@ def raig_score(p, eps):
 # Method specification: selection rule + (assumed) hat-epsilon + allowed set
 # ---------------------------------------------------------------------------
 class Method:
-    def __init__(self, name, select, hat_eps_fn, allowed_tiers=("objective", "semi", "subjective")):
+    def __init__(self, name, select, hat_eps_fn, allowed_tiers=("objective", "semi", "subjective"),
+                 scorer=None, hat_delta=None, early_stop_threshold=None, explore_frac=0.0):
         self.name = name
-        self.select = select          # 'random' | 'ig' | 'raig' | 'capacity'
-        self.hat_eps_fn = hat_eps_fn  # cat, true_eps_vec -> hat_eps_vec (Q,)
+        # 'random' | 'ig' | 'raig' | 'raig-streaming' | 'capacity' | 'learned'
+        self.select = select
+        self.hat_eps_fn = hat_eps_fn  # true_eps_vec -> hat_eps_vec (Q,)
         self.allowed_tiers = allowed_tiers
+        # 'learned': scorer(P_cols, hat_cols, t) -> (Q, Rb) scores. Used by the
+        # learned-policy baselines of Sec. VII-C (see learned.py).
+        self.scorer = scorer
+        # assumed per-question erasure probability, for the abstention channel
+        # of Sec. V-E. None means the method ignores abstention in selection.
+        self.hat_delta = hat_delta
+        # once a trial's belief max crosses this, that trial's belief/asked
+        # mask stop changing for the rest of the run (a real early exit).
+        # None (default) means the method always runs the full T-turn budget,
+        # exactly as before this option existed.
+        self.early_stop_threshold = early_stop_threshold
+        # 'raig-streaming' only: fraction of turns forced to a uniformly
+        # random available question, so an attribute the running estimate
+        # currently distrusts still keeps accumulating evidence to correct
+        # that estimate (mirrors run_em_eps.py's own EXPLORE fix for the
+        # identical problem in its offline setting). 0.0 (default) disables
+        # it and draws no extra randomness for any method that leaves it off.
+        self.explore_frac = explore_frac
 
 
 def make_methods(cat: Catalogue, uniform_eps: float):
@@ -203,19 +264,110 @@ def make_methods(cat: Catalogue, uniform_eps: float):
 # handful of elementwise ops, instead of R_batch separate small matmuls --
 # essential for BLAS to reach useful throughput on this shape.
 # ---------------------------------------------------------------------------
+def _snapshot_metrics(B, tgt_of_col, M, Rb):
+    """Rank-based metrics at one checkpoint.
+
+    Returns (M, Rb) arrays. Top-1 uses argmax (ties broken by lowest index,
+    matching the legacy behaviour); rank uses the mid-rank convention
+    1 + #{b > b*} + (#{b == b*} - 1)/2, so that the many exact ties a belief
+    vector carries early in a session are not scored optimistically.
+    """
+    MC = B.shape[1]
+    cols = np.arange(MC)
+    bt = B[tgt_of_col, cols]                       # (MC,) belief on the target
+    pred = np.argmax(B, axis=0)
+    greater = (B > bt[None, :]).sum(axis=0)
+    equal = (B == bt[None, :]).sum(axis=0)
+    rank = greater + 1.0 + (equal - 1.0) / 2.0
+    return {
+        "correct": (pred == tgt_of_col).reshape(M, Rb),
+        "rank": rank.reshape(M, Rb),
+        "top5": (rank <= 5).reshape(M, Rb),
+        "top10": (rank <= 10).reshape(M, Rb),
+        "nll": (-np.log2(np.clip(bt, 1e-30, None))).reshape(M, Rb),
+    }
+
+
 def run_paired_trials(cat: Catalogue, methods, true_eps_vec, R, T, rng,
-                       track_top5=False, time_selection=False, batch_size=150):
+                       track_top5=False, time_selection=False, batch_size=150,
+                       checkpoints=None, log_questions=False, metrics=False,
+                       true_delta_vec=None):
+    """Run every method on the same targets and the same noise stream.
+
+    The optional arguments all default to the original behaviour and, when
+    left off, consume the random stream in exactly the original order, so
+    results stay comparable with earlier runs.
+
+      checkpoints     turn counts at which to snapshot metrics, so that one
+                      T=60 pass replaces six separate runs (Sec. VII-D).
+      log_questions   also return the selected question index per
+                      (trial, method, turn), which is all the asked-question
+                      reliability table of Sec. VII-B needs.
+      metrics         compute rank / top-5 / top-10 / NLL at each checkpoint.
+      true_delta_vec  per-question TRUE abstention probability. When supplied,
+                      the user declines to answer with that probability, the
+                      question is consumed, and no belief update occurs: the
+                      erasure channel of Sec. V-E.
+
+    Two opt-in, additive extensions. Both are no-ops -- provably, see
+    verify_harness.py -- for every method that doesn't request them, so every
+    existing result in results/*.json remains reproducible unchanged:
+
+      Method.early_stop_threshold  once a trial's belief max crosses this,
+                      that trial's belief and asked-mask stop changing for
+                      the rest of the run: a real early exit, not merely a
+                      logged "would have stopped here" statistic. Reported
+                      per (trial, method) as out["stop_turn"] (== T when the
+                      method never opts in, or never crosses).
+      Method.select == "raig-streaming"  the assumed per-ATTRIBUTE epsilon is
+                      not a fixed hat_eps_fn output; it is re-estimated
+                      BETWEEN batches from the batches already run in this
+                      same call, via the identical attribute-pooled expected-
+                      disagreement M-step run_em_eps.py uses offline over 600
+                      logged sessions, applied here online across this call's
+                      own paired-trial batches instead. Method.explore_frac
+                      forces a fraction of turns to a random available
+                      question so a currently-distrusted attribute keeps
+                      accumulating evidence to correct that estimate.
+    """
     M = len(methods)
     N, Q = cat.N, cat.Q
     X = cat.X                          # (N, Q) float32
     XT = np.ascontiguousarray(X.T)     # (Q, N) float32, contiguous for fast matmul
     true_eps_vec = true_eps_vec.astype(np.float32)
+    if checkpoints is None:
+        checkpoints = [T]
+    checkpoints = sorted(set(int(c) for c in checkpoints))
+    assert checkpoints[-1] <= T, "checkpoint beyond the budget"
 
     HAT = np.stack([m.hat_eps_fn(true_eps_vec) for m in methods], axis=0).astype(np.float32)  # (M,Q)
     ALLOWED = np.stack([m.allowed for m in methods], axis=0)  # (M,Q) bool
+    THRESH = np.array([m.early_stop_threshold if m.early_stop_threshold is not None
+                        else np.inf for m in methods], dtype=np.float64)  # (M,)
+
+    # Streaming-EM state: per-attribute (dis, cnt) accumulators, reset fresh
+    # at the top of this call so one call is self-contained and reproducible
+    # on its own. Uses cat.attr_of_q directly -- no change to Catalogue needed.
+    attrs_present = sorted(set(cat.attr_of_q.tolist()))
+    attr_index = {a: i for i, a in enumerate(attrs_present)}
+    n_attrs = len(attrs_present)
+    q_attr_idx = np.array([attr_index[a] for a in cat.attr_of_q], dtype=np.int64)  # (Q,)
+    streaming_idx = [i for i, m in enumerate(methods) if m.select == "raig-streaming"]
+    for i in streaming_idx:
+        methods[i]._stream_dis = np.zeros(n_attrs, dtype=np.float64)
+        methods[i]._stream_cnt = np.zeros(n_attrs, dtype=np.float64)
+        methods[i]._stream_eps_attr = np.full(n_attrs, STREAM_EPS_INIT, dtype=np.float64)
 
     correct = np.zeros((R, M), dtype=bool)
     top5 = np.zeros((R, M), dtype=bool) if track_top5 else None
+    qlog = np.zeros((R, M, T), dtype=np.int32) if log_questions else None
+    stop_turn_out = np.zeros((R, M), dtype=np.int32)
+    ckpt = None
+    if metrics:
+        ckpt = {c: {k: np.zeros((R, M),
+                                dtype=(bool if k in ("correct", "top5", "top10") else np.float64))
+                    for k in ("correct", "rank", "top5", "top10", "nll")}
+                for c in checkpoints}
     sel_time_total = 0.0
     sel_time_calls = 0
 
@@ -227,16 +379,34 @@ def run_paired_trials(cat: Catalogue, methods, true_eps_vec, R, T, rng,
         MC = M * Rb
         xc_batch = X[targets, :]                      # (Rb, Q)
         r_of_col = np.tile(np.arange(Rb), M)           # (MC,) method-major layout
+        tgt_of_col = targets[r_of_col]                 # (MC,)
 
         HAT_full = np.repeat(HAT, Rb, axis=0).T.copy()        # (Q, MC)  -- see note below
         ALLOWED_full = np.repeat(ALLOWED, Rb, axis=0).T.copy()  # (Q, MC)
+        THRESH_full = np.repeat(THRESH, Rb)                     # (MC,)
         # np.repeat(HAT, Rb, axis=0) gives shape (M*Rb, Q) with method-major
-        # row order already matching r_of_col's column order; transpose to (Q,MC).
+        # row order already matching r_of_col column order; transpose to (Q,MC).
+
+        # Streaming methods: overwrite this batch's slice of HAT_full with the
+        # population estimate accumulated from EARLIER batches only -- this
+        # batch's own turns feed the estimate the NEXT batch will read, not
+        # itself. Keeps the update out of the per-turn critical path and
+        # keeps the RNG-neutrality argument for every other method trivial.
+        for i in streaming_idx:
+            cols = slice(i * Rb, (i + 1) * Rb)
+            eps_per_q = methods[i]._stream_eps_attr[q_attr_idx]  # (Q,)
+            HAT_full[:, cols] = eps_per_q[:, None]
 
         B = np.full((N, MC), 1.0 / N, dtype=np.float32)
         asked = np.zeros((Q, MC), dtype=bool)
-        u_stream = rng.random((T, Rb)).astype(np.float32)      # shared within a trial's 6 methods
+        active = np.ones(MC, dtype=bool)
+        stop_turn = np.zeros(MC, dtype=np.int32)
+        u_stream = rng.random((T, Rb)).astype(np.float32)      # shared across a trial methods
         rand_stream = rng.integers(0, 1 << 31, size=(T, Rb))   # private draws for Random+soft
+        # Abstention draws come from their own request, made only when the
+        # erasure channel is active, so the default path consumes the random
+        # stream in exactly the order earlier runs did.
+        a_stream = rng.random((T, Rb)).astype(np.float32) if true_delta_vec is not None else None
 
         for t in range(T):
             t0 = time.perf_counter() if time_selection else None
@@ -258,15 +428,41 @@ def run_paired_trials(cat: Catalogue, methods, true_eps_vec, R, T, rng,
                 else:
                     if meth.select == "ig":
                         s = Hb(P[:, cols])
-                    elif meth.select == "raig":
+                    elif meth.select in ("raig", "raig-streaming"):
                         s = raig_score(P[:, cols], HAT_full[:, cols])
+                    elif meth.select == "learned":
+                        s = meth.scorer(P[:, cols], HAT_full[:, cols], t)
                     else:  # 'capacity' ablation: reliability only, ignores split mass
                         s = np.broadcast_to((1.0 - Hb(HAT_full[:, cols]))[:, :Rb], avail.shape)
+                    if meth.hat_delta is not None:
+                        # abstention discounts a question by the odds it is
+                        # answered at all (Sec. V-E).
+                        s = s * (1.0 - meth.hat_delta)[:, None]
                     s = np.where(avail, s, -np.inf)
-                    q_idx[cols] = np.argmax(s, axis=0)
+                    chosen = np.argmax(s, axis=0)
+                    if meth.explore_frac:
+                        # Forced exploration so an attribute the running
+                        # estimate currently distrusts still keeps
+                        # accumulating evidence to correct itself (mirrors
+                        # run_em_eps.py's own EXPLORE fix for the identical
+                        # problem offline). Seeded from the shared stream's
+                        # VALUE into a private generator -- reads it, does not
+                        # consume its position -- so no other method's draws
+                        # are perturbed by this method being present at all.
+                        rnd = np.random.default_rng(int(rand_stream[t, 0]) + m * 104729 + t)
+                        force = rnd.random(Rb) < meth.explore_frac
+                        if force.any():
+                            rnd2 = np.random.default_rng(int(rand_stream[t, 0]) + m * 104729 + t + 999983)
+                            rscores = rnd2.random(avail.shape).astype(np.float32)
+                            rscores = np.where(avail, rscores, -1.0)
+                            chosen = np.where(force, np.argmax(rscores, axis=0), chosen)
+                    q_idx[cols] = chosen
             if time_selection:
                 sel_time_total += time.perf_counter() - t0
                 sel_time_calls += 1
+
+            if log_questions:
+                qlog[offset:offset + Rb, :, t] = q_idx.reshape(M, Rb).T
 
             Xsel = X[:, q_idx]                          # (N, MC)
             y_true = xc_batch[r_of_col, q_idx]           # (MC,)
@@ -276,20 +472,67 @@ def run_paired_trials(cat: Catalogue, methods, true_eps_vec, R, T, rng,
             y_obs = (y_true.astype(np.float32) + flip) % 2
 
             hat_sel = HAT_full[q_idx, np.arange(MC)]     # (MC,)
+            p_sel = P[q_idx, np.arange(MC)]              # (MC,) split mass at the asked question
             match = (Xsel == y_obs[None, :])
             lik = np.where(match, 1 - hat_sel[None, :], hat_sel[None, :]).astype(np.float32)
+            if true_delta_vec is not None:
+                # An abstained question yields a flat likelihood, i.e. no update.
+                abstain = a_stream[t][r_of_col] < true_delta_vec[q_idx]   # (MC,)
+                lik = np.where(abstain[None, :], np.float32(1.0), lik)
             Bnew = B * lik
             Z = Bnew.sum(axis=0)
             safeZ = np.where(Z > 0, Z, 1.0)
             Bupdated = Bnew / safeZ[None, :]
-            B = np.where((Z > 0)[None, :], Bupdated, B)
+            B = np.where(((Z > 0) & active)[None, :], Bupdated, B)
 
-            asked[q_idx, np.arange(MC)] = True
+            active_idx = np.where(active)[0]
+            asked[q_idx[active_idx], active_idx] = True
+
+            # Streaming-EM bookkeeping: fold this turn's (attribute, expected
+            # disagreement) into the running per-attribute accumulators, for
+            # still-active columns only -- a frozen (early-stopped) trial is a
+            # finished interaction and contributes no further evidence.
+            for i in streaming_idx:
+                cols = slice(i * Rb, (i + 1) * Rb)
+                col_ids = np.arange(i * Rb, (i + 1) * Rb)
+                live = active[col_ids]
+                if not live.any():
+                    continue
+                q_sel = q_idx[cols][live]
+                y_sel = y_obs[cols][live]
+                p_sel_i = p_sel[cols][live]
+                d = np.where(y_sel == 1, 1.0 - p_sel_i, p_sel_i).astype(np.float64)
+                a_sel = q_attr_idx[q_sel]
+                np.add.at(methods[i]._stream_dis, a_sel, d)
+                np.add.at(methods[i]._stream_cnt, a_sel, 1.0)
+
+            newly = active & (B.max(axis=0) >= THRESH_full)
+            stop_turn = np.where(newly, t + 1, stop_turn)
+            active = active & ~newly
+
+            if metrics and (t + 1) in ckpt:
+                snap = _snapshot_metrics(B, tgt_of_col, M, Rb)
+                for k, v in snap.items():
+                    ckpt[t + 1][k][offset:offset + Rb, :] = v.T
+
+        # Refresh each streaming method's population estimate for the NEXT
+        # batch from everything accumulated through the end of THIS one.
+        for i in streaming_idx:
+            m_i = methods[i]
+            # Bayesian-shrinkage M-step: blend toward the neutral prior with
+            # pseudo-count STREAM_PRIOR_PSEUDO_N, so an attribute's estimate
+            # moves only as fast as its OWN evidence justifies -- a handful of
+            # noisy early observations can no longer swing it to the ceiling.
+            blended = ((STREAM_PRIOR_PSEUDO_N * STREAM_EPS_INIT + m_i._stream_dis) /
+                       (STREAM_PRIOR_PSEUDO_N + m_i._stream_cnt))
+            m_i._stream_eps_attr = np.clip(blended, STREAM_EPS_CLIP[0], STREAM_EPS_CLIP[1])
 
         pred = np.argmax(B, axis=0)                     # (MC,)
         pred = pred.reshape(M, Rb)
         tgt_row = targets[None, :]                       # (1, Rb)
         correct[offset:offset + Rb, :] = (pred == tgt_row).T
+        stop_turn_reported = np.where(stop_turn == 0, T, stop_turn)  # 0 == "never crossed" -> ran full T
+        stop_turn_out[offset:offset + Rb, :] = stop_turn_reported.reshape(M, Rb).T
 
         if track_top5:
             top5idx = np.argpartition(-B, 5, axis=0)[:5, :]   # (5, MC)
@@ -299,7 +542,11 @@ def run_paired_trials(cat: Catalogue, methods, true_eps_vec, R, T, rng,
 
         offset += Rb
 
-    out = {"correct": correct, "top5": top5}
+    out = {"correct": correct, "top5": top5, "targets": all_targets, "stop_turn": stop_turn_out}
+    if log_questions:
+        out["qlog"] = qlog
+    if metrics:
+        out["checkpoints"] = ckpt
     if time_selection and sel_time_calls > 0:
         out["ms_per_selection_call"] = 1000.0 * sel_time_total / sel_time_calls
     return out
@@ -425,3 +672,20 @@ def acc_ci(correct: np.ndarray, resamples=10000, seed=0):
     boot = correct.astype(float)[idx].mean(axis=1)
     lo, hi = np.percentile(boot, [2.5, 97.5])
     return correct.mean(), lo, hi
+
+
+def holm_bonferroni(pvals, alpha=0.05):
+    """Holm step-down adjusted p-values, for the McNemar family of Sec. VII.
+
+    Returns (adjusted, rejected). Adjusted values are enforced monotone, so a
+    later hypothesis can never carry a smaller adjusted p than an earlier one.
+    """
+    p = np.asarray(pvals, dtype=float)
+    m = len(p)
+    order = np.argsort(p)
+    adj = np.empty(m, dtype=float)
+    running = 0.0
+    for rank, i in enumerate(order):
+        running = max(running, (m - rank) * p[i])
+        adj[i] = min(1.0, running)
+    return adj, adj <= alpha

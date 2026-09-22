@@ -1,0 +1,25 @@
+queue: waiting for run_main_ext.py to finish...
+queue: main run finished, starting queue at Sun, Aug 30, 2026 10:02:49 PM
+
+=========== run_stats.py  (22:02:49) ===========
+queue: run_stats.py OK in 13s
+Learned-noiseblind       4.0%   8.3%   +4.33pp [+2.33,+6.44]    89   4.32e-05   8.64e-05  *
+RAIG-oracle              8.3%   8.3%   +0.00pp [+0.00,+0.00]     0   1.00e+00   1.00e+00
+
+wrote results/stats_ext.json
+
+=========== run_domains.py  (22:03:02) ===========
+queue: run_domains.py OK in 98s
+[    89s] dermatology lam=1.0: Random+soft=9.7, IG+hard=20.0, IG+soft-uniform=34.7, IG+soft-objective=17.3, RAIG-tiered=73.0, RAIG-oracle=73.0  | McNemar p=2.66e-52
+[    92s] dermatology lam=1.5: Random+soft=3.0, IG+hard=7.8, IG+soft-uniform=6.0, IG+soft-objective=15.8, RAIG-tiered=48.3, RAIG-oracle=46.3  | McNemar p=5.26e-71
+
+wrote results/domains_methods.json  (92s)
+
+=========== run_budget.py  (22:04:40) ===========
+queue: run_budget.py OK in 1183s
+    RAIG-tiered          T5=0.0 T10=0.4 T15=2.7 T20=6.4 T30=18.4 T40=27.8 T50=33.6 T60=35.1
+    RAIG-oracle          T5=0.0 T10=0.4 T15=2.7 T20=6.4 T30=18.4 T40=27.8 T50=33.6 T60=35.1
+
+wrote results/budget_sweep.json (1177s)
+
+=========== run_eps_ensemble.py  (22:24:23) ===========

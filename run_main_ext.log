@@ -1,0 +1,9 @@
+N=79803 Q=193 methods=9 uniform_eps=0.098083
+[  584.1s] clean: Random+soft=0.9, IG+hard=96.6, IG+soft-uniform=96.3, IG+soft-objective=0.6, Learned-noiseblind=92.9, Learned-noiseaware=90.1, RAIG-empirical=52.3, RAIG-tiered=41.9, RAIG-oracle=96.6
+[  999.8s] homogeneous: Random+soft=0.2, IG+hard=20.3, IG+soft-uniform=28.0, IG+soft-objective=0.2, Learned-noiseblind=23.9, Learned-noiseaware=23.0, RAIG-empirical=12.9, RAIG-tiered=10.7, RAIG-oracle=28.0
+[ 1376.0s] heterogeneous_0.5: Random+soft=0.6, IG+hard=17.8, IG+soft-uniform=22.9, IG+soft-objective=0.6, Learned-noiseblind=22.2, Learned-noiseaware=19.1, RAIG-empirical=11.6, RAIG-tiered=17.6, RAIG-oracle=30.3
+[ 2714.2s] heterogeneous_1.0: Random+soft=0.2, IG+hard=2.0, IG+soft-uniform=3.2, IG+soft-objective=0.3, Learned-noiseblind=4.0, Learned-noiseaware=3.1, RAIG-empirical=2.0, RAIG-tiered=8.3, RAIG-oracle=8.3
+[ 3148.1s] heterogeneous_1.5: Random+soft=0.1, IG+hard=0.1, IG+soft-uniform=0.1, IG+soft-objective=0.3, Learned-noiseblind=0.1, Learned-noiseaware=0.2, RAIG-empirical=0.1, RAIG-tiered=3.0, RAIG-oracle=3.0
+[ 4052.1s] randomised: Random+soft=0.0, IG+hard=4.2, IG+soft-uniform=8.8, IG+soft-objective=0.0, Learned-noiseblind=7.0, Learned-noiseaware=6.9, RAIG-empirical=4.1, RAIG-tiered=5.3, RAIG-oracle=18.1
+[ 4939.2s] adversarial: Random+soft=0.0, IG+hard=11.3, IG+soft-uniform=16.9, IG+soft-objective=0.0, Learned-noiseblind=12.0, Learned-noiseaware=10.9, RAIG-empirical=3.1, RAIG-tiered=3.4, RAIG-oracle=24.7
+DONE in 4939s -> results/main_ext.json

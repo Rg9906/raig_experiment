@@ -1,0 +1,17 @@
+N=79803 Q=193 methods=['IG+hard', 'IG+soft-uniform', 'Learned-noiseaware', 'RAIG-empirical', 'RAIG-tiered', 'RAIG-oracle']
+[   575s] clean:
+    IG+hard              T5=0.0 T10=1.8 T15=42.2 T20=96.4 T30=96.4 T40=96.4 T50=96.4 T60=96.4
+    IG+soft-uniform      T5=0.0 T10=0.9 T15=29.6 T20=96.0 T30=96.4 T40=96.4 T50=96.4 T60=96.4
+    Learned-noiseaware   T5=0.0 T10=1.8 T15=29.8 T20=91.1 T30=95.6 T40=96.4 T50=96.4 T60=96.4
+    RAIG-empirical       T5=0.0 T10=0.9 T15=11.1 T20=53.3 T30=87.1 T40=94.7 T50=96.0 T60=96.4
+    RAIG-tiered          T5=0.0 T10=0.9 T15=12.0 T20=42.4 T30=81.3 T40=89.3 T50=92.0 T60=95.1
+    RAIG-oracle          T5=0.0 T10=1.8 T15=42.2 T20=96.4 T30=96.4 T40=96.4 T50=96.4 T60=96.4
+[  1177s] heterogeneous_1.0:
+    IG+hard              T5=0.0 T10=0.0 T15=0.7 T20=2.0 T30=2.0 T40=2.0 T50=2.0 T60=2.0
+    IG+soft-uniform      T5=0.0 T10=0.0 T15=0.4 T20=1.6 T30=6.9 T40=16.2 T50=20.4 T60=23.8
+    Learned-noiseaware   T5=0.0 T10=0.2 T15=0.9 T20=2.4 T30=7.8 T40=16.0 T50=20.9 T60=24.2
+    RAIG-empirical       T5=0.0 T10=0.0 T15=0.9 T20=1.8 T30=6.2 T40=11.3 T50=15.1 T60=16.0
+    RAIG-tiered          T5=0.0 T10=0.4 T15=2.7 T20=6.4 T30=18.4 T40=27.8 T50=33.6 T60=35.1
+    RAIG-oracle          T5=0.0 T10=0.4 T15=2.7 T20=6.4 T30=18.4 T40=27.8 T50=33.6 T60=35.1
+
+wrote results/budget_sweep.json (1177s)

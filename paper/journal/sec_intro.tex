@@ -1,0 +1,238 @@
+%=============================================================================
+\section{Introduction}
+\label{sec:intro}
+%=============================================================================
+
+\IEEEPARstart{A}{recurring} interaction pattern places a machine in the role of
+questioner and a person in the role of oracle. A troubleshooting assistant
+narrows a fault by asking about symptoms; a clinical triage tool narrows a
+differential by asking about presentation; a product finder narrows a
+catalogue by asking about requirements; the parlour game Akinator narrows a
+space of characters by asking about traits. In each case the system holds a
+belief over a discrete set of hypotheses, selects a question, observes an
+answer, and revises. The engineering question is which question to ask, and
+the near-universal answer is the one that maximises expected information gain.
+
+That criterion inherits its authority from a clean theoretical setting in
+which the answer is observed exactly. Human answers are not observed exactly.
+A user asked whether the song they have in mind is ``energetic'' may hesitate,
+may apply a personal threshold, or may simply be wrong, and the system has no
+way to distinguish a considered answer from a guess. What makes this more than
+a routine robustness concern is that the unreliability is not spread uniformly
+over the question space. Some attributes admit near-certain answers: a
+listener generally knows the performing artist and the language of the lyrics.
+Others are irreducibly fuzzy, and inter-annotator agreement on affective music
+descriptors is documented to be modest even among trained
+annotators~\cite{hu2007mood,kim2010emotion}.
+
+\subsection{The Problem}
+
+The observation that motivates this work is that the two properties---how well
+a question divides the belief, and how reliably it can be answered---need not
+be independent, and that in at least one large real catalogue their dependence
+runs in the unfavourable direction. An attribute is vague when competent
+people disagree about where its boundary falls. Disagreement distributes items
+on both sides of that boundary. A near-even split is exactly what information
+gain rewards. The criterion can therefore acquire a structural tendency to
+promote the questions that are hardest to answer, and it does so silently,
+because nothing in the objective refers to answerability.
+
+Routine preprocessing sharpens the effect. Continuous descriptors are commonly
+discretised at quantiles so that they can be posed as binary questions. A
+median split is a $50/50$ split by construction, which is the maximum of the
+binary entropy function. The discretisation step thus assigns peak apparent
+informativeness to continuous perceptual features, which are the features
+users answer worst, while high-cardinality or heavily skewed identifiers
+generate only lopsided, low-entropy binary questions and are deprioritised
+despite being answerable with near certainty.
+
+\subsection{What We Claim, and What We Do Not}
+
+We are careful about the scope of the empirical claim, because our own
+measurements narrow it. On a $79{,}803$-track music catalogue the bias is
+present and statistically detectable: attributes annotated as reliably
+answerable carry roughly half the maximum information gain of the rest. On two
+further catalogues drawn from different domains---mushroom identification and
+dermatological triage---it is absent. That is not a negative result to be
+buried; it is a confirmation of the proposed mechanism, because neither of
+those catalogues contains a continuous descriptor to discretise, and the
+mechanism we blame is discretisation acting on perceptual quantities. The
+honest generalisation is therefore conditional, and we state it as a scope
+condition rather than as a universal: the bias should be expected wherever a
+catalogue mixes quantile-binned perceptual descriptors with naturally skewed
+objective metadata, and should not be expected where every attribute is
+natively categorical.
+
+The absence of the bias turns out not to settle whether the correction is
+worth making, which is the most useful thing the cross-domain experiment
+taught us. On dermatology, where the bias is absent, reliability-aware
+selection more than doubles top-1 accuracy; on mushroom, where it is equally
+absent, the correction changes nothing at all. What separates them is not the
+correlation but whether the answerable attributes still carry enough
+information to identify the target---and that is a property of the catalogue,
+computable before any user is involved.
+
+We are equally careful about the acquisition function. Correcting the
+criterion means replacing the entropy of the induced split with the mutual
+information between the target and the \emph{observed} answer, under an
+explicit noise model. For a per-attribute binary symmetric channel that
+quantity is $\Hb(p_q \star \varepsilon_q) - \Hb(\varepsilon_q)$, which is
+textbook~\cite[Ch.~7]{cover2006} and which we claim no novelty for. What we
+claim is empirical and diagnostic: that the observation model in some
+attribute catalogues is heterogeneous in a specific and unfavourable way, that
+this is partly an artefact of preprocessing rather than of the domain, that a
+learned selection policy trained on simulated interaction inherits the same
+blind spot, and that correcting it requires far less knowledge about users
+than one might expect---in the end, none that a deployed system cannot recover
+from its own interaction logs.
+
+\subsection{On the Operating Point}
+
+Two parameters govern how hard this task is, and neither is a property of any
+method: how many questions the system may ask, and how many items it must
+choose between. Both need stating in advance, because absolute accuracies mean
+nothing without them and because a reader is entitled to know they were not
+chosen to flatter.
+
+\emph{Budget.} The catalogue has an entropy floor of $16.23$ bits, and the
+capacity-corrected bound of Corollary~\ref{cor:budget} puts the minimum
+sufficient budget at $20.15$ questions under the reliability annotation used
+throughout. A system run at $T=20$ is therefore operating essentially
+\emph{on} the information-theoretic boundary, where even perfect knowledge of
+the noise barely suffices. That is a stress test, and we use it as one: the
+condition sweep, and every robustness experiment in
+Section~\ref{sec:robustness}, is run there. The headline comparison is run at
+$T=40$, roughly twice the bound and within the range a deployed identifier
+would actually spend, where reliability-aware selection reaches $26.6\%$ top-1
+and $44.8\%$ top-5 against classical information gain's $16.6\%$ and $27.2\%$.
+We note explicitly that this is the conservative direction to have moved in:
+the advantage \emph{widens} with budget, so reporting at the floor understated
+our own result rather than exaggerating it.
+
+\emph{Catalogue size.} Eighty thousand items is the largest catalogue we have
+and the hardest version of the task; it is not the version most deployed
+identifiers face. Because size is a task parameter, we sweep it, and report
+accuracy over a grid of sizes and budgets
+(Section~\ref{sec:results-size}). At a thousand items and forty questions the
+same method with the same annotation identifies the target $84.2\%$ of the
+time, and $88.3\%$ if allowed sixty questions. That sweep is emphatically not
+cross-validation and we do not present it as such---no model is fitted, so a
+subset does not estimate performance on the whole, it simply poses an easier
+question, and a number obtained on a subset must be reported with the subset
+size attached. What it establishes is that the advantage we report is not an
+artefact of operating near the floor: it is positive in every one of the
+eighteen cells, by between $6.5$ and $32.2$ percentage points, and every cell
+is significant at $\alpha = 0.01$.
+
+Alongside both we report rank-based metrics, which are not compressed against
+the floor, and the budget each method needs to reach a fixed accuracy, which is
+the quantity a practitioner actually allocates.
+
+\subsection{Limitations of Existing Approaches}
+
+Three responses to answer noise appear in the applied literature, and none
+addresses the bias described above.
+
+The first is to replace hard candidate elimination with a probabilistic belief
+update, so that a contradicted candidate is downweighted rather than
+discarded. This is correct and necessary, and it is where the robustness
+reported by comparative studies of interactive identification actually
+originates. It does not change which questions are asked.
+
+The second is to learn a question-selection policy from simulated
+interaction, typically by regressing a realised measure of progress onto
+features of the state and the query. This substitutes an approximation for a
+quantity that has a closed form under the model, and in the absence of an
+explicit noise term the learned policy inherits the bias from its training
+signal. We do not leave this as an assertion: we implement the policy, give
+it feature capacity sufficient to represent the reliability weighting, train
+it both with and without noise in its rollouts, and report what it does.
+
+The third is to discard unreliable attributes altogether. This is a reasonable
+practitioner heuristic and we treat it as a baseline, but it is wasteful: an
+attribute answered correctly seventy per cent of the time still transmits
+information, and discarding it removes that information permanently rather
+than deferring its use to the point where more reliable questions have been
+exhausted.
+
+\subsection{Research Gap}
+
+The theory needed to correct the bias is not new. Noisy search has been
+studied since R\'enyi~\cite{renyi1961} and Ulam~\cite{ulam1976}, surveyed by
+Pelc~\cite{pelc2002}, and placed on a decision-theoretic footing by Jedynak et
+al.~\cite{jedynak2012}. Bayesian experimental design supplies the general
+principle~\cite{lindley1956,chaloner1995}, and the active-learning literature
+has established both that naive greedy selection degrades badly under noisy
+observations and that noise-aware greedy alternatives with approximation
+guarantees exist~\cite{golovin2010noisy,golovin2011adaptive}. What is missing
+is not an algorithm. It is the empirical observation that in some
+attribute-indexed catalogues the observation model is strongly heterogeneous
+\emph{across attributes} and adversarially aligned with the naive acquisition
+function, an account of where that heterogeneity comes from, and a deployable
+answer to the question of what a practitioner must actually know in order to
+correct it. The noisy-search literature typically assumes a single known
+crossover probability; the applied literature typically assumes none at all.
+
+\subsection{Contributions}
+
+\begin{enumerate}
+\item \textbf{A characterisation of the bias together with its scope
+condition.} We measure the relationship between per-attribute information gain
+and per-attribute answerability, using a test appropriate to an annotation with
+three levels rather than the rank correlation that a three-valued variable
+inflates the ties of, and we isolate the contribution of the discretisation
+step. We then test the
+mechanism by predicting and confirming the absence of the bias in two
+natively categorical catalogues (Sections~\ref{sec:results-bias}
+and~\ref{sec:results-domains}).
+
+\item \textbf{A unification that removes a standing confound.} Hard
+elimination is the $\varepsilon \to 0$ limit of the Bayesian update
+(Proposition~\ref{prop:limit}), so comparative studies that pair an
+information-gain selector with elimination and a learned selector with soft
+updating vary two factors at once. We separate them explicitly
+(Section~\ref{sec:baselines}).
+
+\item \textbf{Reliability-aware information gain.} We derive
+$\RAIG(q) = \Hb(p_q \star \varepsilon_q) - \Hb(\varepsilon_q)$, show that it
+re-ranks rather than rescales (Proposition~\ref{prop:reversal}), derive a
+capacity-based lower bound on the query budget (Corollary~\ref{cor:budget}),
+formalise the discretisation mechanism
+(Proposition~\ref{prop:discretisation}), and extend the criterion to admit
+abstention (Section~\ref{sec:erasure}). The change is one line in an existing
+selector.
+
+\item \textbf{A crossover vector learned from interaction logs, and a
+robustness result that needs none of the assumed values.} The obvious
+objection to this work is that its three reliability constants are invented.
+We answer it three ways. We re-run the primary comparison over an ensemble of
+worlds drawn from priors on those constants, so the conclusion is reported
+across plausible settings rather than at one point; we corrupt the annotation
+and measure how much of it may be wrong before the correction stops paying;
+and---the substantive answer---we show the constants are unnecessary. Treating
+the target item as latent and running EM over the logs of an already-deployed
+incumbent recovers a per-attribute crossover vector with no annotation, no
+labels and no user study, and a system shipping that vector matches the
+hand-annotated one exactly (Sections~\ref{sec:reliability-em},
+\ref{sec:results-ensemble}, \ref{sec:results-em}
+and~\ref{sec:results-corruption}).
+
+\item \textbf{A learned-policy comparison.} We implement, train and evaluate
+the learned-selector family the literature would otherwise supply only as a
+citation, and report the extent to which it does and does not recover
+reliability-aware behaviour (Section~\ref{sec:results-learned}).
+
+\item \textbf{A deployment test that requires no users.} The cross-domain
+results separate two properties that are easily conflated. Whether
+informativeness correlates with unanswerability decides whether classical
+selection is being actively misled; whether the answerable attributes still
+carry enough information to finish the job decides whether a reliability-aware
+selector can do anything about it. The second is computable from a catalogue in
+seconds, by counting distinct attribute vectors over the reliable subset, and
+it---not the correlation---predicts which of our three catalogues benefits
+(Section~\ref{sec:results-synthetic}).
+
+\item \textbf{An open, bitwise-reproducible harness} with paired sampling,
+exact McNemar testing with multiplicity control, three catalogues, and the
+restricted-attribute baseline that most directly threatens the method.
+\end{enumerate}

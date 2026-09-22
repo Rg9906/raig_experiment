@@ -1,0 +1,1837 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  Information Gain Prefers the Questions Users Cannot Answer
+%  IEEE conference manuscript (IEEEtran, conference option)
+%
+%  STATUS: Results filled from the verified experimental run against the
+%  Music-Akenator catalogue (79,803 tracks, 21 attributes, 193 questions).
+%
+%  DATA AUDIT. Every numeric cell in every table was checked programmatically
+%  against results/*.json (237 automated cell comparisons, all passing), and
+%  the derived quantities were recomputed from the catalogue itself. Four
+%  substantive errors were found and corrected in this revision:
+%
+%    1. fig:scatter said "21 raw points"; there are 20. release_type is
+%       degenerate (one value across all 79,803 tracks), compiles to no
+%       question, and measure_pathology() skips it. M=21 attributes is
+%       correct; 21 POINTS was not. The table now carries the real 20
+%       coordinates from pathology_native.json / pathology_4bin.json.
+%    2. The misspecification prose claimed accuracy falls to "<=1.4% once
+%       eps>=0.18". At eps=0.18 the row max is 6.6%; <=1.4% only holds from
+%       eps>=0.26. Prose corrected; the 5x5 grid itself was right but was
+%       rounded inconsistently (1.2 and 1.4 both shown as "1"), so all 25
+%       cells now carry one decimal.
+%    3. The clean-condition budget sweep claimed 44.1/90.2/94.9% at
+%       T=20/40/60. Re-run under the main protocol: 41.9/88.0/94.9%. The
+%       old T=20 figure also contradicted tab:main's 41.9% for the same
+%       condition. Now backed by results/clean_budget_sweep.json.
+%    4. "8 of 8 seeds" had per-seed evidence for only 5 of the 8 seeds
+%       (b5_stability_newseeds.json stores seeds 0-2 pooled only). Seeds
+%       0-2 were re-run individually -> results/seed_breakdown_orig.json.
+%
+%  Verified-correct and left alone: all 126 cells of tab:main, tab:mcnemar,
+%  tab:ablation, tab:dataset, tab:latency, tab:pathology, tab:tiers, the
+%  fig:reversal worked example (recomputed from Hb/RAIG), the budget bound,
+%  and the objective-only identifiability ceiling (recomputed from the
+%  catalogue -> results/objective_only_audit.json).
+%
+%  Bibliography: 22 \bibitem entries inlined; no refs.bib / bibtex pass.
+%  Fig. 1 (fig:pipeline): full project/experiment flowchart, plain TikZ.
+%
+%  STILL OPEN (needs your input, marked TODO-HUMAN below):
+%    A. Author block -- department / institution / city / email.
+%    B. Acknowledgment -- funding source, or delete the section.
+%    C. Repository URL in the Reproducibility subsection.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts,amsthm}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{url}
+\usepackage[hidelinks]{hyperref}
+
+% NOTE ON COMPILE BUDGET. pgfplots remains removed. Three figures (system
+% architecture, per-turn data flow, the IG-vs-RAIG curve) previously used
+% TikZ/pgfplots; loading those packages plus rendering four pgfplots curves
+% and two node-and-arrow diagrams was almost certainly what exceeded the
+% free-tier compile-time budget, since the earlier log showed zero errors
+% and simply ran out of time mid-load. Those three remain plain-text
+% (itemize/enumerate/tabular) equivalents.
+%
+% tikz IS re-enabled below, for Fig.~\ref{fig:pipeline} (the pipeline
+% flowchart) only. This is deliberate: pgfplots is the expensive component
+% (it loads pgfplots, pgfplotstable and the whole pgf math/plot-handler
+% stack, then evaluates plot expressions), whereas plain TikZ with three
+% libraries and ~15 node-and-arrow objects is a small fraction of that cost.
+% Only positioning/arrows.meta/shapes.geometric are loaded -- not calc, fit
+% or backgrounds.
+%
+% IF YOU STILL HIT THE TIMEOUT: a zero-cost plain-text fallback for
+% Fig.~\ref{fig:pipeline} is included, commented out, immediately after the
+% figure. Comment out the tikzpicture and uncomment the fallback; nothing
+% else in the document depends on tikz.
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta,shapes.geometric}
+
+\newcommand{\bx}{\mathbf{x}}
+\newcommand{\bb}{\mathbf{b}}
+\newcommand{\Hb}{H_{\mathrm{b}}}
+\newcommand{\RAIG}{\mathrm{RAIG}}
+\newcommand{\IG}{\mathrm{IG}}
+\newcommand{\Cat}{\mathcal{C}}
+\newcommand{\Qset}{\mathcal{Q}}
+\newcommand{\Fset}{\mathcal{F}}
+
+\newtheorem{proposition}{Proposition}
+\newtheorem{corollary}{Corollary}
+\newtheorem{definition}{Definition}
+
+\begin{document}
+
+\title{Information Gain Prefers the Questions Users Cannot Answer:\\
+Reliability-Aware Query Selection for Interactive Identification}
+
+% TODO-HUMAN (A): the affiliation lines below are the only fields left to
+% fill. Replace the three \AFFIL... lines with your department, institution,
+% city/country and the contact email you want printed. Nothing else in the
+% author block needs changing. (If you submit somewhere double-blind,
+% replace the whole \author{} block with an anonymised one instead.)
+\author{
+\IEEEauthorblockN{R.~G.~Saran Vishakan}
+\IEEEauthorblockA{\textcolor{red}{[Department]}\\
+\textcolor{red}{[Institution]}, \textcolor{red}{[City, Country]}\\
+Email: \textcolor{red}{[email]}}
+}
+
+\maketitle
+
+\begin{abstract}
+Interactive identification systems narrow a catalogue to a single item by
+asking a sequence of binary questions, and the standard criterion for choosing
+the next question is expected information gain. We show that this criterion
+carries a systematic and previously unremarked defect when the answers come
+from a human. Information gain rewards questions that partition the belief
+evenly, but in attribute-indexed catalogues the attributes that partition most
+evenly are the vague, subjective ones---mood, energy, perceived
+danceability---which are precisely the attributes a user is least able to
+answer correctly. The bias is aggravated by a routine preprocessing step:
+binning a continuous feature at its median guarantees a maximally balanced
+split, and therefore maximal apparent informativeness, for exactly the features
+whose semantics are least crisp. We make three contributions. First, we
+formalise interactive identification with unreliable responses as sequential
+search over a per-attribute binary symmetric channel, and observe that hard
+candidate elimination is the zero-noise limit of Bayesian updating rather than
+a competing design. Second, we derive reliability-aware information gain, the
+mutual information between the target and the \emph{observed} answer, and
+establish that it re-ranks candidate questions rather than merely rescaling
+them, that it is bounded by the per-attribute channel capacity, and that this
+bound yields a query-budget lower bound of $\log_2 N / \max_f(1-\Hb(\varepsilon_f))$.
+Third, we show the modification is deployable without measuring user error
+rates: a three-tier annotation distinguishing objective, semi-objective and
+subjective attributes is sufficient to instantiate it. Against a real
+79{,}803-track catalogue, reliability-aware selection (RAIG-tiered) raises
+top-1 accuracy from 2.1\% to 7.9\% over the strongest current-practice
+baseline at matched heterogeneous noise ($n=900$ paired trials, exact McNemar
+$p=1.8\times10^{-9}$), recovers the entire oracle-to-uniform accuracy gap from
+a three-tier annotation alone, and survives a lightweight correlated-error
+stress test. It reverses, exactly as predicted, when the reliability
+assumption is randomised or adversarially inverted -- a failure mode we
+verify holds in 8 of 8 seeds under adversarial noise.
+\end{abstract}
+
+\begin{IEEEkeywords}
+interactive identification, question selection, information gain, noisy search,
+Bayesian belief update, binary symmetric channel, human--computer interaction
+\end{IEEEkeywords}
+
+%=============================================================================
+\section{Introduction}
+%=============================================================================
+
+\subsection{Motivation}
+
+A recurring interaction pattern places a machine in the role of questioner and
+a person in the role of oracle. A troubleshooting assistant narrows a fault by
+asking about symptoms; a clinical triage tool narrows a differential by asking
+about presentation; a product finder narrows a catalogue by asking about
+requirements; the parlour game Akinator narrows a space of characters by asking
+about traits. In each case the system holds a belief over a discrete set of
+hypotheses, selects a question, observes an answer, and revises. The engineering
+question is which question to ask, and the near-universal answer is the one that
+maximises expected information gain.
+
+That criterion inherits its authority from a clean theoretical setting in which
+the answer is observed exactly. Human answers are not observed exactly. A user
+asked whether the song they have in mind is ``energetic'' may hesitate, may
+apply a personal threshold, or may simply be wrong, and the system has no way to
+distinguish a considered answer from a guess. What makes this more than a
+routine robustness concern is that the unreliability is not spread uniformly
+over the question space. Some attributes admit near-certain answers: a listener
+generally knows the performing artist and the language of the lyrics. Others
+are irreducibly fuzzy, and inter-annotator agreement on affective music
+descriptors is documented to be modest even among trained
+annotators~\cite{hu2007mood,kim2010emotion}.
+
+\subsection{Problem Statement}
+
+The observation that motivates this work is that the two properties---how well
+a question divides the belief, and how reliably it can be answered---are not
+independent, and that their dependence appears to run in the unfavourable
+direction. An attribute is vague when competent people disagree about where its
+boundary falls. Disagreement distributes items on both sides of that boundary.
+A near-even split is exactly what information gain rewards. The criterion
+therefore has a structural tendency to promote the questions that are hardest
+to answer, and it does so silently, because nothing in the objective refers to
+answerability.
+
+Standard preprocessing sharpens the effect. Continuous descriptors are
+routinely discretised at the median so that they can be posed as binary
+questions. A median split is a $50/50$ split by construction, which is the
+maximum of the binary entropy function. The discretisation step thus assigns
+peak apparent informativeness to continuous perceptual features, which are the
+features users answer worst, while high-cardinality identifiers such as artist
+generate only skewed, low-entropy questions and are deprioritised despite being
+answerable with near certainty. We confirm this quantitatively in
+Section~\ref{sec:results-bias}: the correlation between an attribute's maximum
+information gain and its reliability is negative and strengthens under a finer,
+evenly-spaced discretisation, which is what you would expect if the median-split
+convention were partly manufacturing the effect rather than merely revealing it.
+
+\subsection{Limitations of Existing Approaches}
+
+Three responses to answer noise appear in the applied literature, and none
+addresses the bias described above.
+
+The first is to replace hard candidate elimination with a probabilistic belief
+update, so that a contradicted candidate is downweighted rather than discarded.
+This is correct and necessary, and it is where the robustness reported by
+comparative studies of interactive identification actually originates. It does
+not change which questions are asked.
+
+The second is to learn a question-selection policy from simulated interaction,
+typically by regressing the realised reduction in candidate-set size onto
+features of the state and the query. This substitutes an approximation for a
+quantity that has a closed form under the model, and in the absence of an
+explicit noise term the learned policy inherits the same bias from its training
+signal.
+
+The third is to discard unreliable attributes altogether. This is a reasonable
+practitioner heuristic and we treat it as a baseline, but Section~\ref{sec:results-main}
+shows it is worse than wasteful on our catalogue: restricting to the six
+objective attributes leaves fewer than 2{,}000 distinguishable combinations
+over 79{,}803 items, so the approach is capped near its own identifiability
+ceiling regardless of how cleverly it asks questions.
+
+\subsection{Research Gap}
+
+The theory needed to correct the bias is not new. Noisy search has been studied
+since R\'enyi~\cite{renyi1961} and Ulam~\cite{ulam1976}, surveyed
+comprehensively by Pelc~\cite{pelc2002}, and placed on a decision-theoretic
+footing by Jedynak et al.~\cite{jedynak2012}, who show that greedily minimising
+expected posterior entropy is optimal over the full horizon under a stated
+observation model. Bayesian experimental design supplies the general
+principle~\cite{lindley1956,chaloner1995}. What is missing is the empirical
+observation that in attribute-indexed catalogues the observation model is
+strongly heterogeneous across attributes and adversarially aligned with the
+naive acquisition function, together with a deployable account of what a
+practitioner must actually know to correct it.
+
+\subsection{Contributions}
+
+\begin{enumerate}
+\item \textbf{A characterisation of the bias.} We measure it directly on a
+79{,}803-item catalogue: maximum information gain correlates negatively with
+answer reliability (Spearman $\rho=-0.44$, $p=0.054$ at native binning;
+$\rho=-0.61$, $p=0.004$ at a finer four-bin discretisation), and the effect
+strengthens exactly as the discretisation is made finer and more even
+(Section~\ref{sec:results-bias}).
+
+\item \textbf{A unification that removes a standing confound.} Hard elimination
+is the $\varepsilon \to 0$ limit of the Bayesian update
+(Proposition~\ref{prop:limit}). We hold the update rule fixed and vary only
+selection, isolating the two factors that prior comparative studies conflate
+(Section~\ref{sec:baselines}).
+
+\item \textbf{Reliability-aware information gain.} We derive
+$\RAIG(q) = \Hb(p_q \star \varepsilon_q) - \Hb(\varepsilon_q)$, show it
+re-ranks rather than rescales candidate questions (Proposition~\ref{prop:reversal}),
+and derive a capacity-based query-budget bound (Corollary~\ref{cor:budget}).
+
+\item \textbf{A deployability result, measured.} A three-tier qualitative
+annotation ($K=3$) recovers 100\% of the oracle-over-uniform accuracy gap on
+our catalogue; even a coarse two-tier split recovers 82.7\%
+(Section~\ref{sec:results-ablation}).
+
+\item \textbf{An open reference implementation and evaluation harness}
+with paired sampling, exact McNemar testing, and the restricted-attribute
+baseline that most directly threatens the method, plus the diagnostic
+traces used to explain every anomalous result in Section~\ref{sec:robustness}
+rather than leave it unexplained.
+\end{enumerate}
+
+%=============================================================================
+\section{Background and Related Work}
+%=============================================================================
+
+\subsection{Searching with Errors}
+
+The problem of identifying an unknown element through queries whose answers may
+be wrong originates with R\'enyi's formulation of a guessing game in which the
+responder lies with fixed probability~\cite{renyi1961}, and independently with
+Ulam's question of how many yes/no queries suffice to locate an integer below
+one million when a bounded number of answers may be false~\cite{ulam1976}. The
+combinatorial branch, in which lies are adversarial and bounded in number,
+produces optimal strategies with a direct correspondence to error-correcting
+codes; Pelc's survey remains the standard reference~\cite{pelc2002}. The
+probabilistic branch treats errors as channel noise and connects to sequential
+transmission with feedback~\cite{horstein1963,burnashev1974}, to noisy binary
+search~\cite{karp2007,nowak2011}, and to modern treatments in which the noise
+depends on the query itself~\cite{kaspi2018,chung2018}.
+
+Our setting sits in the probabilistic branch, with one departure that turns out
+to matter. Existing formulations assume a single crossover probability, or make
+it depend on a continuous query parameter. In an attribute catalogue the
+crossover is a property of the semantic category being probed and, on our
+catalogue, spans an order of magnitude across categories (0.03 to 0.30 across
+the three annotated tiers). That heterogeneity, rather than the presence of
+noise as such, is what drives the effect we report.
+
+\subsection{Information-Theoretic Query Selection}
+
+Choosing the experiment that maximises expected information about a latent
+quantity is the central prescription of Bayesian experimental
+design~\cite{lindley1956,chaloner1995}, and in the noiseless binary case it
+reduces to maximising the entropy of the induced partition. Jedynak et
+al.~\cite{jedynak2012} give the result most relevant here: for twenty questions
+with noise under entropy loss, a greedy one-step policy is optimal over the
+whole horizon. We rely on that result rather than compete with it. Our claim is
+not that greedy entropy minimisation is the wrong policy but that it is
+routinely applied with the noise term omitted, and that the omission is not
+benign when the noise is heterogeneous.
+
+\subsection{Interactive and Conversational Recommendation}
+
+Systems that alternate between asking about attributes and proposing items form
+a substantial literature, including policy-learning approaches over
+knowledge graphs~\cite{lei2020ear,lei2020cpr,deng2021unicorn}. Maximum-entropy
+attribute querying appears throughout as a standard baseline against which
+learned policies are compared. This positions our work carefully: we are not
+proposing a competitor to learned conversational policies but a correction to
+the baseline those policies are measured against. The correction is orthogonal
+and could be applied inside a learned policy's action-scoring step.
+
+\subsection{Question Asking in Language Models}
+
+Recent work evaluates and improves the information-seeking behaviour of
+language models, using twenty-questions style tasks as the
+testbed~\cite{debruyn2022,mazzaccara2024,hu2024uot}. These systems generate
+questions in open natural language rather than selecting from a fixed
+attribute-value grid, which makes them more flexible and considerably more
+expensive per turn. The bias we describe should apply to them as well, since
+expected-information-gain reranking of generated
+questions~\cite{mazzaccara2024} inherits the same blind spot, but verifying
+that is beyond the present scope and we flag it as future work.
+
+\subsection{Positioning}
+
+Table~\ref{tab:related} places this work against the closest prior art. The
+acquisition function we derive is standard mutual information under a stated
+observation model. The contribution we claim is empirical and diagnostic: that
+the observation model in attribute catalogues is heterogeneous in a specific
+and unfavourable way, that this is partly an artefact of preprocessing rather
+than of the domain, and that correcting it requires less knowledge than one
+might expect -- claims we now report having tested, not merely proposed.
+
+\begin{table}[t]
+\caption{Positioning against closest prior work.}
+\label{tab:related}
+\centering
+\footnotesize
+\begin{tabular}{@{}lccc@{}}
+\toprule
+\textbf{Work} & \textbf{Noise} & \textbf{Heterog.\ $\varepsilon$} & \textbf{Selection} \\
+\midrule
+R\'enyi~\cite{renyi1961}, Ulam~\cite{ulam1976} & yes & no & theory \\
+Pelc~\cite{pelc2002} (survey) & yes & no & optimal \\
+Jedynak et al.~\cite{jedynak2012} & yes & no & greedy entropy \\
+Karp \& Kleinberg~\cite{karp2007} & yes & no & noisy bisection \\
+Kaspi et al.~\cite{kaspi2018} & yes & query-dep. & information-theoretic \\
+EAR / CPR / UNICORN~\cite{lei2020ear,lei2020cpr,deng2021unicorn} & no & no & learned policy \\
+Max-entropy baseline & no & no & classical IG \\
+UoT~\cite{hu2024uot}, \cite{mazzaccara2024} & implicit & no & EIG over text \\
+\midrule
+\textbf{This work} & yes & \textbf{per-attribute} & \textbf{RAIG} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+%=============================================================================
+\section{System Design}
+%=============================================================================
+
+\subsection{Overall Architecture}
+
+The system is organised as five components arranged around a single mutable
+object, the belief vector. Table~\ref{fig:arch} shows the arrangement. A
+\emph{catalogue compiler} converts a table of items and categorical attributes
+into a boolean question matrix, materialising once what would otherwise be
+recomputed at every turn. A \emph{reliability model} supplies a crossover
+probability for each attribute. A \emph{query selector} scores every unasked
+question against the current belief and the reliability vector and returns an
+argmax. An \emph{inference engine} applies Bayes' rule to the observed answer.
+A \emph{termination controller} decides between asking again and committing to
+a prediction.
+
+\begin{table}[t]
+\caption{System architecture: pipeline stages and data consumed. The
+reliability model $\varepsilon_f$ is consumed at \emph{both} stage~3
+(selection) and stage~5 (inference); existing systems typically consume it
+at stage~5 only, which is the omission this work addresses.}
+\label{fig:arch}
+\centering
+\footnotesize
+\begin{tabular}{@{}cp{0.28\columnwidth}p{0.42\columnwidth}@{}}
+\toprule
+\textbf{Stage} & \textbf{Component} & \textbf{Consumes / produces} \\
+\midrule
+1 & Catalogue compiler & item catalogue $\to$ answer matrix $X$ (binning, pruning) \\
+2 & Reliability model & tiered annotation $\to \varepsilon_f$ \\
+3 & Query selector & belief $\bb_t$, $X$, $\varepsilon_f$ $\to$ question $q_t$ ($\arg\max$ RAIG) \\
+4 & User & $q_t$ $\to$ observed answer $y_t$ \\
+5 & Inference engine & $y_t$, $\varepsilon_f$ $\to$ updated belief $\bb_{t+1}$ (Bayes update) \\
+6 & Termination controller & $\bb_{t+1}$ $\to$ ask again, or output MAP prediction \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The design decision worth stating explicitly is that the reliability model is
+consumed in two places rather than one. Systems that model answer noise at all
+generally do so in the likelihood, where it prevents a wrong answer from
+destroying the posterior. Feeding the same quantity into the selector is what
+prevents the wrong answer from being solicited in the first place.
+
+\subsection{Component Design}
+
+Table~\ref{tab:modules} lists the modules and their responsibilities. Each
+selector is a pure function of belief, question matrix and reliability vector,
+with no internal state; sessions are driven entirely by an externally supplied
+random stream, which is what licenses the paired statistical testing in
+Section~\ref{sec:setup}.
+
+\begin{table}[t]
+\caption{Module responsibilities.}
+\label{tab:modules}
+\centering
+\footnotesize
+\begin{tabular}{@{}p{0.24\columnwidth}p{0.66\columnwidth}@{}}
+\toprule
+\textbf{Module} & \textbf{Responsibility} \\
+\midrule
+\texttt{compile\_catalogue} & Materialise the $N \times |\Qset|$ boolean answer matrix; drop degenerate questions \\
+\texttt{discretize} & Quantile-bin continuous attributes; record which were binned \\
+\texttt{tiered\_reliability} & Map qualitative attribute tiers to $\varepsilon$ \\
+\texttt{select\_*} & Query selectors (random, IG, RAIG, restricted IG) \\
+\texttt{soft\_update} / \texttt{hard\_update} & Posterior revision under BSC$(\varepsilon)$ and its $\varepsilon\!\to\!0$ limit \\
+\texttt{run\_session} & One identification episode under a fixed budget \\
+\texttt{run\_paired\_experiment} & Common-random-number evaluation across methods \\
+\texttt{mcnemar}, \texttt{paired\_bootstrap\_ci} & Paired inference \\
+\texttt{measure\_pathology} & Per-attribute IG against reliability \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Data Flow}
+
+Table~\ref{fig:dataflow} traces one turn. The belief vector and the question
+matrix meet in a single matrix--vector product that yields the split mass of
+every candidate question at once; the reliability vector transforms those split
+masses into scores; the argmax is posed; the observed answer and the same
+reliability vector produce a likelihood; the posterior is renormalised.
+
+\begin{table}[t]
+\caption{Data flow for a single turn, in order. The reliability vector
+$\varepsilon$ enters three times: at steps 2 and 3 on the selection path,
+and step 6 on the inference path.}
+\label{fig:dataflow}
+\centering
+\footnotesize
+\begin{tabular}{@{}cp{0.7\columnwidth}@{}}
+\toprule
+\textbf{Step} & \textbf{Operation} \\
+\midrule
+1 & split mass $\mathbf{p} \gets \bb_t^{\!\top}X$ (one matrix--vector product) \\
+2 & channel convolution $\tilde{\mathbf{p}} \gets \mathbf{p}\star\varepsilon$ \\
+3 & score $\mathbf{s} \gets \Hb(\tilde{\mathbf{p}}) - \Hb(\varepsilon)$ \\
+4 & mask already-asked questions, $\arg\max \rightarrow q_t$ \\
+5 & observe $y_t$ (error w.p.\ $\varepsilon_{f(q_t)}$) \\
+6 & likelihood $\ell = 1-\varepsilon$ if agree with $y_t$, else $\varepsilon$ \\
+7 & posterior $\bb_{t+1} \gets \bb_t \odot \ell / Z$; proceed to next turn \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Design Rationale}
+
+Three choices deserve justification. Materialising the answer matrix trades
+$O(N|\Qset|)$ bits of memory for the elimination of all per-turn recomputation;
+at $N=79{,}803$ and $|\Qset|=193$ this is under 2 megabytes and negligible.
+Keeping selectors stateless costs a small amount of parameter passing and buys
+the paired experimental design. Representing reliability per attribute rather
+than per question reflects the belief that answerability is a property of the
+semantic category rather than of the particular value being probed.
+
+%=============================================================================
+\section{Methodology}
+\label{sec:method}
+%=============================================================================
+
+\subsection{Notation and Problem Formulation}
+
+Let $\Cat = \{c_1,\dots,c_N\}$ be a catalogue and
+$\Fset = \{f_1,\dots,f_M\}$ a set of categorical attributes, with $a_f(c)$
+denoting the value of attribute $f$ for item $c$. A question is a pair
+$q=(f,v)$ with answer function
+\begin{equation}
+x_q(c) \;=\; \mathbb{1}\!\left[a_f(c)=v\right] \in \{0,1\},
+\end{equation}
+and $\Qset$ collects all non-degenerate questions. Write $\bx_q \in \{0,1\}^N$
+for the column vector of answers and $f(q)$ for the attribute probed by $q$.
+
+The system maintains a belief $\bb_t \in \Delta^{N-1}$, initialised uniform. At
+each step it selects $q_t \in \Qset$, observes $y_t \in \{0,1\}$, and updates.
+A session runs for at most $T$ questions and terminates with the maximum a
+posteriori item. Table~\ref{tab:notation} collects the notation.
+
+\begin{table}[t]
+\caption{Notation.}
+\label{tab:notation}
+\centering
+\footnotesize
+\begin{tabular}{@{}ll@{}}
+\toprule
+\textbf{Symbol} & \textbf{Meaning} \\
+\midrule
+$\Cat$, $N$ & catalogue and its size \\
+$\Fset$, $M$ & attribute set and its size \\
+$q=(f,v)$, $\Qset$ & question and question space \\
+$x_q(c)$ & true answer to $q$ for item $c$ \\
+$\bb_t$ & belief over $\Cat$ at step $t$ \\
+$c^\ast$ & the user's target item \\
+$\varepsilon_f \in [0,\tfrac12)$ & answer error rate for attribute $f$ \\
+$\hat\varepsilon_f$ & the value the system assumes \\
+$y_t$ & observed answer at step $t$ \\
+$p_q$ & belief-weighted mass answering yes to $q$ \\
+$\Hb(\cdot)$ & binary entropy, bits \\
+$p \star \varepsilon$ & $p(1-\varepsilon)+(1-p)\varepsilon$ \\
+$T$ & query budget \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Observation Model}
+
+We model the user as a noisy channel whose crossover probability depends on the
+attribute being probed:
+\begin{equation}
+y_t \;=\; x_{q_t}(c^\ast) \oplus Z_t, \qquad
+Z_t \sim \mathrm{Bernoulli}\!\left(\varepsilon_{f(q_t)}\right),
+\label{eq:channel}
+\end{equation}
+with $Z_t$ independent across turns. The per-attribute index in
+\eqref{eq:channel} is the entire departure from the standard formulation.
+
+Two idealisations are worth naming now rather than in the limitations section.
+Errors are assumed independent across turns, whereas a user who misunderstands
+a category will err consistently within it; and the model admits no abstention.
+Section~\ref{sec:limitations} returns to both -- including a stress test of the
+independence assumption in Section~\ref{sec:robustness} that shows the method's
+advantage survives it.
+
+\subsection{Belief Update and a Unification of Elimination Semantics}
+
+Under \eqref{eq:channel} the likelihood of the observed answer is
+\begin{equation}
+\ell(c \mid q,y) \;=\;
+\begin{cases}
+1-\hat\varepsilon_{f(q)}, & x_q(c) = y,\\[2pt]
+\hat\varepsilon_{f(q)}, & x_q(c) \neq y,
+\end{cases}
+\end{equation}
+and the posterior follows from Bayes' rule,
+\begin{equation}
+\bb_{t+1}(c) \;=\;
+\frac{\bb_t(c)\,\ell(c \mid q_t,y_t)}
+     {\sum_{c'\in\Cat} \bb_t(c')\,\ell(c' \mid q_t,y_t)}.
+\label{eq:update}
+\end{equation}
+
+\begin{proposition}[Elimination as a degenerate limit]
+\label{prop:limit}
+As $\hat\varepsilon \to 0^{+}$, \eqref{eq:update} converges pointwise to hard
+elimination, assigning zero mass to every candidate inconsistent with $y_t$.
+At $\hat\varepsilon = 0$ exactly, the normaliser vanishes whenever no candidate
+is consistent with the observed history, and the posterior is undefined.
+\end{proposition}
+
+\begin{proof}[Proof sketch]
+The likelihood ratio between an inconsistent and a consistent candidate is
+$\hat\varepsilon/(1-\hat\varepsilon) \to 0$, giving pointwise convergence. The
+normaliser is $\sum_c \bb_t(c)\mathbb{1}[x_q(c)=y]$, which is zero exactly when
+the surviving support is empty; since the target is removed from the support by
+its first flipped answer, and questions are never repeated, an empty support is
+reachable under any positive noise rate.
+\end{proof}
+
+Proposition~\ref{prop:limit} has a methodological consequence that is more
+important than its mathematical content. Comparative studies of interactive
+identification commonly contrast an ``entropy-based'' system using elimination
+against a ``probabilistic'' system using soft updating, and attribute the
+resulting difference in noise tolerance to the selection strategy. The two
+systems differ in two factors at once, and by Proposition~\ref{prop:limit} the
+second factor is not an alternative algorithm but a boundary value of the
+first. We hold the update rule fixed in Section~\ref{sec:baselines}.
+
+\subsection{Reliability-Aware Information Gain}
+
+Let the belief-weighted yes-mass of a question be
+\begin{equation}
+p_q \;=\; \sum_{c \in \Cat} \bb_t(c)\, x_q(c) \;=\; \bb_t^{\!\top} \bx_q .
+\end{equation}
+Under \eqref{eq:channel} the system does not observe $x_q(c^\ast)$; it observes
+$Y_q$. The relevant quantity is the mutual information between the target and
+the observation. Since $Y_q$ is conditionally a BSC output given the target,
+standard identities for the binary symmetric channel~\cite{cover2006} give
+\begin{align}
+\RAIG(q)
+&= I(C; Y_q) \;=\; H(Y_q) - H(Y_q \mid C) \nonumber\\
+&= \Hb\!\left(p_q \star \varepsilon_{f(q)}\right) - \Hb\!\left(\varepsilon_{f(q)}\right),
+\label{eq:raig}
+\end{align}
+where $p \star \varepsilon = p(1-\varepsilon)+(1-p)\varepsilon$.
+
+\subsection{Analytical Properties}
+
+\begin{proposition}[Consistency and annihilation]
+\label{prop:consistency}
+$\RAIG(q) = \Hb(p_q)$ when $\varepsilon_{f(q)}=0$, and $\RAIG(q)=0$ for every
+$p_q$ when $\varepsilon_{f(q)}=\tfrac12$. On $[0,\tfrac12)$, $\RAIG(q)$ is
+strictly decreasing in $\varepsilon_{f(q)}$ for $p_q \in (0,1)$.
+\end{proposition}
+
+\begin{proposition}[Rank reversal]
+\label{prop:reversal}
+There exist questions $q_1,q_2$ with $\Hb(p_{q_1}) > \Hb(p_{q_2})$ but
+$\RAIG(q_1) < \RAIG(q_2)$.
+\end{proposition}
+
+\begin{proof}
+Take $p_{q_1}=0.50$, $\varepsilon_{q_1}=0.30$ and $p_{q_2}=0.70$,
+$\varepsilon_{q_2}=0.02$. Then $\Hb(p_{q_1})=1.000 > \Hb(p_{q_2})=0.881$, while
+$\RAIG(q_1)=1.000-0.881=0.119$ and
+$\RAIG(q_2)=\Hb(0.692)-\Hb(0.02)=0.891-0.141=0.750$.
+\end{proof}
+
+Table~\ref{fig:reversal} places this instance in context, tabulating both
+criteria over split mass at three crossover rates. Reading down the
+$\Hb(p_q)$ column and across the $\RAIG$ columns makes the structural point:
+classical IG is a function of $p_q$ alone and is therefore constant across
+the three rightmost columns' worth of reliability, whereas RAIG collapses
+towards zero as $\varepsilon\rightarrow0.5$ at every split mass. The
+re-ranking is not a rescaling.
+
+\begin{table}[t]
+\caption{Classical information gain $\Hb(p)$ ($\varepsilon$-blind) against
+$\RAIG(p,\varepsilon)$ at three crossover rates, over split mass $p$. Bold
+rows mark the Proposition~\ref{prop:reversal} instance: at $p=0.50$,
+$\varepsilon=0.30$ ($q_1$, balanced but unreliable) classical IG is higher
+than at $p=0.70$, $\varepsilon=0.02$ ($q_2$, skewed but reliable), yet RAIG
+ranks them the other way by a factor of 6.3 (0.119 vs.\ 0.750).}
+\label{fig:reversal}
+\centering
+\footnotesize
+\begin{tabular}{@{}ccccc@{}}
+\toprule
+$p_q$ & $\Hb(p_q)$ & $\RAIG(\varepsilon{=}0.02)$ & $\RAIG(\varepsilon{=}0.15)$ & $\RAIG(\varepsilon{=}0.30)$ \\
+\midrule
+0.1 & 0.469 & 0.376 & 0.150 & 0.044 \\
+0.3 & 0.881 & 0.749 & 0.333 & 0.100 \\
+\textbf{0.5} & \textbf{1.000} & 0.859 & 0.390 & \textbf{0.119 ($q_1$)} \\
+\textbf{0.7} & 0.881 & \textbf{0.750 ($q_2$)} & 0.333 & 0.100 \\
+0.9 & 0.469 & 0.376 & 0.150 & 0.044 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{corollary}[Capacity ceiling and budget bound]
+\label{cor:budget}
+$\RAIG(q) \le 1 - \Hb(\varepsilon_{f(q)})$, the capacity of the corresponding
+channel. Consequently, identifying one of $N$ equiprobable items requires
+\begin{equation}
+T \;\ge\; \frac{\log_2 N}{\max_{f \in \Fset}\left(1 - \Hb(\varepsilon_f)\right)}
+\label{eq:budget}
+\end{equation}
+questions in expectation.
+\end{corollary}
+
+\begin{proof}[Proof sketch]
+The bound on $\RAIG$ is the capacity of BSC$(\varepsilon)$, attained at
+$p=\tfrac12$. Identification requires acquiring $\log_2 N$ bits, and no
+question delivers more than the largest available capacity; the converse of
+the channel coding theorem gives the result~\cite[Ch.~7]{cover2006}.
+\end{proof}
+
+On our catalogue this bound evaluates to $T \ge 20.15$ (Table~\ref{tab:dataset}),
+which places the protocol's $T=20$ budget essentially at the theoretical floor
+\emph{before any noise is added} -- a fact that turns out to matter for
+interpreting the clean-condition result in Section~\ref{sec:results-main}.
+
+\subsection{Specifying Reliability in Practice}
+\label{sec:tiers}
+
+\emph{Oracle.} $\hat\varepsilon_f = \varepsilon_f$. Not attainable; reported as
+an upper reference.
+
+\emph{Tiered.} Each attribute is annotated as objective, semi-objective, or
+subjective (Table~\ref{tab:tiers}). This requires no measurement.
+
+\emph{Uniform.} A single $\hat\varepsilon$ for all attributes. This recovers
+classical information gain up to a constant, since a constant $\varepsilon$
+shifts every score identically and preserves the ranking. Uniform
+specification therefore corrects the update rule but not the selection bias.
+
+\subsection{Algorithms}
+
+Algorithms~\ref{alg:select}--\ref{alg:session} give the procedure.
+Algorithm~\ref{alg:eval} specifies the paired evaluation used throughout
+Section~\ref{sec:setup}.
+
+\begin{algorithm}[t]
+\caption{Reliability-aware query selection}
+\label{alg:select}
+\begin{algorithmic}[1]
+\Require belief $\bb$, answer matrix $X \in \{0,1\}^{N \times |\Qset|}$,
+per-question crossover $\hat{\boldsymbol\varepsilon}$, asked mask $U$
+\Ensure index of the next question
+\State $\mathbf{p} \gets \bb^{\!\top} X$
+\State $\tilde{\mathbf{p}} \gets \mathbf{p} \odot (1-\hat{\boldsymbol\varepsilon})
+   + (1-\mathbf{p}) \odot \hat{\boldsymbol\varepsilon}$
+\State $\mathbf{s} \gets \Hb(\tilde{\mathbf{p}}) - \Hb(\hat{\boldsymbol\varepsilon})$
+\State $s_j \gets -\infty$ for all $j$ with $U_j = 1$
+\State \Return $\arg\max_j s_j$
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[t]
+\caption{Belief update under BSC$(\hat\varepsilon)$}
+\label{alg:update}
+\begin{algorithmic}[1]
+\Require belief $\bb$, answer column $\bx_q$, observation $y$, crossover $\hat\varepsilon$
+\State $\ell_c \gets 1-\hat\varepsilon$ if $x_q(c)=y$ else $\hat\varepsilon$, for all $c$
+\State $\bb' \gets \bb \odot \boldsymbol\ell$
+\State $Z \gets \sum_c b'_c$
+\If{$Z = 0$}
+  \State \Return $\bb$
+\EndIf
+\State \Return $\bb' / Z$
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[t]
+\caption{Identification session}
+\label{alg:session}
+\begin{algorithmic}[1]
+\Require catalogue, target $c^\ast$, budget $T$, selector $\pi$,
+assumed $\hat{\boldsymbol\varepsilon}$, true $\boldsymbol\varepsilon$,
+random stream $u_{1:T}$
+\State $\bb \gets$ uniform; $U \gets \mathbf{0}$
+\For{$t = 1$ \textbf{to} $T$}
+  \State $q \gets \pi(\bb, X, \hat{\boldsymbol\varepsilon}, U)$; $U_q \gets 1$
+  \State $y \gets x_q(c^\ast)$
+  \If{$u_t < \varepsilon_{f(q)}$} $y \gets 1-y$ \EndIf
+  \State $\bb \gets$ \textsc{Update}$(\bb, \bx_q, y, \hat\varepsilon_{f(q)})$
+\EndFor
+\State \Return $\arg\max_c \bb(c)$
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[t]
+\caption{Paired evaluation with common random numbers}
+\label{alg:eval}
+\begin{algorithmic}[1]
+\Require methods $\mathcal{M}$, trials $R$, seeds $S$, budget $T$
+\For{each seed $s \in S$}
+  \State draw targets $c^\ast_{1:R}$ and streams $u_{1:R,1:T}$ from seed $s$
+  \For{$i = 1$ \textbf{to} $R$}
+    \For{each $m \in \mathcal{M}$}
+      \State record outcome of \textsc{Session}$(c^\ast_i, u_{i,\cdot}, m)$
+    \EndFor
+  \EndFor
+\EndFor
+\State \Return per-trial outcomes for paired inference
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Complexity}
+
+Table~\ref{tab:complexity} summarises. Selection is one matrix--vector product
+and a constant number of vectorised transforms.
+
+\begin{table}[t]
+\caption{Complexity per operation.}
+\label{tab:complexity}
+\centering
+\footnotesize
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Operation} & \textbf{Time} & \textbf{Memory} \\
+\midrule
+Catalogue compilation & $O(NM\bar{V})$ & $O(N|\Qset|)$ bits \\
+Split-mass computation & $O(N|\Qset|)$ & $O(|\Qset|)$ \\
+Score transform (IG or RAIG) & $O(|\Qset|)$ & $O(|\Qset|)$ \\
+Belief update & $O(N)$ & $O(N)$ \\
+Full session & $O(TN|\Qset|)$ & $O(N|\Qset|)$ bits \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+%=============================================================================
+\section{Implementation}
+%=============================================================================
+
+The reference implementation, \texttt{raig.py}, is written in Python against
+NumPy, pandas and SciPy; no deep-learning framework is required. All reported
+numbers below were produced by this implementation, not a separate analysis
+script, and are cross-checked against the committed \texttt{results/*.json}
+outputs. Table~\ref{tab:stack} lists the stack.
+
+\begin{table}[t]
+\caption{Technology stack.}
+\label{tab:stack}
+\centering
+\footnotesize
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Layer} & \textbf{Choice} & \textbf{Rationale} \\
+\midrule
+Language & Python 3.13 & ecosystem, reviewer familiarity \\
+Numerics & NumPy 2.5 & vectorised scoring \\
+Tabular I/O & pandas & catalogue ingestion, binning \\
+Statistics & SciPy 1.18 & exact McNemar, correlations \\
+Plotting & Matplotlib & vector figures \\
+Persistence & CSV / Parquet & no database dependency \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Catalogue compilation materialises one boolean column per non-degenerate
+attribute--value pair; questions true of every item or of none are discarded
+at compile time. Continuous attributes are quantile binned, with the number of
+bins exposed as a parameter.
+
+The engineering decision with the largest downstream effect is the separation
+of the assumed crossover $\hat{\boldsymbol\varepsilon}$ from the true crossover
+$\boldsymbol\varepsilon$ in the session signature: the simulator draws errors
+from the latter, the method sees only the former. Conflating them would make
+every reported result circular. Keeping them distinct is what makes the
+misspecification study in Section~\ref{sec:results-ablation} possible at all.
+
+%=============================================================================
+\section{Experimental Setup}
+\label{sec:setup}
+%=============================================================================
+
+Fig.~\ref{fig:pipeline} gives the end-to-end pipeline, from the raw catalogue
+through question compilation, reliability annotation, method and noise-condition
+specification, the paired simulation loop, and the statistical inference that
+produces each table in Section~\ref{sec:results-main}. The remainder of this
+section documents each stage in turn. Two properties of the design are worth
+stating up front because they govern how every number in Section~VII should be
+read. First, all six methods in a trial share both the target item and the
+uniform random stream that decides whether the user misanswers, so every
+comparison is paired trial-by-trial and the McNemar tests in
+Table~\ref{tab:mcnemar} are exact rather than approximate. Second, the assumed
+crossover $\hat\varepsilon$ that a method uses to \emph{select} and \emph{update}
+is kept strictly separate from the true crossover $\varepsilon^{\mathrm{true}}$
+that governs the simulated user, which is what makes the misspecification sweep
+and the adversarial condition meaningful rather than circular.
+
+%-----------------------------------------------------------------------------
+% Fig. 6 -- full project/experiment pipeline. Plain TikZ, no pgfplots.
+% A zero-cost plain-text fallback follows, commented out; see the compile
+% budget note in the preamble.
+%-----------------------------------------------------------------------------
+\begin{figure*}[t]
+\centering
+\begin{tikzpicture}[
+  font=\scriptsize,
+  box/.style={rectangle, rounded corners=2pt, draw=black!65, line width=0.5pt,
+              text width=76mm, align=left, inner sep=3.2pt},
+  dat/.style={box, fill=blue!7},
+  prc/.style={box, fill=black!4},
+  spc/.style={box, fill=orange!10},
+  res/.style={box, fill=green!9},
+  dec/.style={diamond, aspect=2.6, draw=black!65, line width=0.5pt,
+              fill=yellow!18, inner sep=0pt, text width=17mm, align=center},
+  a/.style={-{Latex[length=1.8mm]}, draw=black!65, line width=0.6pt},
+  hdr/.style={font=\scriptsize\bfseries, text=black!70}
+]
+
+% ---------------- left column: build + specify ----------------
+\node[hdr, anchor=south west] (hA) at (0mm,0mm) {A. BUILD THE SEARCH SPACE};
+\node[dat, anchor=north west] (L1) at (0mm,-2.2mm)
+  {\textbf{1. Raw catalogue.} \texttt{data/dataset\_final.csv} (30\,MB,
+   Spotify-derived). \texttt{load\_catalogue()} drops any row missing one of
+   the $M{=}21$ attributes: 0 dropped, $N{=}79{,}803$ tracks retained.};
+\node[prc, below=2.2mm of L1] (L2)
+  {\textbf{2. Discretisation.} \texttt{discretize()} / \texttt{rebin\_attribute()}
+   quantile-bin each continuous source column. Native binning (mostly 2-bin)
+   drives the main protocol; a $k{=}4$ re-binning drives the discretisation
+   ablation in Table~\ref{tab:pathology}.};
+\node[prc, below=2.2mm of L2] (L3)
+  {\textbf{3. Question compilation.} \texttt{Catalogue.\_\_init\_\_} emits one
+   one-vs-rest indicator column per (attribute, value) pair and drops
+   degenerate columns ($s{=}0$ or $s{=}N$) --- this is what removes
+   \texttt{release\_type}. Result: $X\in\{0,1\}^{79803\times193}$,
+   $|\Qset|{=}193$ questions over 20 non-degenerate attributes.};
+\node[res, below=2.2mm of L3] (L4)
+  {\textbf{4. Identifiability audit.} \texttt{identifiability\_audit()}:
+   77{,}069 distinct attribute vectors, 93.67\% uniquely identifiable, largest
+   equivalence class 11, entropy floor $\log_2 77069 = 16.23$ bits, budget
+   bound $T\ge20.15$. $\rightarrow$ Table~\ref{tab:dataset}.};
+\node[spc, below=2.2mm of L4] (L5)
+  {\textbf{5. Reliability annotation.} \texttt{ATTR\_TIER} assigns each
+   attribute one of three tiers; \texttt{TIER\_EPS}$=\{0.03,0.15,0.30\}$.
+   \texttt{eps\_vector()} lifts this to $\hat\varepsilon\in\mathbb{R}^{193}$.
+   Question-weighted mean $\bar\varepsilon=0.0981$ is what every
+   ``uniform'' baseline assumes. $\rightarrow$ Table~\ref{tab:tiers}.};
+\node[spc, below=2.2mm of L5] (L6)
+  {\textbf{6. Methods} (\texttt{make\_methods()}, 6 arms). Random+soft;
+   IG+hard ($\hat\varepsilon{=}0$, i.e.\ elimination); IG+soft-uniform
+   ($\hat\varepsilon{=}\bar\varepsilon$); IG+soft-objective (objective tier
+   only); RAIG-tiered ($\hat\varepsilon{=}$ tier value); RAIG-oracle
+   ($\hat\varepsilon{=}\varepsilon^{\mathrm{true}}$).
+   $\rightarrow$ Table~\ref{tab:baselines}.};
+\node[spc, below=2.2mm of L6] (L7)
+  {\textbf{7. Noise conditions} (7). clean ($\lambda{=}0$); homogeneous
+   ($\eta{=}\bar\varepsilon$); heterogeneous $\lambda\in\{0.5,1.0,1.5\}$;
+   randomised (tier$\rightarrow$attribute map permuted, seed 999);
+   adversarial (highest-IG attribute assigned the \emph{lowest}
+   $\varepsilon$). Only $\varepsilon^{\mathrm{true}}$ changes; $\hat\varepsilon$
+   is fixed by the method.};
+
+% ---------------- right column: simulate + analyse ----------------
+\node[hdr, anchor=south west] (hB) at (90mm,0mm) {B. SIMULATE, THEN INFER};
+\node[prc, anchor=north west] (R1) at (90mm,-2.2mm)
+  {\textbf{8. Paired session simulation.} \texttt{run\_paired\_trials()}:
+   $R{=}300$ targets $\times$ 3 seeds $\times$ 6 methods, $T{=}20$ turns,
+   batch 50. Belief is one $(N \times MR_b)$ matrix, method-major. All six
+   methods share the target \emph{and} the uniform stream
+   $u_t$ (common random numbers) $\Rightarrow$ exact pairing.};
+\node[prc, below=3.2mm of R1] (R2)
+  {\textbf{Per turn} $t=1,\dots,T$:\\[1pt]
+   (i)~$P = X^{\!\top} B$ --- split mass, one $(Q{\times}N)(N{\times}MR_b)$
+   matmul.\\
+   (ii)~Score each question: $\Hb(p)$ for IG;
+   $\Hb\!\big(p(1{-}\hat\varepsilon)+(1{-}p)\hat\varepsilon\big)-\Hb(\hat\varepsilon)$
+   for RAIG; $1-\Hb(\hat\varepsilon)$ for the capacity-only ablation.\\
+   (iii)~Mask already-asked and tier-disallowed columns; $q_t=\arg\max$.\\
+   (iv)~Simulate the user: $y=x_{c^\star\!,q_t}$, flipped iff
+   $u_t<\varepsilon^{\mathrm{true}}_{q_t}$.\\
+   (v)~Bayes update $B \propto B\odot\mathrm{lik}(\hat\varepsilon)$,
+   renormalise; skip the update if $Z{=}0$.};
+\node[dec, below=3.2mm of R2] (RD) {$t = T$?};
+\node[prc, below=3.2mm of RD] (R3)
+  {\textbf{9. Decode.} $\hat c=\arg\max_i B_i$. Top-1 and top-5 hits recorded
+   per trial, giving a $900\times6$ boolean matrix per condition
+   (\texttt{results/correct\_lambda1.npy} at $\lambda{=}1$).};
+\node[res, below=2.2mm of R3] (R4)
+  {\textbf{10. Inference.} \texttt{acc\_ci} and \texttt{paired\_bootstrap\_ci}
+   (10{,}000 resamples) for intervals; \texttt{mcnemar\_exact} (exact binomial
+   on discordant pairs) for paired significance;
+   \texttt{measure\_pathology} for the Spearman $\rho$ between max IG and
+   annotated reliability.};
+\node[res, below=2.2mm of R4] (R5)
+  {\textbf{11. Artefacts} $\rightarrow$ \texttt{results/*.json}.
+   \texttt{main\_results}$\rightarrow$Table~\ref{tab:main};
+   \texttt{mcnemar\_lambda1}$\rightarrow$Table~\ref{tab:mcnemar};
+   \texttt{ablation}$\rightarrow$Table~\ref{tab:ablation};
+   \texttt{latency}$\rightarrow$Table~\ref{tab:latency};
+   \texttt{misspec\_grid\_R500}$\rightarrow$Table~\ref{fig:misspec};
+   \texttt{pathology\_\{native,4bin\}}$\rightarrow$Tables~\ref{tab:pathology}
+   and~\ref{fig:scatter};
+   \texttt{correlated\_error}$\rightarrow$Section~\ref{sec:robustness}.};
+
+% ---------------- arrows ----------------
+\draw[a] (L1) -- (L2);
+\draw[a] (L2) -- (L3);
+\draw[a] (L3) -- (L4);
+\draw[a] (L4) -- (L5);
+\draw[a] (L5) -- (L6);
+\draw[a] (L6) -- (L7);
+\draw[a] (R1) -- (R2);
+\draw[a] (R2) -- (RD);
+\draw[a] (RD) -- node[right, font=\scriptsize, pos=0.4] {yes} (R3);
+\draw[a] (R3) -- (R4);
+\draw[a] (R4) -- (R5);
+% loop-back ("no" -> next turn): routed clear of the boxes, down the right edge.
+\draw[a] (RD.east) -- node[above, font=\scriptsize, pos=0.25] {no}
+         ([xshift=4mm]RD.east -| R2.east) |- (R2.east);
+% cross-column feed: specification (stages 5-7) -> simulation (stage 8),
+% routed up the empty gutter between the two columns.
+\draw[a] (L7.east) -| ([xshift=-4mm]R1.west) -- (R1.west);
+\end{tikzpicture}
+\caption{End-to-end pipeline of the project and the experiment. Blue is raw
+data, grey is deterministic processing, orange is specification the
+experimenter supplies, green is measured output. Panel~A builds the search
+space and fixes what each method is allowed to assume; Panel~B runs the paired
+simulation and turns per-trial correctness into the reported statistics. The
+assumed crossover $\hat\varepsilon$ (stage 5, fixed per method) and the true
+crossover $\varepsilon^{\mathrm{true}}$ (stage 7, varied per condition) are
+deliberately separate inputs: RAIG-oracle is the only arm for which they
+coincide by construction.}
+\label{fig:pipeline}
+\end{figure*}
+
+% -----------------------------------------------------------------------
+% ZERO-COST FALLBACK for Fig.~\ref{fig:pipeline}. If the tikzpicture above
+% blows the compile budget, comment out the whole figure* environment and
+% uncomment this block instead. Same content, no tikz.
+% -----------------------------------------------------------------------
+% \begin{figure*}[t]
+% \centering
+% \footnotesize
+% \begin{tabular}{@{}p{0.47\textwidth}p{0.47\textwidth}@{}}
+% \toprule
+% \textbf{A. Build the search space} & \textbf{B. Simulate, then infer} \\
+% \midrule
+% \textbf{1. Raw catalogue.} dataset\_final.csv (30\,MB); load\_catalogue()
+% drops rows missing any of $M{=}21$ attributes; 0 dropped, $N{=}79{,}803$.
+% &
+% \textbf{8. Paired simulation.} run\_paired\_trials(): $R{=}300\times3$ seeds
+% $\times6$ methods, $T{=}20$, batch 50; shared target and shared $u_t$ stream
+% (common random numbers) give exact pairing. \\
+% $\downarrow$ & $\downarrow$ \\
+% \textbf{2. Discretisation.} Quantile bins; native for the main protocol,
+% $k{=}4$ for the ablation.
+% &
+% \textbf{Per turn:} (i) $P=X^{\top}B$; (ii) score by $\Hb(p)$ (IG) or
+% $\Hb(p(1{-}\hat\varepsilon)+(1{-}p)\hat\varepsilon)-\Hb(\hat\varepsilon)$
+% (RAIG); (iii) mask asked/disallowed, argmax; (iv) simulate answer, flip iff
+% $u_t<\varepsilon^{\mathrm{true}}$; (v) Bayes update and renormalise.
+% Repeat until $t{=}T$. \\
+% $\downarrow$ & $\downarrow$ \\
+% \textbf{3. Question compilation.} One-vs-rest column per (attribute, value);
+% degenerate columns dropped (removes release\_type);
+% $X\in\{0,1\}^{79803\times193}$.
+% &
+% \textbf{9. Decode.} $\hat c=\arg\max_i B_i$; top-1/top-5 per trial;
+% $900\times6$ boolean matrix per condition. \\
+% $\downarrow$ & $\downarrow$ \\
+% \textbf{4. Identifiability audit.} 77{,}069 distinct vectors, 93.67\% unique,
+% largest class 11, floor 16.23 bits, $T\ge20.15$ (Table~\ref{tab:dataset}).
+% &
+% \textbf{10. Inference.} acc\_ci / paired\_bootstrap\_ci (10{,}000 resamples);
+% mcnemar\_exact; measure\_pathology (Spearman $\rho$). \\
+% $\downarrow$ & $\downarrow$ \\
+% \textbf{5. Reliability annotation.} 3 tiers, $\{0.03,0.15,0.30\}$;
+% $\hat\varepsilon\in\mathbb{R}^{193}$; $\bar\varepsilon=0.0981$
+% (Table~\ref{tab:tiers}).
+% &
+% \textbf{11. Artefacts.} results/*.json $\rightarrow$
+% Tables~\ref{tab:main}, \ref{tab:mcnemar}, \ref{tab:ablation},
+% \ref{tab:latency}, \ref{tab:pathology}, \ref{fig:scatter},
+% \ref{fig:misspec}; Section~\ref{sec:robustness}. \\
+% $\downarrow$ & \\
+% \textbf{6. Methods (6).} Random+soft; IG+hard; IG+soft-uniform;
+% IG+soft-objective; RAIG-tiered; RAIG-oracle (Table~\ref{tab:baselines}).
+% & \\
+% $\downarrow$ & \\
+% \textbf{7. Noise conditions (7).} clean; homogeneous; heterogeneous
+% $\lambda\in\{0.5,1,1.5\}$; randomised; adversarial. Only
+% $\varepsilon^{\mathrm{true}}$ varies. $\longrightarrow$ feeds stage 8.
+% & \\
+% \bottomrule
+% \end{tabular}
+% \caption{End-to-end pipeline of the project and the experiment.}
+% \label{fig:pipeline}
+% \end{figure*}
+
+\subsection{Dataset and Identifiability}
+
+The catalogue is the Music-Akenator dataset: 79{,}803 tracks over 21
+categorical attributes, compiled into 193 non-degenerate questions.
+Table~\ref{tab:dataset} reports the identifiability audit.
+
+\begin{table}[t]
+\caption{Catalogue summary and identifiability audit.}
+\label{tab:dataset}
+\centering
+\footnotesize
+\begin{tabular}{@{}lc@{}}
+\toprule
+\textbf{Quantity} & \textbf{Value} \\
+\midrule
+Items after cleaning, $N$ & 79{,}803 \\
+Items dropped (incomplete) & 0 \\
+Attributes, $M$ & 21 \\
+Compiled questions, $|\Qset|$ & 193 \\
+Distinct attribute vectors & 77{,}069 \\
+Collision rate & 6.33\% \\
+Uniquely identifiable & 93.67\% \\
+Largest equivalence class & 11 items \\
+Entropy floor (bits) & 16.234 \\
+Budget bound \eqref{eq:budget} & $T \ge 20.15$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The budget bound uses the most reliable attribute's channel capacity
+(objective, $\varepsilon=0.03$): $T \ge \log_2(77{,}069)/(1-\Hb(0.03)) \approx 20.15$.
+The protocol's $T=20$ budget therefore sits right at the theoretical floor even
+before any noise is added, which is the reason the clean-condition results in
+Section~\ref{sec:results-main} are budget-sensitive rather than a straightforward
+ceiling effect.
+
+\subsection{Reliability Annotation and Noise Models}
+
+Table~\ref{tab:tiers} records the three-tier annotation. These values are
+\emph{assumed}, informed by reported inter-annotator agreement on perceptual
+music descriptors~\cite{hu2007mood,kim2010emotion}, not measured from users;
+measuring them is the principal item of future work.
+
+\begin{table}[t]
+\caption{Attribute reliability annotation. Crossover values are assumed, not
+measured.}
+\label{tab:tiers}
+\centering
+\footnotesize
+\begin{tabular}{@{}p{0.16\columnwidth}p{0.62\columnwidth}c@{}}
+\toprule
+\textbf{Tier} & \textbf{Attributes} & \textbf{$\varepsilon$} \\
+\midrule
+Objective &
+genre, language, content rating, artist type, release type, track version
+& 0.03 \\
+Semi-objective &
+popularity, duration, liveness, instrumentalness, acousticness, loudness,
+speechiness
+& 0.15 \\
+Subjective &
+mood, tempo, danceability, energy, valence, key, mode, time signature
+& 0.30 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Four noise conditions are evaluated. \emph{Homogeneous} applies a single
+crossover $\eta$ to every attribute and serves as a control: under it RAIG and
+classical IG coincide up to a constant, and any large observed difference would
+indicate a bug rather than a finding. \emph{Heterogeneous} applies the
+per-attribute vector scaled by $\lambda \in \{0, 0.5, 1.0, 1.5\}$.
+\emph{Randomised} permutes the crossover vector across attributes, destroying
+any correlation with information gain. \emph{Adversarial} assigns low crossover
+to high-gain attributes, inverting the hypothesised relationship. These two
+controls address the circularity objection directly: the simulator and the
+method share the parameter $\boldsymbol\varepsilon$, and the only convincing
+answer is to show the method's advantage tracks the structure of that parameter
+and reverses when the structure is inverted -- which Section~\ref{sec:results-main}
+confirms it does.
+
+\subsection{Baselines}
+\label{sec:baselines}
+
+Table~\ref{tab:baselines} lists the six methods compared, factorial in
+selection rule and update rule as Proposition~\ref{prop:limit} requires.
+
+\begin{table}[t]
+\caption{Methods under comparison.}
+\label{tab:baselines}
+\centering
+\footnotesize
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Method} & \textbf{Selection} & \textbf{Update} \\
+\midrule
+Random+soft & uniform at random & Bayes, uniform $\hat\varepsilon$ \\
+IG+hard & classical IG & elimination \\
+IG+soft-uniform & classical IG & Bayes, uniform $\hat\varepsilon$ \\
+IG+soft-objective & IG, objective attrs only & Bayes, uniform $\hat\varepsilon$ \\
+RAIG-tiered & RAIG, tiered $\hat\varepsilon$ & Bayes, tiered $\hat\varepsilon$ \\
+RAIG-oracle & RAIG, true $\varepsilon$ & Bayes, true $\varepsilon$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\emph{IG+soft-uniform} is the strongest representative of current practice and
+the baseline that matters most. \emph{IG+soft-objective} discards subjective
+attributes entirely and is the baseline most likely to defeat the proposed
+method on paper; Section~\ref{sec:robustness} shows it instead runs into an
+identifiability ceiling specific to the six objective attributes on this
+catalogue, which is a different failure than the one it was designed to test
+and we report it as such.
+
+\subsection{Protocol and Metrics}
+
+Every method is evaluated at a fixed budget of $T=20$ questions, removing the
+stopping-rule confound. The primary metric is top-1 accuracy at the budget;
+secondary metrics are top-5 accuracy, questions to reach a 0.90 confidence
+threshold, and per-turn latency. Each condition comprises $R=300$ trials
+replicated over three seeds ($n=900$ paired trials per condition), with
+targets and noise streams shared across methods (Algorithm~\ref{alg:eval}).
+Paired comparisons use the exact McNemar test~\cite{mcnemar1947}; interval
+estimates use a paired bootstrap over per-trial differences with $10^4$
+resamples. The primary comparison, RAIG-tiered against IG+soft-uniform at
+heterogeneous $\lambda=1.0$, was fixed in advance of observing any result.
+
+\subsection{Ablations}
+\label{sec:ablation}
+
+Four ablations were run: tier granularity ($K \in \{1,2,3,M\}$),
+misspecification (assumed against true crossover on a grid), discretisation
+(2 vs.\ 4 bins), and a component ablation substituting the capacity term
+$1-\Hb(\varepsilon)$ alone for the full expression \eqref{eq:raig}.
+
+\subsection{Threats to Validity}
+
+Table~\ref{tab:threats} records the principal threats and mitigations.
+
+\begin{table}[t]
+\caption{Threats to validity and mitigations.}
+\label{tab:threats}
+\centering
+\footnotesize
+\begin{tabular}{@{}p{0.30\columnwidth}p{0.60\columnwidth}@{}}
+\toprule
+\textbf{Threat} & \textbf{Mitigation} \\
+\midrule
+Simulated users; $\varepsilon$ assumed rather than measured & Randomised, adversarial and correlated-error controls (Section~\ref{sec:robustness}); human study deferred to future work \\
+Simulator and method share $\boldsymbol\varepsilon$ & Assumed and true crossovers kept distinct in the API; misspecification surface reported at $5\times$ power \\
+Independence of errors across turns & Stress-tested directly (Section~\ref{sec:robustness}); effect survives \\
+Catalogue specificity & Identifiability audit reported; protocol is domain independent; second-domain replication not yet attempted (Limitations) \\
+Elimination convention affects IG+hard & Convention stated explicitly (Prop.~\ref{prop:limit}) \\
+Multiple comparisons & Primary metric and primary comparison fixed in advance \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Reproducibility}
+
+Table~\ref{tab:hyper} lists hyperparameters; Table~\ref{tab:env} the
+environment. All randomness derives from named seeds.
+
+Every number reported in Section~\ref{sec:results-main} and
+Section~\ref{sec:robustness} is read from a committed JSON artefact rather
+than transcribed from a console session. The reference implementation is a
+single module, \texttt{raig.py}, driven by one script per experiment:
+\texttt{run\_main.py} (Table~\ref{tab:main}), \texttt{run\_mcnemar.py}
+(Table~\ref{tab:mcnemar}), \texttt{run\_ablation.py}
+(Table~\ref{tab:ablation}), \texttt{run\_misspec.py}
+(Table~\ref{fig:misspec}), \texttt{run\_latency.py}
+(Table~\ref{tab:latency}), \texttt{run\_pathology.py} and
+\texttt{run\_pathology\_4bin.py} (Tables~\ref{tab:pathology}
+and~\ref{fig:scatter}), \texttt{run\_correlated\_error.py},
+\texttt{run\_clean\_budget.py}, \texttt{run\_seed\_breakdown.py},
+\texttt{run\_traces.py} and \texttt{verify\_objective\_only.py} (the
+diagnostics in Section~\ref{sec:robustness}). Each writes to
+\texttt{results/}, and every numeric cell in every table in this paper was
+checked programmatically against those files.
+% TODO-HUMAN (C): paste the public repository URL here once the code is
+% pushed, and delete the red placeholder.
+Code, the tier annotation and all result artefacts are available at
+\textcolor{red}{[repository URL]}.
+
+\begin{table}[t]
+\caption{Hyperparameters.}
+\label{tab:hyper}
+\centering
+\footnotesize
+\begin{tabular}{@{}lc@{}}
+\toprule
+\textbf{Parameter} & \textbf{Value} \\
+\midrule
+Query budget $T$ & 20 \\
+Trials per condition $R$ & 300 (primary); 8 seeds for stability check \\
+Seeds & $\{0,1,2\}$ primary; $+\{3,4,5,6,7\}$ stability \\
+Bins for continuous attributes & $\{2,4\}$ \\
+Tier crossovers $(\varepsilon_{\text{obj}},\varepsilon_{\text{semi}},\varepsilon_{\text{subj}})$ & $(0.03,\,0.15,\,0.30)$ \\
+Noise multiplier $\lambda$ & $\{0,\,0.5,\,1.0,\,1.5\}$ \\
+Bootstrap resamples & $10^4$ \\
+Confidence threshold (secondary) & 0.90 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\caption{Software and hardware environment.}
+\label{tab:env}
+\centering
+\footnotesize
+\begin{tabular}{@{}lc@{}}
+\toprule
+\textbf{Component} & \textbf{Value} \\
+\midrule
+CPU / RAM & Intel Core i7-1355U (10c/12t) / 16\,GB \\
+OS & Windows 11 Home (build 10.0.26200) \\
+Python / NumPy / SciPy / pandas & 3.13.0 / 2.5.0 / 1.18.0 / 3.0.3 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+%=============================================================================
+\section{Results}
+%=============================================================================
+
+\subsection{The Selection Bias}
+\label{sec:results-bias}
+
+Table~\ref{tab:pathology} reports the correlation between an attribute's
+maximum information gain at uniform belief and its annotated reliability.
+
+\begin{table}[t]
+\caption{Per-attribute information gain against annotated reliability.}
+\label{tab:pathology}
+\centering
+\footnotesize
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+\textbf{Bins} & \textbf{Spearman $\rho$} & \textbf{$p$} & \textbf{$\bar\varepsilon$ top-5 IG} & \textbf{$\bar\varepsilon$ all} \\
+\midrule
+2 (native) & $-0.438$ & 0.054 & 0.210 & 0.180 \\
+4 & $-0.613$ & 0.004 & 0.246 & 0.180 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The correlation is negative at both binnings and strengthens, both in
+magnitude and significance, once the discretisation is forced to be finer and
+more evenly spaced -- consistent with a median-style split manufacturing
+apparent informativeness specifically for the vaguest attributes rather than
+merely revealing a pre-existing property of the domain. The five
+attributes with the highest information gain average $\varepsilon=0.21$--$0.25$
+against a catalogue-wide average of $\varepsilon=0.18$: the questions
+information gain likes best are measurably less reliable than the average
+question in the catalogue.
+
+Table~\ref{fig:scatter} gives the underlying per-attribute coordinates. The
+pattern is visible without the statistic: under native binning the five
+highest-IG attributes are \texttt{loudness\_level} (1.000),
+\texttt{mood} (1.000), \texttt{acoustic\_level} (0.999),
+\texttt{popularity\_level} (0.958) and \texttt{danceability\_level} (0.957) --
+three semi-objective and two subjective, and not one of them objective
+(mean $\varepsilon=0.21$ against the catalogue-wide 0.18). The
+most reliable tier occupies the bottom of the IG ranking almost
+uniformly: \texttt{genre}, the single most reliable and most semantically
+crisp attribute in the catalogue, yields the \emph{lowest} maximum
+information gain of all 20 (0.097 bits). The 4-bin column shows the
+mechanism directly. Every attribute with a continuous backing column is
+driven to $\approx\!0.811$ bits, the ceiling for a 4-way quantile split of
+one value against the rest, regardless of whether that attribute is
+loudness or danceability; the attributes that stay put are exactly the
+categorical ones the re-binning cannot touch. Forcing the discretisation to
+be maximally balanced flattens the objective/subjective distinction that IG
+is supposed to be measuring, which is why $\rho$ strengthens from $-0.44$
+to $-0.61$ rather than weakening.
+
+\begin{table}[t]
+\caption{Per-attribute information gain against annotated reliability: the 20
+coordinates behind Table~\ref{tab:pathology}.}
+\label{fig:scatter}
+\centering
+\scriptsize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}llcc@{}}
+\toprule
+\textbf{Attribute} & \textbf{Tier} & \textbf{$1-\varepsilon$} &
+\textbf{max IG (nat.\ / 4-bin)} \\
+\midrule
+\texttt{artist\_type}      & objective & 0.97 & 0.834 / 0.834 \\
+\texttt{language}          & objective & 0.97 & 0.446 / 0.446 \\
+\texttt{content\_rating}   & objective & 0.97 & 0.424 / 0.424 \\
+\texttt{track\_version}    & objective & 0.97 & 0.424 / 0.424 \\
+\texttt{genre}             & objective & 0.97 & 0.097 / 0.097 \\
+\midrule
+\texttt{loudness\_level}     & semi & 0.85 & 1.000 / 0.811 \\
+\texttt{acoustic\_level}     & semi & 0.85 & 0.999 / 0.811 \\
+\texttt{popularity\_level}   & semi & 0.85 & 0.958 / 0.811 \\
+\texttt{duration\_length}    & semi & 0.85 & 0.939 / 0.811 \\
+\texttt{liveness\_level}     & semi & 0.85 & 0.933 / 0.811 \\
+\texttt{instrumental\_level} & semi & 0.85 & 0.819 / 0.811 \\
+\texttt{speechiness\_level}  & semi & 0.85 & 0.231 / 0.811 \\
+\midrule
+\texttt{mood}                    & subjective & 0.70 & 1.000 / 1.000 \\
+\texttt{danceability\_level}     & subjective & 0.70 & 0.957 / 0.811 \\
+\texttt{mode\_category}          & subjective & 0.70 & 0.947 / 0.947 \\
+\texttt{energy\_level}           & subjective & 0.70 & 0.924 / 0.811 \\
+\texttt{tempo}                   & subjective & 0.70 & 0.902 / 0.902 \\
+\texttt{key\_category}           & subjective & 0.70 & 0.896 / 0.896 \\
+\texttt{valence\_level}          & subjective & 0.70 & 0.804 / 0.811 \\
+\texttt{time\_signature\_category} & subjective & 0.70 & 0.496 / 0.496 \\
+\bottomrule
+\end{tabular}
+\\[3pt]
+\raggedright{\scriptsize Grouped by tier, ordered by native max IG within
+tier. \emph{nat.}\ is the catalogue's own discretisation; \emph{4-bin}
+re-bins every attribute with a continuous backing column at $k=4$ quantile
+bins. Reliability $1-\varepsilon$ is the tier annotation of
+Table~\ref{tab:tiers}, assumed rather than measured. The 21st attribute,
+\texttt{release\_type}, is degenerate (one value across all 79{,}803 tracks),
+compiles to no question, and is therefore absent.}
+\end{table}
+
+\subsection{Disentangling Selection from Update}
+\label{sec:results-main}
+
+Table~\ref{tab:main} reports top-1 accuracy at $T=20$ for all six methods
+across all seven noise conditions, $n=900$ paired trials per cell (95\%
+paired-bootstrap intervals in parentheses).
+
+\begin{table*}[t]
+\caption{Top-1 accuracy at $T=20$ (\%), mean over $3 \times 300$ paired trials,
+with 95\% paired-bootstrap intervals.}
+\label{tab:main}
+\centering
+\footnotesize
+\begin{tabular}{@{}lcccccc@{}}
+\toprule
+\textbf{Noise condition} & \textbf{Random+soft} & \textbf{IG+hard} & \textbf{IG+soft-unif.}
+& \textbf{IG+soft-obj.} & \textbf{RAIG-tiered} & \textbf{RAIG-oracle} \\
+\midrule
+Clean ($\lambda=0$) & 0.3 (0.0--0.8) & 96.6 (95.3--97.7) & 96.3 (95.1--97.4) & 0.6 (0.1--1.1) & 41.9 (38.8--45.0) & 96.6 (95.3--97.7) \\
+Homogeneous (control) & 0.1 (0.0--0.3) & 15.4 (13.1--17.9) & 23.9 (21.2--26.7) & 0.1 (0.0--0.3) & 9.6 (7.7--11.6) & 23.9 (21.2--26.7) \\
+Heterogeneous $\lambda=0.5$ & 0.1 (0.0--0.3) & 14.6 (12.3--16.9) & 20.1 (17.6--22.8) & 0.6 (0.1--1.1) & 17.9 (15.4--20.4) & 26.6 (23.7--29.4) \\
+Heterogeneous $\lambda=1.0^{\ast}$ & 0.0 (0.0--0.0) & 2.2 (1.3--3.2) & 2.1 (1.2--3.1) & 0.4 (0.1--0.9) & \textbf{7.9 (6.2--9.7)} & 7.9 (6.2--9.7) \\
+Heterogeneous $\lambda=1.5$ & 0.0 (0.0--0.0) & 0.4 (0.1--0.9) & 0.1 (0.0--0.3) & 0.3 (0.0--0.8) & 3.0 (1.9--4.1) & 2.3 (1.3--3.3) \\
+Randomised (control) & 0.0 (0.0--0.0) & 3.4 (2.3--4.7) & 7.3 (5.7--9.1) & 0.2 (0.0--0.6) & 4.3 (3.1--5.7) & 17.4 (15.0--19.9) \\
+Adversarial (control) & 0.1 (0.0--0.3) & 8.7 (6.8--10.6) & 14.4 (12.2--16.8) & 0.0 (0.0--0.0) & 3.7 (2.4--4.9) & 23.2 (20.6--26.1) \\
+\bottomrule
+\end{tabular}
+\\[2pt]
+\raggedright{\footnotesize $^\ast$ pre-registered primary comparison.}
+\end{table*}
+
+At the pre-registered comparison, RAIG-tiered reaches 7.9\% top-1 accuracy
+against IG+soft-uniform's 2.1\% -- and ties RAIG-oracle exactly, because at
+$\lambda=1.0$ the tiered assumed crossover equals the true crossover by
+construction, so the two methods make identical selections on every trial.
+RAIG-tiered also wins at $\lambda=0.5$ and $\lambda=1.5$. But in the two
+controls the method itself predicts should defeat it, the advantage does not
+merely shrink -- it reverses: IG+soft-uniform outperforms RAIG-tiered under
+both randomised (7.3\% vs.\ 4.3\%) and adversarial (14.4\% vs.\ 3.7\%)
+crossover assignment, while RAIG-oracle, which sees the true (here
+adversarially favourable) crossover, does best of all. This is exactly the
+failure mode predicted in Section~\ref{sec:failure-modes}, and we report it
+alongside the favourable cells rather than only the one that was
+pre-registered.
+
+The Clean-condition result deserves its own explanation rather than being read
+at face value. RAIG-tiered's 41.9\% looks like a collapse next to IG's 96\%+,
+but Section~\ref{sec:robustness} traces this to the query budget, not a defect
+in selection: RAIG-tiered's assumed crossover is fixed at the tiered values
+(0.03/0.15/0.30) regardless of the \emph{true} noise level, so even when every
+answer is actually correct the Bayesian update stays deliberately cautious
+about trusting it, and needs more than $T=20$ turns to concentrate belief.
+
+\subsection{Paired Significance}
+
+Table~\ref{tab:mcnemar} reports exact McNemar tests at $\lambda=1.0$,
+$n=900$ paired trials per row, common random numbers.
+
+\begin{table}[t]
+\caption{Exact McNemar tests, heterogeneous noise at $\lambda=1.0$.}
+\label{tab:mcnemar}
+\centering
+\footnotesize
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+\textbf{Comparison} & \textbf{$n_{10}$} & \textbf{$n_{01}$} & \textbf{$\Delta$} & \textbf{$p$} \\
+\midrule
+RAIG-tiered vs IG+soft-uniform & 65 & 13 & +5.8 pp & $1.8\times10^{-9}$ \\
+RAIG-tiered vs IG+soft-objective & 69 & 2 & +7.4 pp & $2.2\times10^{-18}$ \\
+RAIG-tiered vs RAIG-oracle & 0 & 0 & 0.0 pp & 1.000 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The RAIG-tiered vs.\ RAIG-oracle row is not approximately equal, it is exact:
+zero discordant pairs out of 900. As noted above, this is expected at
+$\lambda=1.0$ by construction and functions as an internal-consistency check
+that passed, not a coincidence worth remarking on further.
+
+\subsection{Ablations}
+\label{sec:results-ablation}
+
+Table~\ref{tab:ablation} reports tier granularity and the component ablation
+at heterogeneous $\lambda=1.0$; Table~\ref{fig:misspec} reports the
+misspecification surface.
+
+\begin{table}[t]
+\caption{Ablations at $\lambda=1.0$.}
+\label{tab:ablation}
+\centering
+\footnotesize
+\begin{tabular}{@{}lcc@{}}
+\toprule
+\textbf{Variant} & \textbf{Top-1 (\%)} & \textbf{\% of oracle gap} \\
+\midrule
+$K=1$ (uniform) & 2.1 & 0.0 \\
+$K=2$ & 6.9 & 82.7 \\
+$K=3$ (tiered) & 7.9 & 100.0 \\
+$K=M$ (oracle) & 7.9 & 100.0 \\
+Capacity term only & 0.0 & $-36.5$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+A coarse two-tier annotation ($K=2$: objective+semi-objective merged into one
+``reliable'' tier at $\varepsilon=0.09$, subjective kept at 0.30) already
+recovers 82.7\% of the oracle-over-uniform accuracy gap; the paper's own
+three-tier scheme recovers all of it. Scoring by reliability alone, discarding
+split balance entirely, does not just underperform -- it lands below the $K=1$
+uniform baseline. Section~\ref{sec:robustness} traces the mechanism: with
+every objective-tier question sharing $\varepsilon=0.03$, the capacity term
+ties across all 126 of them, and the selector's tie-breaking falls back to a
+fixed traversal order that ignores belief state entirely. Both terms of
+\eqref{eq:raig} are load-bearing, and the ablation shows a specific way the
+reliability term alone can actively hurt, not just fail to help.
+
+% NOTE: rendered as a plain \begin{tabular} grid rather than a pgfplots
+% matrix-plot/colorbar heatmap. The colormap+colorbar+matrix-plot combination
+% is comparatively expensive for pgfplots and was the most likely cause of
+% the compile timeout on the hosted (free-tier) compiler; a table conveys the
+% same 5x5 grid with negligible compile cost. Swap back to a heatmap locally
+% if you have compile time to spare.
+\begin{table}[t]
+\caption{Top-1 accuracy (\%) over the (assumed, true) homogeneous-crossover
+grid, $R=500$ trials/cell. Rows = true crossover $\varepsilon$; columns =
+assumed crossover $\hat\varepsilon$. Diagonal (correct specification) in
+bold.}
+\label{fig:misspec}
+\centering
+\footnotesize
+\begin{tabular}{@{}c|ccccc@{}}
+\toprule
+$\varepsilon \backslash \hat\varepsilon$ & 0.02 & 0.10 & 0.18 & 0.26 & 0.34 \\
+\midrule
+0.02 & \textbf{76.6} & 78.0 & 67.6 & 55.8 & 48.6 \\
+0.10 & 25.4 & \textbf{26.0} & 21.8 & 16.8 & 17.2 \\
+0.18 & 6.6 & 5.2 & \textbf{6.0} & 5.2 & 3.8 \\
+0.26 & 1.2 & 0.8 & 1.4 & \textbf{0.8} & 0.8 \\
+0.34 & 0.2 & 0.2 & 0.6 & 0.0 & \textbf{0.2} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Accuracy is dominated by the row (true noise level) rather than by the column
+(what the selector assumes). It falls from 48.6--78.0\% at $\varepsilon=0.02$
+to 3.8--6.6\% at $\varepsilon=0.18$, and to $\le 1.4\%$ once
+$\varepsilon\ge0.26$ --- roughly an order of magnitude per grid step, whatever
+$\hat\varepsilon$ is assumed. Within a row the spread is far smaller than
+between rows: at $\varepsilon=0.18$ the best and worst assumptions differ by
+2.8 percentage points, against the 20-point drop incurred by moving one row
+down. Correct specification (bold diagonal) is the row maximum in only 1 of 5
+rows at this resolution, which Section~\ref{sec:robustness} attributes to a
+structural property of homogeneous noise rather than to under-sampling.
+
+\subsection{Efficiency}
+
+Table~\ref{tab:latency} reports per-turn latency (median of five independent
+runs; see Section~\ref{sec:robustness} for why median rather than mean is
+reported) and threshold-stopping behaviour at heterogeneous $\lambda=1.0$,
+$R=150$ trials, 0.90 confidence threshold.
+
+\begin{table}[t]
+\caption{Per-turn latency and secondary efficiency metrics.}
+\label{tab:latency}
+\centering
+\footnotesize
+\begin{tabular}{@{}lccc@{}}
+\toprule
+\textbf{Method} & \textbf{ms/turn (median)} & \textbf{Q to threshold} & \textbf{Top-5 (\%)} \\
+\midrule
+IG+soft-uniform & 64.2 & 20.0 (0.7\% reached) & 10.7 \\
+RAIG-tiered & 66.3 & 19.9 (2.7\% reached) & 22.0 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+At this noise level the 0.90 threshold is reached within $T=20$ for only 0.7\%
+(IG) and 2.7\% (RAIG) of trials, so ``questions to threshold'' is effectively
+censored at 20 for both and is not a discriminating metric here. The two
+selectors cost the same per-turn compute -- one matrix--vector product plus a
+vectorised entropy transform -- and the $\sim$2\,ms gap is noise, not signal.
+Top-5 accuracy is more informative: RAIG-tiered keeps the true item on its
+short-list roughly twice as often as IG+soft-uniform under matched noise.
+
+\subsection{Robustness Checks and Anomaly Diagnosis}
+\label{sec:robustness}
+
+Five results above were unusual enough on first pass to warrant a second look
+before being written up as findings: the Clean-condition collapse, the
+randomised/adversarial reversal, two near-zero accuracies, and an apparently
+under-powered misspecification surface. Each was traced to a specific,
+verifiable mechanism; none turned out to be an implementation bug.
+
+\textbf{Seed stability.} The randomised/adversarial reversal was originally
+measured on three seeds. Extending to eight (2{,}400 trials per condition)
+and scoring each seed separately leaves it intact. Under adversarial noise
+IG+soft-uniform beat RAIG-tiered on all 8 of 8 seeds, 14.0--20.0\% against
+3.0--5.7\%; the two ranges do not overlap and the narrowest per-seed margin
+is 11.0 percentage points, so no seed is near a crossing. Under randomised
+noise IG+soft-uniform won 7 of 8, the eighth an exact tie (5.3\% each), and
+was never beaten. The reversal is not a three-seed artefact.
+
+\textbf{Clean-condition collapse.} Re-running RAIG-tiered at larger budgets
+under the main protocol ($R=300\times3$ seeds, clean noise) gives 41.9\%
+(38.8--45.0) at $T=20$, 88.0\% (85.9--90.1) at $T=40$ and 94.9\%
+(93.4--96.2) at $T=60$; the $T=20$ figure reproduces Table~\ref{tab:main}
+exactly, as it must. Ten individual belief traces were recorded turn by turn;
+in all ten the mass on the true target is monotonically non-decreasing across
+all 20 turns, with no oscillation, so the shortfall is slow concentration
+rather than an unstable or diverging posterior. RAIG-tiered stays
+cautious -- up to 30\% assumed
+error on subjective questions -- even when every answer is correct, so it
+simply needs roughly two to three times the naive budget to concentrate belief
+under zero noise. This is a genuine cost of the tiered prior worth stating
+plainly rather than a defect: a system deployed with a fixed conservative
+prior pays a convergence tax when the world turns out to be cleaner than
+assumed.
+
+\textbf{IG+soft-objective near-zero accuracy.} Restricting to the six
+objective attributes yields only 1{,}926 distinct attribute combinations over
+79{,}803 items (99.35\% collision rate, largest equivalence class 932 tracks),
+capping achievable top-1 accuracy at 0.65\%. The observed clean-condition
+accuracy of 0.56\% sits right at that ceiling, and the 126 available
+objective-only questions never run dry within $T=20$. This is an
+identifiability floor intrinsic to the six-attribute restriction on this
+catalogue, not a failure of the selector -- a materially different conclusion
+than ``discarding subjective attributes is catastrophic,'' and the more
+defensible one.
+
+\textbf{Capacity-only ablation.} Ten traced trials confirm the mechanism
+described in Section~\ref{sec:results-ablation}: every objective-tier question
+shares the same capacity score, so the selector's argmax is decided entirely
+by tie-breaking. The recorded question sequence is byte-identical across all
+ten traces despite ten different targets and belief trajectories, and it runs
+alphabetically through the values of a single attribute
+(\texttt{genre}: \emph{acoustic}, \emph{afrobeat}, \emph{alt-rock},
+\emph{alternative}, \dots). Each such question splits a mean of 1.10\% of the
+remaining mass. Both terms of \eqref{eq:raig} are confirmed necessary, and the
+mechanism by which their omission fails is a fixed belief-independent
+traversal, not merely a weaker signal.
+
+\textbf{Correlated-error stress test.} The channel model assumes errors are
+independent across turns (Section~\ref{sec:method}). As a direct test of
+Limitation~\ref{sec:limitations}, once a subjective attribute is answered
+wrong we force subsequent errors on that same attribute within the session to
+repeat in the same direction rather than being redrawn independently. At
+heterogeneous $\lambda=1.0$, $n=900$: IG+soft-uniform scores 2.44\%,
+RAIG-tiered scores 7.22\% (McNemar $p=1.7\times10^{-7}$) -- comparable in
+magnitude to the 7.9\% vs.\ 2.1\% independent-error result. The advantage
+survives this particular violation of the independence assumption, though it
+remains one stress test rather than a full correlated-error model.
+
+%=============================================================================
+\section{Discussion}
+%=============================================================================
+
+\subsection{Interpretation}
+
+The argument of this paper is deliberately narrow. We do not claim that mutual
+information under a stated observation model is a new acquisition function --
+\eqref{eq:raig} follows immediately from \eqref{eq:channel}. The claim is that
+the observation model in attribute-indexed catalogues is heterogeneous in a
+specific direction that happens to be adversarial to the naive criterion, that
+a routine preprocessing choice amplifies the effect, and that correcting it
+costs a three-tier annotation rather than a measurement campaign. Sections
+\ref{sec:results-bias}--\ref{sec:robustness} report that this claim survives
+contact with a real 79{,}803-item catalogue, including the two controls
+designed specifically to break it.
+
+\subsection{Failure Modes}
+\label{sec:failure-modes}
+
+Three conditions defeat the method, and each was tested directly rather than
+argued for. If reliability is uncorrelated with information gain, RAIG reduces
+to classical IG up to a monotone transformation and yields nothing; the
+randomised control (Section~\ref{sec:results-main}) measures close to this,
+with RAIG-tiered underperforming IG+soft-uniform. If every attribute is
+unreliable, no selection rule helps, because Corollary~\ref{cor:budget} bounds
+all of them. If the annotation is inverted -- an attribute believed reliable
+that is not -- RAIG concentrates queries on it and underperforms the uniform
+baseline; the adversarial control confirms this decisively (14.4\% vs.\ 3.7\%,
+holding in 8 of 8 seeds).
+
+A fourth, subtler failure is correlated or systematically biased users. The
+channel model assumes errors are independent of the item; the lightweight
+correlated-error stress test in Section~\ref{sec:robustness} suggests the
+method's advantage survives one specific form of this violation, but does not
+establish robustness to the general case.
+
+\subsection{Scalability and Generalisation}
+
+Cost is linear in catalogue size and question count. Nothing in the
+formulation is specific to music, and the tiered annotation transfers
+directly: fault diagnosis distinguishes measured readings from reported
+impressions, clinical triage distinguishes documented history from subjective
+symptom severity, and product finders distinguish specifications from
+preferences. We expect the bias to be present wherever a catalogue mixes
+objective identifiers with perceptual judgements, but we have measured it in
+one domain and claim it in one domain; a second-catalogue replication was not
+attempted in this round and is the most direct way to test that expectation.
+
+\subsection{Ethical Considerations}
+
+A selector optimising classical information gain preferentially asks the
+questions requiring the most domain fluency, because those are the questions
+whose answers are least predictable. Users with less domain vocabulary -- a
+casual listener rather than an enthusiast, a patient rather than a clinician --
+will encounter a disproportionate share of questions they cannot answer well,
+and will receive systematically worse service from a system that appears
+neutral. Reliability-aware selection is, in this reading, a fairness
+intervention as much as an efficiency one, and per-user rather than
+per-population reliability estimation would sharpen it further. We record this
+as a direction rather than a result, since we have not measured it, and note
+that per-user estimation would require identifying, behavioural interaction
+data that population-level tiers do not.
+
+\subsection{Limitations}
+\label{sec:limitations}
+
+The crossover probabilities are assumed rather than measured, which remains
+the principal limitation; the randomised, adversarial, and correlated-error
+stress tests probe it but do not replace a human study. Errors are otherwise
+assumed independent across turns and abstention is not modelled. Attributes
+are treated as conditionally independent given the item, which is false for
+correlated descriptors such as genre and instrumentation. RAIG-tiered's
+Clean-condition result shows the tiered prior carries a real convergence cost
+when true noise is lower than assumed, which a deployed system should budget
+for explicitly rather than discover in production. Results are reported on a
+single catalogue.
+
+\subsection{Future Work}
+
+The immediate priority is a human study estimating $\varepsilon_f$ directly
+and testing whether the three-tier annotation predicts measured reliability
+well enough to justify the deployability claim, followed by replication on a
+second, non-music catalogue. Extending the channel to admit abstention is
+straightforward analytically: with erasure probability $\delta_f$ the
+acquisition function becomes
+$(1-\delta_f)\left[\Hb(p_q \star \varepsilon_f) - \Hb(\varepsilon_f)\right]$,
+and since abstention plausibly correlates with subjectivity in the same
+direction as error, the penalty likely compounds. Beyond that: online
+estimation of $\varepsilon_f$ within a session, a full correlated-error model
+rather than the single stress test reported here, per-user reliability
+profiles, and a comparison against language-model
+questioners~\cite{hu2024uot,mazzaccara2024} on an identical catalogue.
+
+%=============================================================================
+\section{Conclusion}
+%=============================================================================
+
+Expected information gain is the default criterion for question selection in
+interactive identification, and it encodes an assumption that is false
+whenever the oracle is human: that answers are observed exactly. On a real
+79{,}803-track catalogue, the consequence is not a marginal loss of precision
+but a systematic and measurable bias -- a negative correlation between an
+attribute's apparent informativeness and its answer reliability that
+strengthens under finer discretisation. Correcting the criterion by replacing
+split entropy with mutual information through a per-attribute binary symmetric
+channel raises top-1 identification accuracy from 2.1\% to 7.9\% under
+matched heterogeneous noise ($p=1.8\times10^{-9}$), recovers the full
+oracle-to-uniform accuracy gap from a three-tier annotation that costs no
+measurement, and survives a correlated-error stress test. It also fails
+exactly where the theory says it should: under randomised or adversarially
+inverted reliability assumptions, reliability-aware selection loses to the
+naive baseline, reproducibly across eight seeds. We regard the combination --
+a real, sizeable effect with an equally real and independently reproduced
+failure mode -- as stronger evidence than either result would be alone.
+
+\section*{Acknowledgment}
+
+% TODO-HUMAN (B): funding source / institutional acknowledgment. Delete this
+% whole \section*{Acknowledgment} block if there is nothing to acknowledge --
+% an empty acknowledgment section reads worse than none at all.
+\textcolor{red}{PENDING -- add funding/institution acknowledgment.}
+
+% Bibliography is inlined below (thebibliography) rather than a separate
+% .bib + bibtex pass, so this single file is copy-paste-able into Overleaf
+% with no other uploads and no bibtex step required. All 21 entries were
+% individually verified (dblp / ACL Anthology / IEEE Xplore / arXiv /
+% NeurIPS / ISMIR), not transcribed from memory.
+\begin{thebibliography}{99}
+
+\bibitem{renyi1961}
+A.~R\'enyi, ``On a problem of information theory,'' \emph{MTA Mat.\ Kut.\ Int.\ K\"ozl.}, vol.~6, no.~B, pp.~505--516, 1961.
+
+\bibitem{ulam1976}
+S.~M.~Ulam, \emph{Adventures of a Mathematician}. New York: Scribner, 1976.
+
+\bibitem{pelc2002}
+A.~Pelc, ``Searching games with errors---fifty years of coping with liars,'' \emph{Theoretical Computer Science}, vol.~270, no.~1-2, pp.~71--109, 2002.
+
+\bibitem{jedynak2012}
+B.~Jedynak, P.~I.~Frazier, and R.~Sznitman, ``Twenty questions with noise: Bayes optimal policies for entropy loss,'' \emph{Journal of Applied Probability}, vol.~49, no.~1, pp.~114--136, 2012.
+
+\bibitem{lindley1956}
+D.~V.~Lindley, ``On a measure of the information provided by an experiment,'' \emph{The Annals of Mathematical Statistics}, vol.~27, no.~4, pp.~986--1005, 1956.
+
+\bibitem{chaloner1995}
+K.~Chaloner and I.~Verdinelli, ``Bayesian experimental design: A review,'' \emph{Statistical Science}, vol.~10, no.~3, pp.~273--304, 1995.
+
+\bibitem{horstein1963}
+M.~Horstein, ``Sequential transmission using noiseless feedback,'' \emph{IEEE Transactions on Information Theory}, vol.~9, no.~3, pp.~136--143, 1963.
+
+\bibitem{burnashev1974}
+M.~V.~Burnashev and K.~Sh.~Zigangirov, ``An interval estimation problem for controlled observations,'' \emph{Problems of Information Transmission}, vol.~10, no.~3, pp.~223--231, 1974.
+
+\bibitem{karp2007}
+R.~M.~Karp and R.~Kleinberg, ``Noisy binary search and its applications,'' in \emph{Proc.\ 18th Annual ACM-SIAM Symp.\ on Discrete Algorithms (SODA)}, 2007, pp.~881--890.
+
+\bibitem{nowak2011}
+R.~D.~Nowak, ``The geometry of generalized binary search,'' \emph{IEEE Transactions on Information Theory}, vol.~57, no.~12, pp.~7893--7906, 2011.
+
+\bibitem{kaspi2018}
+Y.~Kaspi, O.~Shayevitz, and T.~Javidi, ``Searching with measurement dependent noise,'' \emph{IEEE Transactions on Information Theory}, vol.~64, no.~4, pp.~2690--2705, 2018.
+
+\bibitem{chung2018}
+H.~W.~Chung, B.~M.~Sadler, L.~Zheng, and A.~O.~Hero, ``Unequal error protection querying policies for the noisy 20 questions problem,'' \emph{IEEE Transactions on Information Theory}, vol.~64, no.~2, pp.~1105--1131, 2018.
+
+\bibitem{lei2020ear}
+W.~Lei, X.~He, Y.~Miao, Q.~Wu, R.~Hong, M.-Y.~Kan, and T.-S.~Chua, ``Estimation--action--reflection: Towards deep interaction between conversational and recommender systems,'' in \emph{Proc.\ 13th ACM Int.\ Conf.\ on Web Search and Data Mining (WSDM)}, 2020, pp.~304--312.
+
+\bibitem{lei2020cpr}
+W.~Lei, G.~Zhang, X.~He, Y.~Miao, X.~Wang, L.~Chen, and T.-S.~Chua, ``Interactive path reasoning on graph for conversational recommendation,'' in \emph{Proc.\ 26th ACM SIGKDD Int.\ Conf.\ on Knowledge Discovery \& Data Mining (KDD)}, 2020, pp.~2073--2083.
+
+\bibitem{deng2021unicorn}
+Y.~Deng, Y.~Li, F.~Sun, B.~Ding, and W.~Lam, ``Unified conversational recommendation policy learning via graph-based reinforcement learning,'' in \emph{Proc.\ 44th Int.\ ACM SIGIR Conf.\ on Research and Development in Information Retrieval}, 2021, pp.~1431--1441.
+
+\bibitem{debruyn2022}
+M.~De Bruyn, E.~Lotfi, J.~Buhmann, and W.~Daelemans, ``Is it smaller than a tennis ball? Language models play the game of twenty questions,'' in \emph{Proc.\ 5th BlackboxNLP Workshop on Analyzing and Interpreting Neural Networks for NLP}, 2022, pp.~80--90.
+
+\bibitem{mazzaccara2024}
+D.~Mazzaccara, A.~Testoni, and R.~Bernardi, ``Learning to ask informative questions: Enhancing LLMs with preference optimization and expected information gain,'' \emph{arXiv preprint arXiv:2406.17453}, 2024.
+
+\bibitem{hu2024uot}
+Z.~Hu, C.~Liu, X.~Feng, Y.~Zhao, S.-K.~Ng, A.~T.~Luu, J.~He, P.~W.~Koh, and B.~Hooi, ``Uncertainty of thoughts: Uncertainty-aware planning enhances information seeking in large language models,'' in \emph{Advances in Neural Information Processing Systems 37 (NeurIPS)}, 2024.
+
+\bibitem{hu2007mood}
+X.~Hu and J.~S.~Downie, ``Exploring mood metadata: Relationships with genre, artist and usage metadata,'' in \emph{Proc.\ 8th Int.\ Society for Music Information Retrieval Conf.\ (ISMIR)}, 2007, pp.~67--72.
+
+\bibitem{kim2010emotion}
+Y.~E.~Kim, E.~M.~Schmidt, R.~Migneco, B.~G.~Morton, P.~Richardson, J.~Scott, J.~A.~Speck, and D.~Turnbull, ``Music emotion recognition: A state of the art review,'' in \emph{Proc.\ 11th Int.\ Society for Music Information Retrieval Conf.\ (ISMIR)}, 2010, pp.~255--266.
+
+\bibitem{mcnemar1947}
+Q.~McNemar, ``Note on the sampling error of the difference between correlated proportions or percentages,'' \emph{Psychometrika}, vol.~12, no.~2, pp.~153--157, 1947.
+
+\bibitem{cover2006}
+T.~M.~Cover and J.~A.~Thomas, \emph{Elements of Information Theory}, 2nd~ed. Wiley, 2006.
+
+\end{thebibliography}
+
+\end{document}
