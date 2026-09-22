@@ -11,3 +11,9 @@ paper/*.blg
 paper/*.log
 paper/*.out
 paper/missfont.log
+paper/journal/*.aux
+paper/journal/*.bbl
+paper/journal/*.blg
+paper/journal/*.log
+paper/journal/*.out
+paper/journal/missfont.log
