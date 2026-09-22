@@ -1,0 +1,305 @@
+%=============================================================================
+\section{Experimental Setup}
+\label{sec:setup}
+%=============================================================================
+
+Every number reported in this paper comes from the same harness, described in
+Section~\ref{sec:system}, run under the protocol fixed here. The protocol is
+stated in full before any result is shown because several of the choices---the
+budget, the paired sampling, the separation of assumed from true
+reliability---determine what the results can and cannot be read to mean.
+
+\subsection{Catalogues}
+\label{sec:catalogues}
+
+We use three real catalogues from three domains and one synthetic family.
+Table~\ref{tab:catalogues} summarises them.
+
+\emph{Music.} A catalogue of $79{,}803$ tracks described by $21$ attributes,
+derived from a public audio-features corpus and used as the item table of a
+deployed Akinator-style music identification system. Eleven of the attributes
+are discretisations of continuous audio descriptors (danceability, energy,
+valence, acousticness, instrumentalness, liveness, speechiness, loudness,
+tempo, popularity, duration); the remainder are natively categorical metadata
+(genre, language, content rating, artist type, release type, track version) or
+music-theoretic labels (key, mode, time signature). This mixture is the
+structure the mechanism of Section~\ref{sec:discretisation-theory} requires,
+and it is why this catalogue is the primary one.
+
+\emph{Mushroom.} UCI Agaricus-Lepiota~\cite{uci}, $8{,}124$ specimens by $21$ usable
+categorical attributes, cast as field identification by a forager. Every
+attribute is natively categorical, so the discretisation mechanism cannot
+operate. The catalogue is nonetheless a genuine test rather than a formality,
+because its two most informative attributes---odour, and colour names drawn
+from nine to twelve options---are the two classic unreliable human perceptual
+judgements. If high information gain concentrated on hard-to-answer attributes
+for reasons other than binning, this is where it would show.
+
+\emph{Dermatology.} UCI Dermatology~\cite{uci,guvenir1998}, $366$ cases by $34$ attributes, cast as
+differential narrowing by a triage questioner with the patient as oracle. This
+is the one catalogue whose reliability annotation we did not invent: the
+dataset documentation itself partitions attributes into clinical and
+histopathological, and a histopathological attribute is by construction one the
+patient cannot answer at all, since it requires a biopsy and a microscope. Our
+annotation refines that documented split by asking who can answer from what
+evidence. The single continuous column, age, is banded into quartiles.
+
+\emph{Synthetic.} A family in which the rank correlation between an attribute's
+apparent informativeness and its reliability is a control knob, used in
+Section~\ref{sec:results-synthetic} to turn the randomised and adversarial
+controls---which are two isolated points on that axis---into a continuum.
+
+\begin{table}[t]
+\caption{Catalogues. $|\Qset|$ is the number of compiled one-versus-rest
+questions after degenerate questions are dropped. The entropy floor is
+$\log_2$ of the number of distinct attribute vectors, i.e.\ the information
+that must be acquired even with perfect answers; $T_{\min}$ is the
+capacity-corrected budget bound~\eqref{eq:budget} under each catalogue's
+reliability annotation.}
+\label{tab:catalogues}
+\centering
+\footnotesize
+\begin{tabular}{@{}lrrrrr@{}}
+\toprule
+\textbf{Catalogue} & \textbf{$N$} & \textbf{$M$} & \textbf{$|\Qset|$} &
+\textbf{floor} & \textbf{$T_{\min}$} \\
+\midrule
+Music        & 79{,}803 & 21 & 193 & 16.23 & 20.15 \\
+Mushroom     & 8{,}124  & 21 & 116 & 12.99 & 16.12 \\
+Dermatology  & 366      & 34 & 134 & 8.52  & 10.58 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The music catalogue is not perfectly identifiable, and this bounds every
+accuracy we report. Its $79{,}803$ tracks occupy $77{,}069$ distinct attribute
+vectors, so $93.7\%$ of items are uniquely identifiable and the largest
+equivalence class holds $11$ indistinguishable tracks. No method, with any
+budget and a perfect user, can exceed $96.6\%$ top-1 accuracy on it; the clean
+condition confirms that the best methods reach exactly that ceiling.
+
+\subsection{Attribute Inventory}
+\label{sec:attributes}
+
+Table~\ref{tab:attributes} lists the music attributes with their annotated
+tier, their maximum one-versus-rest information gain in the catalogue as
+shipped, and the same quantity after the eleven continuous sources are
+re-discretised into four equal-population quantile bins. The second column is
+the operative one for Section~\ref{sec:results-bias}; the third exists because
+it is the clean instantiation of Proposition~\ref{prop:discretisation}, and it
+is where every re-binned attribute reports exactly $\Hb(1/4)=0.811$ bits,
+regardless of what the attribute means.
+
+Two features of the table should be noted in advance. First, the shipped
+catalogue's continuous attributes are \emph{not} equal-population bins: they
+were cut at fixed semantic thresholds by the original pipeline, so their split
+masses vary and their maximum information gain ranges from $0.231$ to $1.000$
+rather than sitting at $\Hb(1/5)$. The bias in the shipped catalogue is
+therefore not an artefact of our own preprocessing---we did not do the
+binning---and the four-bin column shows what happens when the binning is made
+textbook-clean, which is that the bias strengthens
+(Section~\ref{sec:results-bias}). Second, genre carries $113$ values and a
+maximum one-versus-rest information gain of $0.097$ bits: it is the most
+discriminative attribute in the catalogue by any reasonable measure and the
+least attractive to a criterion that maximises binary entropy. That single row
+is the whole problem in miniature.
+
+\begin{table}[t]
+\caption{Music attributes. $|V|$ is the number of distinct values;
+$\max\Hb$ is the largest one-versus-rest binary entropy at a uniform belief;
+$\max\Hb^{(4)}$ is the same after re-discretising the underlying continuous
+column into four equal-population bins (``---'' where the attribute has no
+continuous source). Release type is degenerate in this catalogue (a single
+value) and compiles to no questions.}
+\label{tab:attributes}
+\centering
+\footnotesize
+\begin{tabular}{@{}llrrr@{}}
+\toprule
+\textbf{Attribute} & \textbf{Tier} & \textbf{$|V|$} &
+\textbf{$\max\Hb$} & \textbf{$\max\Hb^{(4)}$} \\
+\midrule
+genre            & objective & 113 & 0.097 & --- \\
+language         & objective & 2   & 0.446 & --- \\
+content rating   & objective & 2   & 0.424 & --- \\
+artist type      & objective & 4   & 0.834 & --- \\
+track version    & objective & 5   & 0.424 & --- \\
+release type     & objective & 1   & ---   & --- \\
+\midrule
+popularity       & semi & 5 & 0.958 & 0.811 \\
+duration         & semi & 5 & 0.939 & 0.811 \\
+acousticness     & semi & 5 & 0.999 & 0.811 \\
+instrumentalness & semi & 5 & 0.819 & 0.811 \\
+liveness         & semi & 5 & 0.933 & 0.811 \\
+speechiness      & semi & 3 & 0.231 & 0.811 \\
+loudness         & semi & 5 & 1.000 & 0.811 \\
+\midrule
+mood             & subjective & 5 & 1.000 & --- \\
+tempo            & subjective & 5 & 0.902 & 0.811 \\
+danceability     & subjective & 5 & 0.957 & 0.811 \\
+energy           & subjective & 5 & 0.924 & 0.811 \\
+valence          & subjective & 5 & 0.804 & 0.811 \\
+key              & subjective & 4 & 0.896 & --- \\
+mode             & subjective & 2 & 0.947 & --- \\
+time signature   & subjective & 3 & 0.496 & --- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Baselines}
+\label{sec:baselines}
+
+A comparison of ``information gain'' against ``a learned policy'' confounds two
+independent choices: how the next question is selected, and how the answer is
+absorbed. Proposition~\ref{prop:limit} shows the second choice is a limit of one
+model rather than a different model, so the two can and should be crossed. Our
+nine methods do that, and are listed in Table~\ref{tab:baselines}.
+
+\begin{table}[t]
+\caption{Methods. ``Selector'' is the rule that chooses the next question;
+``update'' is how the answer is absorbed; $\hat\varepsilon$ is what the method
+assumes about answer reliability. Hard elimination is
+$\hat\varepsilon \equiv 0$ (Proposition~\ref{prop:limit}), so the selector and
+update columns are not independent for that row alone.}
+\label{tab:baselines}
+\centering
+\scriptsize
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{Method} & \textbf{Selector} & \textbf{Update} & \textbf{$\hat\varepsilon$} \\
+\midrule
+Random+soft         & uniform random & soft & uniform \\
+IG+hard             & $\Hb(p_q)$     & hard & $0$ \\
+IG+soft-uniform     & $\Hb(p_q)$     & soft & uniform \\
+IG+soft-objective   & $\Hb(p_q)$, objective only & soft & uniform \\
+Learned-noiseblind  & ridge value regression & soft & uniform \\
+Learned-noiseaware  & ridge value regression & soft & uniform \\
+RAIG-empirical      & $\RAIG(q)$     & soft & measured \eqref{eq:discordance} \\
+RAIG-tiered         & $\RAIG(q)$     & soft & 3-tier annotation \\
+RAIG-oracle         & $\RAIG(q)$     & soft & true $\varepsilon$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Two further specifications of $\hat\varepsilon$---RAIG-EM, which learns the
+crossover vector from interaction logs, and RAIG-psycho, which computes it from
+the catalogue's own cut points---are introduced where they are tested
+(Sections~\ref{sec:results-em} and~\ref{sec:results-psycho}) rather than here,
+because each is evaluated against this nine-method set rather than alongside it.
+
+Three of the nine deserve comment.
+
+\emph{IG+soft-uniform is the honest incumbent.} It is classical information
+gain paired with a correct probabilistic belief update at the catalogue-average
+crossover. By Proposition~\ref{prop:uniform} its selector is exactly classical
+information gain, so the comparison of RAIG-tiered against IG+soft-uniform
+isolates the acquisition function with the update held fixed. This is the
+pre-registered primary comparison, and the only one we treat as confirmatory.
+
+\emph{IG+soft-objective is the restricted-attribute baseline}, the practitioner
+heuristic of simply not asking unreliable questions. It is the baseline that
+most directly threatens the method---if discarding subjective attributes
+worked, weighting them would be unnecessary---and we report it in every
+condition. Its weakness is structural rather than empirical: the six objective
+attributes partition the music catalogue into only $1{,}926$ equivalence
+classes, the largest holding $932$ tracks, so the strategy has a top-1 accuracy
+ceiling of $0.65\%$ however many questions it is given. We state this ceiling
+in advance so that its poor showing is not mistaken for a tuning failure.
+
+\emph{The learned policies} are myopic value-regression selectors in the
+EAR/CPR mould~\cite{lei2020ear,lei2020cpr}: roll out a behaviour policy, log
+state--question features against the realised one-turn reduction in belief
+entropy, fit a ridge regressor, and select by the learned score. Training uses
+$600$ simulated sessions of $T=20$ turns, giving $12{,}000$ samples over $51$
+features, with ridge penalty $\lambda=1$. The two variants differ in exactly
+one respect: the noise used to generate the training rollouts. Noiseblind
+trains on noiseless rollouts, which is the modelling choice we attribute to
+prior work; noiseaware trains under the true heterogeneous noise and can in
+principle discover the reliability weighting from data. The feature set
+deliberately includes the interaction between split balance and attribute
+identity ($\Hb(p) \times$ attribute one-hot), so a linear model over these
+features \emph{can} represent a per-attribute discount on balanced splits,
+which is precisely what RAIG encodes. Omitting that interaction would have
+guaranteed the baseline could not compete and made any win an artefact of
+feature design.
+
+\subsection{Noise Conditions}
+\label{sec:conditions}
+
+The simulator draws answer errors from a true per-question crossover vector
+$\boldsymbol\varepsilon$; every method sees only its own assumed
+$\hat{\boldsymbol\varepsilon}$. The two are separate arguments in the session
+signature, and conflating them would make every result circular. Seven
+conditions are used throughout.
+
+\begin{enumerate}
+\item \emph{Clean}: $\varepsilon \equiv 0$. A sanity condition, not a realistic
+one. Its purpose is to verify that every method attains the identifiability
+ceiling when the model's noise assumption is the only thing that is wrong.
+\item \emph{Homogeneous}: $\varepsilon \equiv 0.098$, the catalogue average of
+the tier annotation. Answer noise, but no heterogeneity, hence nothing for a
+reliability-aware selector to exploit (Proposition~\ref{prop:uniform}).
+\item \emph{Heterogeneous} at $\lambda \in \{0.5, 1.0, 1.5\}$:
+$\varepsilon_f = \lambda \cdot \varepsilon_{\mathrm{tier}(f)}$, with
+$\lambda=1.0$ the primary condition. $\lambda$ scales user noise without
+changing its structure, and locating the value at which reliability awareness
+begins to pay is the practitioner-facing question of
+Section~\ref{sec:results-lambda}.
+\item \emph{Randomised}: the attribute-to-$\varepsilon$ assignment is permuted.
+The tier annotation is then uninformative about the truth, and the system is
+running on an annotation that has been scrambled behind its back.
+\item \emph{Adversarial}: $\varepsilon$ is assigned in inverse rank order of
+maximum information gain, so the best-splitting attribute becomes the most
+reliable. The annotation is now not merely uninformative but wrong in the
+direction most damaging to RAIG.
+\end{enumerate}
+
+The last two are the conditions under which the theory predicts our method
+should lose, and we report them with the same prominence as the conditions in
+which it wins. A method that could not be made to fail by inverting its
+assumption would be a method whose assumption did no work.
+
+\subsection{Metrics}
+\label{sec:metrics}
+
+Top-1 accuracy at the budget is the headline metric because it is what an
+identification system is for. It is also the metric most compressed against the
+entropy floor at $T=20$, so we report alongside it: top-5 and top-10 accuracy;
+the median rank of the true item; mean reciprocal rank; the negative log
+posterior of the true item in bits, which is sensitive to belief quality even
+when no prediction is correct; and, for the behavioural claim, the mean true
+$\varepsilon$ of the questions each method actually chose to ask, together with
+the tier composition of those questions. That last pair is the most direct
+evidence for or against the bias, because it measures what the selector did
+rather than how well it happened to do.
+
+Ranks use the mid-rank convention, $1 + |\{i : b_i > b^\ast\}| +
+(|\{i : b_i = b^\ast\}| - 1)/2$. This matters more than it sounds: early in a
+session the belief vector carries very large ties, and the optimistic
+convention would credit a method for a tie it has not broken.
+
+\subsection{Statistical Protocol}
+\label{sec:stats}
+
+Trials are paired by construction. For each trial index the harness draws one
+target item and one stream of uniform variates, and every method under
+comparison plays that same target against that same stream
+(Algorithm~\ref{alg:eval}). Methods diverge in which questions they ask and
+therefore in which crossover probabilities they face, but they consult the same
+underlying draws, so a difference in outcome is attributable to question choice
+rather than to sampling luck. The primary comparison uses $R=300$ trials at
+each of three seeds, $n=900$ paired trials per cell.
+
+Significance is assessed with the exact (binomial) McNemar
+test~\cite{mcnemar1947} on the discordant pairs, which is the appropriate test
+for paired binary outcomes and does not rely on a normal approximation that
+would be poor at these discordance counts. Within each condition the family of
+comparisons against the reference method is corrected by the Holm step-down
+procedure~\cite{holm1979}. Confidence intervals on accuracies and on paired
+differences are bootstrap percentile intervals over $10{,}000$ resamples.
+
+One comparison is designated primary in advance: RAIG-tiered against
+IG+soft-uniform, top-1 accuracy, heterogeneous $\lambda=1.0$, $T=20$. Every
+other comparison in this paper is exploratory, and we label the tables
+accordingly rather than reporting a wall of asterisks and letting the reader
+assume they were all planned.

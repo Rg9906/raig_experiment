@@ -1,0 +1,277 @@
+%=============================================================================
+\section{Discussion}
+\label{sec:discussion}
+%=============================================================================
+
+\subsection{What This Paper Establishes}
+
+Four things, the first three in decreasing order of confidence and the fourth
+the one that answers the objection this work is most exposed to.
+
+That \emph{classical information gain systematically solicits the questions
+users answer worst, in catalogues of a particular shape}, is established by
+direct measurement of selector behaviour and does not depend on any assumed
+$\varepsilon$. On the music catalogue, a classical selector asks questions
+whose annotated crossover averages $0.225$ against a catalogue average of
+$0.098$, filling $53.9\%$ of a twenty-question budget with the tier a listener
+judges least reliably, while a uniformly random selector faces $0.097$, which
+is the catalogue average. Whatever one believes about the numeric values of
+$\varepsilon$, the ordering of the annotation is what drives that contrast, and
+the contrast is large.
+
+That \emph{the effect is manufactured by discretisation rather than inherited
+from the domain} is established by three independent lines that agree:
+Proposition~\ref{prop:discretisation}, which shows quantile binning fixes
+apparent informativeness at $\Hb(1/k)$ irrespective of semantics; the
+measurement that binned attributes carry mean maximum information gain $0.861$
+against $0.618$ for natively categorical ones; and the observation that
+refining the binning to four equal-population bins \emph{strengthens} the
+measured bias, from $\rho = -0.44$ to $\rho = -0.61$. The absence of the effect
+in two catalogues with no continuous attributes to bin is the prediction this
+account makes, and it holds.
+
+That \emph{correcting the acquisition function helps, and does so from an
+annotation cheap enough to be deployable}, is established at $n=900$ paired
+trials with exact tests and multiplicity control, and---more importantly---is
+shown to survive the assumption it rests on: over $60$ worlds drawn from priors
+on the tier values, the fixed deployed system wins in $60$ of $60$, with a
+minimum advantage of $+1.33\pp$. Three coarse tiers recover roughly $72\%$ of
+what perfect per-attribute knowledge would deliver, and a two-tier annotation
+recovers $78\%$ of the three-tier gain (Section~\ref{sec:results-ablation}).
+
+That \emph{the three assumed constants are not load-bearing} is answered three
+ways, in increasing strength: the conclusion survives
+a distribution over those constants; it survives a majority of attributes being
+placed in the wrong tier; and the constants are not required at all. EM over
+$600$ logged sessions of the already-deployed incumbent---no annotation, no
+labels, and the target item latent throughout---recovers a per-attribute
+crossover vector that matches the curator's annotation to a dead heat, $38$
+discordant pairs in each direction out of $900$
+(Section~\ref{sec:results-em}).
+
+Two of the model's structural assumptions were attacked directly, and the
+outcomes point in opposite directions. Relaxing independence across turns
+\emph{strengthens} the result: making subjective errors persist for the rest of
+a session costs classical selection $0.78\pp$ and costs reliability-aware
+selection exactly nothing, because a selector that avoids unreliable attributes
+is not exposed to their errors being persistent
+(Section~\ref{sec:results-correlated}). Adding abstention, by contrast, refutes
+a prediction we made in advance: we expected the penalties to compound and the
+absolute advantage to grow, and it shrinks
+(Section~\ref{sec:results-erasure}). Only the relative advantage compounds. We
+report the failed prediction because a paper that only tests the predictions it
+expects to confirm is not testing anything.
+
+\subsection{What It Does Not Establish}
+
+We claim no algorithmic novelty. The acquisition function is the mutual
+information between the target and the observed answer under a binary symmetric
+channel; it is in Cover and Thomas~\cite[Ch.~7]{cover2006}, and a reader who
+finds \eqref{eq:raig} unsurprising is reading it correctly. The contribution is
+that the observation model in some deployed attribute catalogues is
+heterogeneous in a specific and adversarial way, that the heterogeneity is
+partly an artefact of preprocessing, that a learned policy trained without a
+noise model inherits the blind spot, and that the correction needs far less
+knowledge about users than one would expect. Those are empirical claims, and
+they are what the experiments are for.
+
+Nor have we measured $\varepsilon$ on people, and it is worth being precise
+about what the log-based estimator of Section~\ref{sec:results-em} does and
+does not settle. It establishes identifiability and sufficiency: a
+per-attribute crossover vector can be recovered from six hundred sessions of
+ordinary use without annotation, labels or ground truth, and recovering it is
+enough to match a hand-annotated one exactly. It does not establish that real
+users behave this way, because the logs it consumes were generated by a
+simulator whose users err at rates drawn from the annotation---so what EM
+recovers is, at bottom, the structure we put in. The same caveat applies to
+the ensemble over tier priors (Section~\ref{sec:results-ensemble}), the
+corruption sweep (Section~\ref{sec:results-corruption}) and the repeated-item
+measurement (Section~\ref{sec:reliability-empirical}). Together they establish
+that the conclusion is not an artefact of three particular numbers. None of
+them tells a practitioner what $\varepsilon$ is in their domain, and only the
+study of Appendix~\ref{app:protocol} would.
+
+Finally, the two negative results on catalogue-derived specifications should
+not be softened, because together they say something the positive results do
+not. RAIG-empirical, which infers reliability from the rate at which repeated
+items disagree with each other, is beaten by the three-tier annotation by
+$6.33\pp$ and is no better than classical information gain. RAIG-psycho, which
+computes the crossover of each binned attribute from the position of its own
+cut points, fails at every setting of its two parameters
+(Section~\ref{sec:results-psycho}). Both measure a property of the
+\emph{catalogue}, and both are defeated by the same thing: a listener cannot
+name the key of a song, not because the boundary between keys is fuzzy or
+because the catalogue disagrees with itself about it, but because they never
+learned to name keys. Answerability is a fact about people. What succeeds---the
+curator's tiers, and the vector learned from logs---succeeds because each is,
+in the end, an observation of people rather than of data.
+
+\subsection{A Deployment Test}
+
+The cross-domain results yield a procedure a practitioner can run before
+committing to anything, and it is the most transferable output of this work.
+
+\begin{enumerate}
+\item \emph{Is there anything to correct?} Compute per-attribute maximum
+one-versus-rest entropy and compare it across a coarse answerability
+annotation. A Kruskal--Wallis test on three tiers is the right instrument; a
+Spearman correlation on three tied levels is not. If informativeness
+concentrates on the hard-to-answer tier, classical selection is being actively
+misled.
+\item \emph{Is the correction affordable in information?} Compute the
+identifiability ceiling of the reliable attribute subset by counting distinct
+attribute vectors. This costs one database query. If the ceiling is high
+(dermatology, $70.8\%$), reliability-aware selection will help substantially
+even when step~1 finds no bias. If it is near zero (mushroom, $0.3\%$), the
+unreliable attributes are load-bearing and no selection rule can route around
+them.
+\item \emph{Is the channel actually noisy?} Reliability weighting is a
+correction for a noisy channel and is harmful when the channel is clean: in our
+clean condition RAIG-tiered loses to classical selection by more than
+fifty points at $T=20$, because it breaks ties towards attributes that cannot
+by themselves separate the catalogue. Switch it off, not down, when answers are
+reliable.
+\item \emph{Annotate coarsely and ship, then let the system re-estimate.} Two
+tiers recover $78\%$ of what three tiers deliver, and three tiers recover about
+$72\%$ of what per-attribute truth would deliver. Once the system is running,
+that residual is addressable without a measurement campaign: EM over its own
+logs recovers a per-attribute vector that matches the annotation
+(Section~\ref{sec:results-em}). The order of operations is therefore curator
+first, logs second, user study only if the first two disagree.
+\end{enumerate}
+
+Steps~1 and~2 are computable from the catalogue alone. Step~3 requires knowing
+roughly how noisy users are, which is the one thing that genuinely needs
+observation---and Section~\ref{sec:results-lambda} locates the threshold.
+
+\subsection{Threats to Validity}
+
+\emph{Simulated users.} Every session in this paper is played by a simulator
+drawing from a binary symmetric channel. This is the central threat and we do
+not minimise it. Its severity is bounded in three ways: the deployed system
+never sees the true $\varepsilon$; the conclusion is reported across a
+distribution of true $\varepsilon$ rather than at a point; and two structural
+assumptions of the channel---that every turn is an independent draw, and that a
+question is always answered---are attacked directly in
+Sections~\ref{sec:results-correlated} and~\ref{sec:results-erasure}. Three
+things remain unaddressed. Whether real answer errors are well described by
+\emph{any} per-attribute rate is the deepest of them, and only the study of
+Appendix~\ref{app:protocol} can settle it. The channel is assumed
+\emph{symmetric}, whereas real users may well have a bias---readier to say
+``yes'' than ``no'' when unsure---which an asymmetric binary channel would
+capture and which our formulation does not. And errors are correlated within an
+attribute in Section~\ref{sec:results-correlated} but never \emph{across}
+attributes, though a listener with an unusual notion of ``energetic'' plausibly
+has an unusual notion of ``danceable'' too; that structure would penalise any
+method that concentrates its questions within a tier, ours included.
+
+\emph{One primary catalogue.} The headline comparison is on music. We add two
+further catalogues and a synthetic family precisely because one catalogue
+cannot support a general claim, and the resulting scope condition is stated as
+a condition rather than as a universal.
+
+\emph{Greedy selection.} We select greedily throughout. Greedy optimality under
+noise is established for a single common crossover probability~\cite{jedynak2012}
+and, as Remark~\ref{rem:greedy} notes, does not obviously extend to
+heterogeneous per-attribute capacities. Holding the policy class fixed at the
+one deployed systems use is what isolates the acquisition function; it is not a
+claim that greedy is optimal here.
+
+\emph{Static reliability.} $\hat\varepsilon$ is fixed for the session. A real
+system could estimate a user's per-attribute reliability online from answer
+consistency, which would make the specification problem largely disappear---and
+would introduce an exploration/exploitation trade-off this paper does not
+address.
+
+\emph{Simulator--method coupling.} The simulator and the method share the
+functional form of the noise model. This is standard in the noisy-search
+literature but it is a real limitation: the ensemble experiment breaks the
+parameter coupling but not the functional-form coupling, and the abstention
+experiment is the only place where the true channel has a component the
+baseline selector cannot represent.
+
+\subsection{Future Work}
+
+The obvious next step is the user study, and it is specified rather than
+gestured at. Beyond it, three directions follow from what the experiments
+showed rather than from what would be conventional to list.
+
+\emph{Per-user} reliability estimation is the most valuable, and is the natural
+extension of what Section~\ref{sec:results-em} already does. That estimator
+pools every session into one crossover vector, which is the right object when
+the population is homogeneous and the wrong one when it is not: a musician and
+a casual listener do not share a crossover for ``what key is it in''. Estimating
+$\hat\varepsilon_f$ per user, from within-session answer consistency and a
+population prior, is a hierarchical version of the same EM and would attack the
+variation this paper's model cannot express. It also introduces an
+exploration/exploitation trade-off---questions asked to learn about the user
+rather than about the item---that Section~\ref{sec:results-em} shows is not
+free, and Section~\ref{sec:results-streaming} shows can be worse than not
+free: we tried the simpler, non-hierarchical version of this idea---one
+crossover vector, updated \emph{online} from the deployment's own trials
+instead of offline from a fixed log---and it loses badly on the full
+catalogue to a feedback loop the offline estimator's repeated replay does not
+allow (\texttt{genre} monopolises $58.6\%$ of every question asked once the
+running estimate correctly favours it, starving the other nineteen
+attributes of the evidence needed to estimate them), though the deficit
+disappears on a smaller catalogue with a longer budget. A per-user version
+would face the identical loop at the scale of a single session rather than
+the whole deployment, which is a reason for pessimism about a naive
+implementation and a concrete requirement---replay, or an explicit
+optimism bonus for under-sampled attributes, not exploration alone---for a
+serious one.
+
+Non-myopic selection under heterogeneous capacities is the most interesting
+theoretically. Corollary~\ref{cor:budget} makes the difficulty concrete: with
+per-attribute capacities, a horizon-optimal policy may wish to reserve a
+high-capacity attribute for a later turn when the belief can exploit it, and a
+greedy rule cannot express that preference.
+
+Finally, the discretisation result suggests attacking the problem one stage
+earlier. If quantile binning is what manufactures the bias, then a
+reliability-aware \emph{discretiser}---one that chooses bin boundaries to
+maximise mutual information through the channel rather than to equalise
+populations---would prevent it rather than compensate for it. Nothing in this
+paper requires the binning to be given.
+
+%=============================================================================
+\section{Conclusion}
+\label{sec:conclusion}
+%=============================================================================
+
+Expected information gain is the default acquisition function for interactive
+identification, and it was derived for an oracle that answers exactly. When the
+oracle is a person, the criterion has a blind spot with a specific shape: it
+scores a question by how evenly it divides the belief, and vagueness is what
+makes a split even. In a catalogue that mixes quantile-binned perceptual
+descriptors with skewed categorical metadata, the criterion therefore seeks out
+the questions users answer worst---not as a failure of tuning but as a
+consequence of what it optimises, sharpened by a preprocessing step that fixes
+apparent informativeness at a value determined by the bin count rather than by
+the attribute.
+
+The correction is a single line, and it is textbook: score the question by the
+mutual information between the target and the observed answer through a
+per-attribute binary symmetric channel. What we have tried to establish is not
+that this quantity is new but that it is needed, and that the knowledge it
+requires is cheap enough to be had. Two coarse tiers recover most of the
+benefit; the annotation may be wrong for a majority of attributes before it
+stops paying; across sixty worlds drawn from priors on the tier values a system
+shipping the fixed point estimates wins in sixty; and a two-line audit of the
+catalogue predicts in advance whether any of this will help. The three numbers
+need not even be assumed: EM over six hundred logged sessions of the
+already-deployed incumbent, with the target item latent and nothing annotated,
+recovers a crossover vector that matches the curator's exactly.
+
+We have also been explicit about the boundaries. Reliability weighting is a
+correction for a noisy channel, and on a clean one it is not merely useless but
+harmful. It requires a reliability model, and inverting that model inverts the
+result. The two routes that would have supplied one from the catalogue
+alone---repeated-item instability, and a psychophysical model of the bin
+boundaries---both fail, and fail for the same reason: they measure the data,
+and answerability is a property of the people. The route that does work without
+a curator is to watch those people, which is what the log-based estimator does
+and why it succeeds where the catalogue-derived ones do not. And the parameter
+has still not been measured on real people, only on simulated ones. That is the
+piece of work this paper specifies and does not do, and it is the piece that
+would close the argument.

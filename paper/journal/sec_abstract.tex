@@ -1,0 +1,54 @@
+\begin{abstract}
+Interactive identification systems---troubleshooters, triage assistants,
+product finders, twenty-questions engines---choose what to ask next by
+maximising expected information gain, a criterion derived under the assumption
+that answers are observed exactly. Human answers are not. We show that the two
+properties governing a question's value, how evenly it splits the belief and
+how reliably a person can answer it, are not independent, and that in a
+$79{,}803$-track music catalogue their dependence runs in the unfavourable
+direction: a classical selector asks questions whose annotated error rate
+averages $0.225$ against a catalogue average of $0.098$, spending $54\%$ of a
+twenty-question budget on the attributes users judge worst, while a random
+selector faces $0.097$, the catalogue average. We trace the effect to
+preprocessing rather than to the domain. Quantile binning fixes an attribute's
+maximum one-versus-rest entropy at $H_{\mathrm b}(1/k)$ regardless of its
+semantics, so discretised perceptual descriptors are assigned peak apparent
+informativeness; refining the binning to four equal-population bins strengthens
+the measured bias from $\rho=-0.44$ to $\rho=-0.61$, and the effect is absent,
+as this account predicts, in two catalogues that contain nothing to discretise.
+The correction is one line: replace the entropy of the induced split with the
+mutual information between target and \emph{observed} answer under a
+per-attribute binary symmetric channel. We claim no novelty for that
+quantity---it is textbook---but we show it re-ranks rather than rescales, that a
+uniform noise assumption leaves the selector provably unchanged, and that a
+learned value-regression policy with sufficient feature capacity fails to
+recover the weighting and gets worse, not better, when noise is added to its
+training rollouts. On $900$ paired trials with exact McNemar testing, at a
+forty-question budget on the full catalogue, reliability-aware selection raises
+top-1 accuracy from $16.56\%$ to $26.56\%$ and top-5 from $27.22\%$ to
+$44.78\%$ ($p = 2.0\times10^{-9}$ after Holm correction), moving the median
+rank of the true item among $79{,}803$ candidates from $59.0$ to $8.8$. The
+advantage widens rather than narrows with budget, and survives every operating
+point we tested: over a grid of six catalogue sizes and three budgets it is
+positive in all eighteen cells, by $6.5$ to $32.2$ percentage points, and at a
+thousand-item catalogue with forty questions reliability-aware selection
+identifies the target $84.2\%$ of the time. Crucially, the result does not depend on the three assumed
+reliability values. Over $60$ worlds drawn from priors on them, a system that
+ships the fixed point estimates wins in $60$ of $60$, with a minimum advantage
+of $1.3$ percentage points; the annotation may be wrong for a majority of
+attributes before the correction stops paying; and the values need not be
+assumed at all. Treating the target item as a latent variable and running EM
+over $600$ logged sessions of the incumbent system recovers a per-attribute
+crossover vector with no annotation, no labels and no user study, and a system
+shipping that learned vector matches the hand-annotated one exactly
+($8.33\%$ against $8.33\%$, $38$ discordant pairs each way). We also report where the method fails---clean channels, scrambled or
+inverted annotations---and give a two-step test, computable from a catalogue
+with no users at all, that predicts in advance whether reliability-aware
+selection will pay.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Interactive identification, active learning, information gain, query selection,
+noisy oracles, conversational recommendation, binary symmetric channel,
+discretisation.
+\end{IEEEkeywords}

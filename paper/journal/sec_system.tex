@@ -1,0 +1,230 @@
+%=============================================================================
+\section{System and Implementation}
+\label{sec:system}
+%=============================================================================
+
+\subsection{Architecture}
+
+The system is organised as five components arranged around a single mutable
+object, the belief vector (Fig.~\ref{fig:arch}). A \emph{catalogue compiler} converts a table of
+items and categorical attributes into a boolean question matrix, materialising
+once what would otherwise be recomputed at every turn. A \emph{reliability
+model} supplies a crossover probability for each attribute. A \emph{query
+selector} scores every unasked question against the current belief and the
+reliability vector and returns an argmax. An \emph{inference engine} applies
+Bayes' rule to the observed answer. A \emph{termination controller} decides
+between asking again and committing to a prediction.
+
+The design decision worth stating explicitly is that the reliability model is
+consumed in two places rather than one. Systems that model answer noise at all
+generally do so in the likelihood, where it prevents a wrong answer from
+destroying the posterior. Feeding the same quantity into the selector is what
+prevents the wrong answer from being solicited in the first place, and by
+Proposition~\ref{prop:uniform} it is only worth doing if the quantity varies
+across attributes.
+
+%---------------------------------------------------------------- Fig. arch
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[node distance=2.6mm]
+\node[fdata, text width=25mm] (cat) {Item catalogue\\{\tiny $N$ items $\times$ $M$ attributes}};
+\node[fproc, text width=25mm, below=of cat] (comp)
+  {Catalogue compiler\\{\tiny binning, pruning}};
+\node[fdata, text width=25mm, below=of comp] (X)
+  {Answer matrix $X$\\{\tiny $N\times|\Qset|$ boolean}};
+\node[frel, text width=20mm, right=7mm of comp] (rel)
+  {Reliability\\model $\varepsilon_f$\\{\tiny tiers, or measured}};
+\node[fproc, text width=25mm, below=6mm of X] (sel)
+  {Query selector\\{\tiny $\arg\max$ RAIG}};
+\node[fdata, text width=15mm, left=5mm of sel] (bel) {belief $\bb_t$};
+\node[fbox, text width=22mm, below=of sel] (q) {question $q_t$};
+\node[fuser, text width=14mm, below=of q] (user) {user};
+\node[fproc, text width=25mm, below=of user] (inf)
+  {Inference engine\\{\tiny Bayes update}};
+\node[fdec, text width=13mm, below=3mm of inf] (term) {stop?};
+\node[fbox, text width=22mm, below=3mm of term] (out) {MAP prediction};
+
+\draw[far] (cat) -- (comp);
+\draw[far] (comp) -- (X);
+\draw[far] (X) -- (sel);
+\draw[far] (bel) -- (sel);
+\draw[far] (sel) -- (q);
+\draw[far] (q) -- (user);
+\draw[far] (user) -- node[right, font=\tiny, xshift=0.5mm] {$y_t$} (inf);
+\draw[far] (inf) -- (term);
+\draw[far] (term) -- node[right, font=\tiny, xshift=0.5mm] {yes} (out);
+\draw[far] (term.west) -- ++(-9mm,0) node[above, font=\tiny, pos=0.6] {no}
+           |- (bel.south);
+\draw[frar] (rel.south) .. controls +(0,-14mm) and +(9mm,4mm) .. (sel.east);
+\draw[frar] (rel.east) -- ++(3mm,0) |- (inf.east);
+\end{tikzpicture}
+\caption{System architecture. The reliability model is consumed by both the
+selector and the inference engine (dashed); existing systems typically consume
+it in the latter only, which is the omission this work addresses.}
+\label{fig:arch}
+\end{figure}
+%----------------------------------------------------------------------
+
+\subsection{Algorithms}
+
+Algorithms~\ref{alg:select}--\ref{alg:eval} give the procedure. Selection is
+one matrix--vector product and a constant number of vectorised transforms.
+Every selector is a pure function of belief, question matrix and reliability
+vector, with no internal state; sessions are driven entirely by an externally
+supplied random stream. This is not incidental tidiness. It is what allows the
+same target and the same noise realisation to be replayed across every method
+under comparison, which in turn is what licenses paired statistical testing.
+
+\begin{algorithm}[t]
+\caption{Reliability-aware query selection}
+\label{alg:select}
+\begin{algorithmic}[1]
+\Require belief $\bb$, answer matrix $X \in \{0,1\}^{N \times |\Qset|}$,
+per-question crossover $\hat{\boldsymbol\varepsilon}$, asked mask $U$
+\Ensure index of the next question
+\State $\mathbf{p} \gets \bb^{\!\top} X$
+  \Comment{split mass of all questions, one product}
+\State $\tilde{\mathbf{p}} \gets \mathbf{p} \odot (1-\hat{\boldsymbol\varepsilon})
+   + (1-\mathbf{p}) \odot \hat{\boldsymbol\varepsilon}$
+\State $\mathbf{s} \gets \Hb(\tilde{\mathbf{p}}) - \Hb(\hat{\boldsymbol\varepsilon})$
+\If{modelling abstention}
+  \State $\mathbf{s} \gets (1-\hat{\boldsymbol\delta}) \odot \mathbf{s}$
+    \Comment{Eq.~\eqref{eq:erasure}}
+\EndIf
+\State $s_j \gets -\infty$ for all $j$ with $U_j = 1$
+\State \Return $\arg\max_j s_j$
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[t]
+\caption{Belief update under BSC$(\hat\varepsilon)$}
+\label{alg:update}
+\begin{algorithmic}[1]
+\Require belief $\bb$, answer column $\bx_q$, observation $y$, crossover $\hat\varepsilon$
+\If{$y$ is an erasure} \State \Return $\bb$ \Comment{no information} \EndIf
+\State $\ell_c \gets 1-\hat\varepsilon$ if $x_q(c)=y$ else $\hat\varepsilon$, for all $c$
+\State $\bb' \gets \bb \odot \boldsymbol\ell$; \quad $Z \gets \sum_c b'_c$
+\If{$Z = 0$} \Comment{reachable only at $\hat\varepsilon=0$}
+  \State \Return $\bb$ \Comment{stated convention; see Prop.~\ref{prop:limit}}
+\EndIf
+\State \Return $\bb' / Z$
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[t]
+\caption{Identification session}
+\label{alg:session}
+\begin{algorithmic}[1]
+\Require catalogue, target $c^\ast$, budget $T$, selector $\pi$,
+assumed $\hat{\boldsymbol\varepsilon}$, true $\boldsymbol\varepsilon$,
+random stream $u_{1:T}$
+\State $\bb \gets$ uniform; $U \gets \mathbf{0}$
+\For{$t = 1$ \textbf{to} $T$}
+  \State $q \gets \pi(\bb, X, \hat{\boldsymbol\varepsilon}, U)$; $U_q \gets 1$
+  \State $y \gets x_q(c^\ast)$
+  \If{$u_t < \varepsilon_{f(q)}$} $y \gets 1-y$ \Comment{answer error} \EndIf
+  \State $\bb \gets$ \textsc{Update}$(\bb, \bx_q, y, \hat\varepsilon_{f(q)})$
+\EndFor
+\State \Return $\arg\max_c \bb(c)$
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[t]
+\caption{Paired evaluation with common random numbers}
+\label{alg:eval}
+\begin{algorithmic}[1]
+\Require methods $\mathcal{M}$, trials $R$, seeds $S$, budget $T$
+\For{each seed $s \in S$}
+  \State draw targets $c^\ast_{1:R}$ and streams $u_{1:R,1:T}$ from seed $s$
+  \For{$i = 1$ \textbf{to} $R$}
+    \For{each $m \in \mathcal{M}$}
+      \State record outcome of \textsc{Session}$(c^\ast_i, u_{i,\cdot}, m)$
+    \EndFor
+  \EndFor
+\EndFor
+\State \Return per-trial outcomes for paired inference
+\end{algorithmic}
+\end{algorithm}
+
+One implementation detail is omitted from Algorithm~\ref{alg:select} because it
+never fires in our experiments and stating it inline would obscure the
+selection rule. A method restricted to a subset of attributes could in
+principle exhaust its allowed pool before the budget is spent; the
+implementation then falls back to the unrestricted unasked pool rather than
+returning nothing. With $T=20$ and at least $126$ allowed questions for every
+method including the restricted baseline, this branch is unreachable in every
+run reported here, and the restricted baseline's poor showing is therefore not
+an artefact of it.
+
+Sharing $u_{i,\cdot}$ across methods in Algorithm~\ref{alg:eval} is deliberate.
+Methods diverge in which questions they ask and therefore in which crossover
+probabilities they face, but they consult the same underlying draws, so
+differences in outcome are attributable to question choice rather than to
+sampling luck. This substantially reduces variance relative to independent
+sampling and permits exact paired testing~\cite{mcnemar1947}.
+
+\subsection{Complexity}
+
+Let $|\Qset|$ be the number of compiled questions. Selection is one
+matrix--vector product and a constant number of vectorised transforms, hence
+$O(N|\Qset|)$ time and $O(|\Qset|)$ working memory; the update is $O(N)$. A
+session of $T$ turns costs $O(TN|\Qset|)$, and the compiled matrix occupies
+$N|\Qset|$ bits. Table~\ref{tab:complexity} summarises. Critically, RAIG and
+classical IG have identical asymptotic complexity, and the constant is
+negligible too: the correction adds one elementwise affine map and one
+subtraction on a vector of length $|\Qset|$ to a matrix--vector product costing
+$O(N|\Qset|)$, so the expected relative overhead is $1/N$, here
+$1.3\times10^{-5}$. Section~\ref{sec:results-efficiency} reports what happens
+when one tries to measure a difference that small on a shared machine.
+
+\begin{table}[t]
+\caption{Complexity per operation. RAIG and classical IG differ only in the
+score transform, which is $O(|\Qset|)$ for both.}
+\label{tab:complexity}
+\centering
+\footnotesize
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Operation} & \textbf{Time} & \textbf{Memory} \\
+\midrule
+Catalogue compilation & $O(NM\bar{V})$ & $O(N|\Qset|)$ bits \\
+Split-mass computation & $O(N|\Qset|)$ & $O(|\Qset|)$ \\
+Score transform (IG or RAIG) & $O(|\Qset|)$ & $O(|\Qset|)$ \\
+Belief update & $O(N)$ & $O(N)$ \\
+Full session & $O(TN|\Qset|)$ & $O(N|\Qset|)$ bits \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Implementation and Reproducibility}
+
+The reference implementation is Python~3.13 against NumPy, pandas and SciPy;
+no deep-learning framework is required, and the entire selection and inference
+path is dense linear algebra. Catalogue compilation materialises one boolean
+column per non-degenerate attribute--value pair; questions true of every item
+or of none are discarded at compile time, since they carry zero information
+under either criterion.
+
+The engineering decision with the largest downstream effect is the separation
+of the assumed crossover $\hat{\boldsymbol\varepsilon}$ from the true crossover
+$\boldsymbol\varepsilon$ in the session signature. The simulator draws errors
+from the latter; the method sees only the former. Conflating them---the natural
+shortcut---would make every reported result circular, because the method would
+be evaluated against a user whose behaviour it defines. Keeping them distinct
+is what makes the misspecification studies of
+Sections~\ref{sec:results-ensemble} and~\ref{sec:results-corruption} possible
+at all.
+
+\emph{Determinism.} The BLAS thread count is pinned to one before NumPy is
+imported. This is a correctness requirement, not a performance tweak. A
+multi-threaded matmul sums $(|\Qset|,N)\times(N,\cdot)$ in a shape-dependent
+order, so the split-mass vector differs in the last float32 unit in the last
+place between runs with different batch shapes; selection is an argmax over
+that vector, near-ties are common in a catalogue with many equal-mass
+questions, and a single different question at turn one sends the entire session
+down a different path. Pinning to one thread makes every run bitwise
+reproducible and---verified empirically as a gate test---makes the per-method
+results of a run with $M$ methods identical to those of a run with any subset
+of them. That property is what allows a new method to be added to an existing
+comparison without re-running the incumbents, and it is worth the modest cost
+of stating. On our hardware it is also faster, the matmul being memory-bound.

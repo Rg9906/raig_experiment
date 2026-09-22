@@ -1,0 +1,110 @@
+%=============================================================================
+\appendices
+%=============================================================================
+
+\section{A Protocol for Measuring $\varepsilon_f$ from Users}
+\label{app:protocol}
+
+The most exposed assumption of this paper is the tier annotation
+$(0.03, 0.15, 0.30)$, and four experiments reduce the exposure without removing
+it. Section~\ref{sec:reliability-empirical} measures an adjacent quantity from
+the catalogue; Section~\ref{sec:results-ensemble} shows the conclusion survives
+a distribution over the values; Section~\ref{sec:results-corruption} shows how
+wrong the tier assignment can be before the correction stops paying; and
+Section~\ref{sec:results-em} dispenses with the values entirely, recovering
+them from interaction logs.
+
+None of that is the same as measuring $\varepsilon_f$ on people, and the last
+of the four is the one whose limits are easiest to overstate. Its logs come
+from a simulator whose users err at rates drawn from the annotation, so it
+establishes that the parameter is \emph{identifiable} from logs of that size
+and that recovering it \emph{suffices}, not that human error rates have this
+shape. Only observation of people can establish that. We did not run a human
+study, and rather than list that as a limitation we specify the study, so that
+the gap is a piece of work someone can do rather than a hole in the argument.
+
+\subsection*{Design}
+
+The estimand is not ``how often is a user wrong'', which is unidentifiable
+without ground truth about what the user is thinking. It is the crossover
+probability of the channel between the item a user has in mind and the answer
+they give: $\varepsilon_f = \Pr[\,\tilde{a}_f \neq a_f(c) \mid c\,]$, where
+$a_f(c)$ is the catalogue's value and $\tilde{a}_f$ the user's report. This is
+identifiable if the item is known to the experimenter and unknown to be under
+test by the participant.
+
+\emph{Task.} A participant is shown a track---title, artist, and a
+thirty-second audio excerpt---and asked the same one-versus-rest binary
+questions the deployed system would ask, in randomised order. Because the
+catalogue value $a_f(c)$ is known, each answer is directly scoreable, and
+$\hat\varepsilon_f$ is the per-attribute error rate with a Wilson
+interval~\cite{wilson1927}.
+
+\emph{Recall versus perception.} A user of the deployed system answers from
+memory, not from an excerpt. The excerpt condition therefore measures a lower
+bound on $\varepsilon_f$. We would run both arms: a \emph{perception} arm with
+the excerpt available, and a \emph{recall} arm in which participants nominate
+tracks they claim to know well and answer without hearing them. The contrast
+between the arms is itself the interesting quantity for objective attributes,
+where the excerpt makes the answer nearly free but recall does not.
+
+\emph{Sample size.} To separate the annotated tiers we need to distinguish
+$0.03$ from $0.15$ and $0.15$ from $0.30$. At $\varepsilon = 0.15$, a Wilson
+interval of half-width $0.05$ requires roughly $200$ answers per attribute.
+With $20$ attributes and $30$ questions per participant, that is $130$--$140$
+participants, or fewer if each answers about several tracks. A pilot at $n=25$
+would not resolve individual attributes but would resolve the \emph{tier
+contrast}, which is what the method actually consumes: pooling within tiers
+gives roughly $1{,}300$ answers per tier at $n=25$, ample to reject tier
+equality.
+
+\emph{Analysis.} The per-attribute rate is a proportion with a Wilson interval;
+the tier contrast is a mixed-effects logistic regression with a random
+intercept per participant and per track, since answers from the same person and
+about the same track are not independent. The pre-registered test is the tier
+main effect. The secondary analysis regresses $\hat\varepsilon_f$ on (i) the
+annotated tier, (ii) the measured catalogue discordance $d_f$ of
+\eqref{eq:discordance}, and (iii) the bin count of the attribute, which is the
+direct test of the psychophysical mechanism of
+Section~\ref{sec:psychophysical}.
+
+\subsection*{What the Study Would and Would Not Settle}
+
+It would settle whether the three-tier ordering is real and roughly how far
+apart the tiers are, which is the only property of the annotation that the
+method uses: by Proposition~\ref{prop:uniform} only the heterogeneity does any
+work, by Section~\ref{sec:results-em} an estimate that is correctly ordered but
+badly calibrated performs as well as the truth, and by
+Section~\ref{sec:results-corruption} the tier assignment may be wrong for most
+attributes before the correction stops paying. The study needs to establish an
+ordering, not three decimal places, and it is powered accordingly.
+
+It would not settle the point values for a different catalogue, a different
+population, or a different interface, and it should not be read as doing so.
+The transportable claim in this paper is conditional and has two parts, which
+Section~\ref{sec:results-synthetic} separates. Where answerability is
+heterogeneous \emph{and} negatively aligned with apparent informativeness,
+classical selection is actively misled and the correction pays most. Where it
+is heterogeneous but unaligned, classical selection is merely blind and the
+correction still pays, provided the answerable attributes carry enough
+information to finish the job. Where they do not, no selection rule can route
+around them. Three coarse tiers capture most of the available gain in the first
+two cases, and nothing helps in the third.
+
+\section{Reproduction}
+\label{app:repro}
+
+Every number in this paper is produced by a script in the released repository
+and stored as JSON, and the tables are checked against those files
+mechanically rather than transcribed by hand. The determinism requirements of
+Section~\ref{sec:system}---single-threaded BLAS, externally supplied random
+streams---make the runs bitwise reproducible on a given machine and make each
+method's results invariant to which other methods are run alongside it.
+
+Two caveats are worth recording. First, results generated before the
+single-thread pin was introduced do not reproduce bitwise; they agree within
+sampling error, and where such a run is quoted we say so. Second, the budget
+sweep, the $\varepsilon$-ensemble and the cross-domain comparisons are
+independent runs at their own sample sizes, so their overlapping cells agree
+within sampling error rather than exactly. We report the overlaps rather than
+suppressing them.

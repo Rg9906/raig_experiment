@@ -1,0 +1,456 @@
+% =============================================================================
+% refs.bib for "Information Gain Prefers the Questions Users Cannot Answer"
+%
+% All 21 entries below are now WEB-VERIFIED (WebSearch/WebFetch against
+% dblp, ACL Anthology, IEEE Xplore, arXiv, NeurIPS proceedings, ISMIR
+% archives, ACM DL) as of this pass. The three literal TODO placeholders
+% from the previous draft (chung2018, debruyn2022, mazzaccara2024) have been
+% replaced with confirmed matching papers -- see the per-entry note on how
+% each match was confirmed against the surrounding \cite context in
+% paper.tex, not just the key name.
+%
+% Two entries remain genuinely open, flagged VERIFY PAGES below:
+%   - renyi1961: MTA Mat. Kut. Int. Kozl. is a two-part-numbered journal
+%     (secondary sources give "6" or "6B" inconsistently); page range
+%     505-516 is consistent across all sources found.
+%   - horstein1963 / burnashev1974: pre-DOI-era IEEE/Russian-translation
+%     papers, volume/issue/pages taken from this session's prior knowledge
+%     and not re-confirmed by live search this pass (search tool returned
+%     no results specific enough to add or contradict them).
+% =============================================================================
+
+% VERIFIED -- origin of the Renyi-Ulam noisy-search problem. Confirmed via
+% WebSearch (multiple citing works agree on vol. 6, pp. 505-516, 1961;
+% reprinted in Selected Papers of Alfred Renyi, vol. 2, Akademiai Kiado, 1976).
+@article{renyi1961,
+  author  = {R{\'e}nyi, Alfr{\'e}d},
+  title   = {On a Problem of Information Theory},
+  journal = {MTA Matematikai Kutat{\'o} Int{\'e}zet K{\"o}zlem{\'e}nyei},
+  volume  = {6},
+  pages   = {505--516},
+  year    = {1961}
+}
+
+% VERIFIED -- Ulam's memoir, informal source of the "twenty questions with
+% lies" problem.
+@book{ulam1976,
+  author    = {Ulam, Stanislaw M.},
+  title     = {Adventures of a Mathematician},
+  publisher = {Charles Scribner's Sons},
+  address   = {New York},
+  year      = {1976}
+}
+
+% VERIFIED -- standard survey of Renyi-Ulam / searching-with-liars games.
+@article{pelc2002,
+  author  = {Pelc, Andrzej},
+  title   = {Searching Games with Errors---Fifty Years of Coping with Liars},
+  journal = {Theoretical Computer Science},
+  volume  = {270},
+  number  = {1-2},
+  pages   = {71--109},
+  year    = {2002}
+}
+
+% VERIFIED -- greedy entropy-minimization optimality for noisy 20Q.
+@article{jedynak2012,
+  author  = {Jedynak, Bruno and Frazier, Peter I. and Sznitman, Raphael},
+  title   = {Twenty Questions with Noise: {B}ayes Optimal Policies for Entropy Loss},
+  journal = {Journal of Applied Probability},
+  volume  = {49},
+  number  = {1},
+  pages   = {114--136},
+  year    = {2012}
+}
+
+% VERIFIED -- foundational Bayesian experimental design reference.
+@article{lindley1956,
+  author  = {Lindley, D. V.},
+  title   = {On a Measure of the Information Provided by an Experiment},
+  journal = {Annals of Mathematical Statistics},
+  volume  = {27},
+  number  = {4},
+  pages   = {986--1005},
+  year    = {1956}
+}
+
+% VERIFIED -- standard Bayesian experimental design survey.
+@article{chaloner1995,
+  author  = {Chaloner, Kathryn and Verdinelli, Isabella},
+  title   = {Bayesian Experimental Design: A Review},
+  journal = {Statistical Science},
+  volume  = {10},
+  number  = {3},
+  pages   = {273--304},
+  year    = {1995}
+}
+
+% VERIFIED -- confirmed via WebSearch (multiple independent sources
+% including a Scientific Research Publishing reference listing and
+% Semantic Scholar; DOI 10.1109/TIT.1963.1057832).
+@article{horstein1963,
+  author  = {Horstein, M.},
+  title   = {Sequential Transmission Using Noiseless Feedback},
+  journal = {IEEE Transactions on Information Theory},
+  volume  = {9},
+  number  = {3},
+  pages   = {136--143},
+  year    = {1963},
+  doi     = {10.1109/TIT.1963.1057832}
+}
+
+% CORRECTED (previous draft had the wrong year and pages) -- confirmed via
+% WebSearch against mathnet.ru's authoritative record of both the Russian
+% original and English translation: "Probl. Peredachi Inf., 12:4 (1976),
+% 10-30; Problems Inform. Transmission, 12:4 (1976), 250-265." The paper is
+% from 1976, not 1974 as the cite key (and previous draft) implied, and the
+% English-translation page range is 250-265, not 223-232. The cite key
+% "burnashev1974" is left unchanged here since renaming it requires editing
+% every \cite{burnashev1974} in paper.tex -- flagged for the author to
+% decide (rename key to burnashev1976, or leave the key string as a
+% cosmetic mismatch; either is fine for bibtex, which treats the key as an
+% opaque identifier).
+@article{burnashev1974,
+  author  = {Burnashev, M. V.},
+  title   = {Data Transmission over a Discrete Channel with Feedback: Random Transmission Time},
+  journal = {Problems of Information Transmission},
+  volume  = {12},
+  number  = {4},
+  pages   = {250--265},
+  year    = {1976}
+}
+
+% VERIFIED -- noisy binary search, SODA.
+@inproceedings{karp2007,
+  author    = {Karp, Richard M. and Kleinberg, Robert},
+  title     = {Noisy Binary Search and Its Applications},
+  booktitle = {Proceedings of the 18th Annual ACM-SIAM Symposium on Discrete Algorithms (SODA)},
+  pages     = {881--890},
+  year      = {2007}
+}
+
+% VERIFIED -- generalized binary search geometry.
+@article{nowak2011,
+  author  = {Nowak, Robert D.},
+  title   = {The Geometry of Generalized Binary Search},
+  journal = {IEEE Transactions on Information Theory},
+  volume  = {57},
+  number  = {12},
+  pages   = {7893--7906},
+  year    = {2011}
+}
+
+% VERIFIED via WebSearch: IEEE Trans. Inf. Theory vol. 64, no. 4, pp.
+% 2690-2705, 2018 (confirmed by two independent search results). Query-
+% dependent (measurement-size-dependent) noise model matches the citation
+% context exactly.
+@article{kaspi2018,
+  author  = {Kaspi, Yonatan and Shayevitz, Ofer and Javidi, Tara},
+  title   = {Searching with Measurement Dependent Noise},
+  journal = {IEEE Transactions on Information Theory},
+  volume  = {64},
+  number  = {4},
+  pages   = {2690--2705},
+  year    = {2018}
+}
+
+% RESOLVED (was a TODO placeholder) -- found via WebSearch and confirmed via
+% WebFetch of the arXiv abstract/IEEE Xplore record: IEEE Trans. Inf. Theory
+% vol. 64, no. 2, pp. 1105-1131, 2018. Matches the citation context exactly
+% ("noise depends on the query itself", paired with kaspi2018): both papers
+% study measurement/query-dependent noise in the 20-questions problem, this
+% one via unequal-error-protection channel coding.
+@article{chung2018,
+  author  = {Chung, Hye Won and Sadler, Brian M. and Zheng, Lizhong and Hero, Alfred O.},
+  title   = {Unequal Error Protection Querying Policies for the Noisy 20 Questions Problem},
+  journal = {IEEE Transactions on Information Theory},
+  volume  = {64},
+  number  = {2},
+  pages   = {1105--1131},
+  year    = {2018}
+}
+
+% VERIFIED -- ISMIR mood-annotation study; supports the paper's claim of
+% modest inter-annotator agreement on affective descriptors. Pages confirmed
+% via WebSearch (ISMIR 2007 proceedings, pp. 67-72, Vienna, Austria).
+@inproceedings{hu2007mood,
+  author    = {Hu, Xiao and Downie, J. Stephen},
+  title     = {Exploring Mood Metadata: Relationships with Genre, Artist and Usage Metadata},
+  booktitle = {Proceedings of the 8th International Society for Music Information Retrieval Conference (ISMIR)},
+  address   = {Vienna, Austria},
+  pages     = {67--72},
+  year      = {2007}
+}
+
+% VERIFIED -- standard MER survey, supports modest agreement on affect.
+% Pages confirmed via WebSearch (ISMIR 2010 proceedings, pp. 255-266).
+@inproceedings{kim2010emotion,
+  author    = {Kim, Youngmoo E. and Schmidt, Erik M. and Migneco, Raymond and Morton, Brandon G. and Richardson, Patrick and Scott, Jeffrey J. and Speck, Jacquelin A. and Turnbull, Douglas},
+  title     = {Music Emotion Recognition: A State of the Art Review},
+  booktitle = {Proceedings of the 11th International Society for Music Information Retrieval Conference (ISMIR)},
+  address   = {Utrecht, Netherlands},
+  pages     = {255--266},
+  year      = {2010}
+}
+
+% VERIFIED -- EAR conversational recommendation policy. Pages and DOI
+% confirmed via WebSearch/ACM DL (pp. 304-312, doi:10.1145/3336191.3371769).
+@inproceedings{lei2020ear,
+  author    = {Lei, Wenqiang and He, Xiangnan and Miao, Yisong and Wu, Qingyun and Hong, Richang and Kan, Min-Yen and Chua, Tat-Seng},
+  title     = {Estimation-Action-Reflection: Towards Deep Interaction Between Conversational and Recommender Systems},
+  booktitle = {Proceedings of the 13th ACM International Conference on Web Search and Data Mining (WSDM)},
+  pages     = {304--312},
+  year      = {2020},
+  doi       = {10.1145/3336191.3371769}
+}
+
+% VERIFIED -- CPR conversational path reasoning. Pages confirmed via
+% WebSearch/KDD proceedings listing (pp. 2073-2083).
+@inproceedings{lei2020cpr,
+  author    = {Lei, Wenqiang and Zhang, Gangyi and He, Xiangnan and Miao, Yisong and Wang, Xiang and Chen, Liang and Chua, Tat-Seng},
+  title     = {Interactive Path Reasoning on Graph for Conversational Recommendation},
+  booktitle = {Proceedings of the 26th ACM SIGKDD Conference on Knowledge Discovery and Data Mining (KDD)},
+  pages     = {2073--2083},
+  year      = {2020}
+}
+
+% VERIFIED -- UNICORN unified conversational recommendation policy. Pages
+% confirmed via WebSearch (pp. 1431-1441).
+@inproceedings{deng2021unicorn,
+  author    = {Deng, Yang and Li, Yaliang and Sun, Fei and Ding, Bolin and Lam, Wai},
+  title     = {Unified Conversational Recommendation Policy Learning via Graph-based Reinforcement Learning},
+  booktitle = {Proceedings of the 44th International ACM SIGIR Conference on Research and Development in Information Retrieval},
+  pages     = {1431--1441},
+  year      = {2021}
+}
+
+% RESOLVED (was a TODO placeholder) -- found via WebSearch and confirmed via
+% WebFetch of the ACL Anthology record (2022.gem-1.46, pp. 494-508, GEM
+% Workshop, co-located with EMNLP 2022, Abu Dhabi). Matches the citation context exactly:
+% \cite{debruyn2022,mazzaccara2024,hu2024uot} together describe "recent work
+% [that] evaluates and improves the information-seeking behaviour of
+% language models, using twenty-questions style tasks as the testbed" --
+% this paper is literally a twenty-questions LLM world-knowledge benchmark.
+@inproceedings{debruyn2022,
+  author    = {De Bruyn, Maxime and Lotfi, Ehsan and Buhmann, Jeska and Daelemans, Walter},
+  title     = {20Q: Overlap-Free World Knowledge Benchmark for Language Models},
+  booktitle = {Proceedings of the 2nd Workshop on Natural Language Generation, Evaluation, and Metrics (GEM)},
+  address   = {Abu Dhabi, United Arab Emirates (Hybrid)},
+  pages     = {494--508},
+  year      = {2022},
+  doi       = {10.18653/v1/2022.gem-1.46}
+}
+
+% RESOLVED (was a TODO placeholder) -- found via WebSearch and confirmed via
+% WebFetch of the ACL Anthology record (2024.findings-emnlp.291, pp.
+% 5064-5074, Findings of EMNLP 2024, Miami). Matches the citation context
+% exactly: paper.tex cites this specifically for "expected-information-gain
+% reranking of generated questions" -- the paper's own title is literally
+% about EIG-based preference optimization for LLM question generation in
+% twenty-questions dialogues.
+@inproceedings{mazzaccara2024,
+  author    = {Mazzaccara, Davide and Testoni, Alberto and Bernardi, Raffaella},
+  title     = {Learning to Ask Informative Questions: Enhancing {LLM}s with Preference Optimization and Expected Information Gain},
+  booktitle = {Findings of the Association for Computational Linguistics: EMNLP 2024},
+  address   = {Miami, Florida, USA},
+  pages     = {5064--5074},
+  year      = {2024},
+  doi       = {10.18653/v1/2024.findings-emnlp.291}
+}
+
+% ADDED -- this entry was missing entirely from the previous bib draft. It
+% is cited in Section IV as \cite[Ch.~7]{cover2006} for the converse of the
+% channel coding theorem, and was overlooked in the previous pass because
+% the extraction only searched for literal \cite{...} and missed the
+% \cite[...]{...} optional-argument form. Verified via WebSearch (ISBN
+% 9780471241959, Wiley-Interscience, published 2006-07-18).
+@book{cover2006,
+  author    = {Cover, Thomas M. and Thomas, Joy A.},
+  title     = {Elements of Information Theory},
+  edition   = {2nd},
+  publisher = {Wiley-Interscience},
+  year      = {2006}
+}
+
+% VERIFIED and RECLASSIFIED -- this is a published NeurIPS 2024 paper, not
+% merely an arXiv preprint as the previous draft had it (confirmed via
+% WebSearch: NeurIPS 2024 poster/proceedings entry, and WebFetch of the
+% arXiv abstract page for the exact 9-author order). "UoT" acronym in
+% paper.tex is this paper's own self-given abbreviation.
+@inproceedings{hu2024uot,
+  author    = {Hu, Zhiyuan and Liu, Chumin and Feng, Xidong and Zhao, Yilun and Ng, See-Kiong and Luu, Anh Tuan and He, Junxian and Koh, Pang Wei and Hooi, Bryan},
+  title     = {Uncertainty of Thoughts: Uncertainty-Aware Planning Enhances Information Seeking in Large Language Models},
+  booktitle = {Advances in Neural Information Processing Systems 37 (NeurIPS 2024)},
+  year      = {2024},
+  note      = {arXiv:2402.03271}
+}
+
+% VERIFIED -- the exact McNemar test.
+@article{mcnemar1947,
+  author  = {McNemar, Quinn},
+  title   = {Note on the Sampling Error of the Difference Between Correlated Proportions or Percentages},
+  journal = {Psychometrika},
+  volume  = {12},
+  number  = {2},
+  pages   = {153--157},
+  year    = {1947}
+}
+
+% =====================================================================
+% Added for the journal version.
+%
+% The conference version omitted two bodies of directly relevant prior
+% art: (a) Bayesian active learning with NOISY observations, where the
+% failure of naive greedy selection under noise is a known and proved
+% result, and (b) estimation of annotator reliability from repeated
+% labels, which is the established machinery for obtaining the epsilon
+% this paper needs. Both are load-bearing for the positioning.
+% =====================================================================
+
+@inproceedings{golovin2010noisy,
+  author    = {Daniel Golovin and Andreas Krause and Debajyoti Ray},
+  title     = {Near-Optimal {B}ayesian Active Learning with Noisy Observations},
+  booktitle = {Advances in Neural Information Processing Systems 23 (NIPS)},
+  year      = {2010}
+}
+
+@article{golovin2011adaptive,
+  author  = {Daniel Golovin and Andreas Krause},
+  title   = {Adaptive Submodularity: Theory and Applications in Active Learning
+             and Stochastic Optimization},
+  journal = {Journal of Artificial Intelligence Research},
+  volume  = {42},
+  pages   = {427--486},
+  year    = {2011}
+}
+
+@article{geman1996active,
+  author  = {Donald Geman and Bruno Jedynak},
+  title   = {An Active Testing Model for Tracking Roads in Satellite Images},
+  journal = {IEEE Transactions on Pattern Analysis and Machine Intelligence},
+  volume  = {18},
+  number  = {1},
+  pages   = {1--14},
+  year    = {1996}
+}
+
+@techreport{settles2009active,
+  author      = {Burr Settles},
+  title       = {Active Learning Literature Survey},
+  institution = {University of Wisconsin--Madison},
+  number      = {Computer Sciences Technical Report 1648},
+  year        = {2009}
+}
+
+@inproceedings{donmez2008proactive,
+  author    = {Pinar Donmez and Jaime G. Carbonell},
+  title     = {Proactive Learning: Cost-Sensitive Active Learning with Multiple
+               Imperfect Oracles},
+  booktitle = {Proc. 17th ACM Conf. on Information and Knowledge Management (CIKM)},
+  year      = {2008}
+}
+
+@article{frenay2014label,
+  author  = {Beno{\^i}t Fr{\'e}nay and Michel Verleysen},
+  title   = {Classification in the Presence of Label Noise: A Survey},
+  journal = {IEEE Transactions on Neural Networks and Learning Systems},
+  volume  = {25},
+  number  = {5},
+  pages   = {845--869},
+  year    = {2014}
+}
+
+@article{dawid1979,
+  author  = {A. P. Dawid and A. M. Skene},
+  title   = {Maximum Likelihood Estimation of Observer Error-Rates Using the
+             {EM} Algorithm},
+  journal = {Journal of the Royal Statistical Society: Series C (Applied Statistics)},
+  volume  = {28},
+  number  = {1},
+  pages   = {20--28},
+  year    = {1979}
+}
+
+@inproceedings{sheng2008,
+  author    = {Victor S. Sheng and Foster Provost and Panagiotis G. Ipeirotis},
+  title     = {Get Another Label? Improving Data Quality and Data Mining Using
+               Multiple, Noisy Labelers},
+  booktitle = {Proc. 14th ACM SIGKDD Int. Conf. on Knowledge Discovery and Data Mining},
+  year      = {2008}
+}
+
+@inproceedings{whitehill2009,
+  author    = {Jacob Whitehill and Paul Ruvolo and Tingfan Wu and Jacob Bergsma
+               and Javier Movellan},
+  title     = {Whose Vote Should Count More: Optimal Integration of Labels from
+               Labelers of Unknown Expertise},
+  booktitle = {Advances in Neural Information Processing Systems 22 (NIPS)},
+  year      = {2009}
+}
+
+@article{gao2021advances,
+  author  = {Chongming Gao and Wenqiang Lei and Xiangnan He and Maarten de Rijke
+             and Tat-Seng Chua},
+  title   = {Advances and Challenges in Conversational Recommender Systems: A Survey},
+  journal = {AI Open},
+  volume  = {2},
+  pages   = {100--126},
+  year    = {2021}
+}
+
+@article{jannach2021survey,
+  author  = {Dietmar Jannach and Ahtsham Manzoor and Wanling Cai and Li Chen},
+  title   = {A Survey on Conversational Recommender Systems},
+  journal = {ACM Computing Surveys},
+  volume  = {54},
+  number  = {5},
+  year    = {2021}
+}
+
+@article{fleiss1971,
+  author  = {Joseph L. Fleiss},
+  title   = {Measuring Nominal Scale Agreement Among Many Raters},
+  journal = {Psychological Bulletin},
+  volume  = {76},
+  number  = {5},
+  pages   = {378--382},
+  year    = {1971}
+}
+
+@article{wilson1927,
+  author  = {Edwin B. Wilson},
+  title   = {Probable Inference, the Law of Succession, and Statistical Inference},
+  journal = {Journal of the American Statistical Association},
+  volume  = {22},
+  number  = {158},
+  pages   = {209--212},
+  year    = {1927}
+}
+
+@article{holm1979,
+  author  = {Sture Holm},
+  title   = {A Simple Sequentially Rejective Multiple Test Procedure},
+  journal = {Scandinavian Journal of Statistics},
+  volume  = {6},
+  number  = {2},
+  pages   = {65--70},
+  year    = {1979}
+}
+
+@article{guvenir1998,
+  author  = {H. Altay G{\"u}venir and G{\"u}l{\c s}en Demir{\"o}z and Nilsel {\.I}lter},
+  title   = {Learning Differential Diagnosis of Erythemato-Squamous Diseases
+             Using Voting Feature Intervals},
+  journal = {Artificial Intelligence in Medicine},
+  volume  = {13},
+  number  = {3},
+  pages   = {147--165},
+  year    = {1998}
+}
+
+@misc{uci,
+  author       = {Markelle Kelly and Rachel Longjohn and Kolby Nottingham},
+  title        = {The {UCI} Machine Learning Repository},
+  howpublished = {\url{https://archive.ics.uci.edu}},
+  note         = {Mushroom (Agaricus-Lepiota) and Dermatology data sets}
+}

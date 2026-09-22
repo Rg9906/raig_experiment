@@ -1,0 +1,157 @@
+%=============================================================================
+\section{Background and Related Work}
+\label{sec:related}
+%=============================================================================
+
+\subsection{Searching with Errors}
+
+Identifying an unknown element through queries whose answers may be wrong
+originates with R\'enyi's guessing game in which the responder lies with fixed
+probability~\cite{renyi1961}, and independently with Ulam's question of how
+many yes/no queries suffice to locate an integer below one million when a
+bounded number of answers may be false~\cite{ulam1976}. The combinatorial
+branch, in which lies are adversarial and bounded in number, produces optimal
+strategies with a direct correspondence to error-correcting codes; Pelc's
+survey remains the standard reference~\cite{pelc2002}. The probabilistic
+branch treats errors as channel noise and connects to sequential transmission
+with feedback~\cite{horstein1963,burnashev1974}, to noisy binary
+search~\cite{karp2007,nowak2011}, and to treatments in which the noise depends
+on the query itself~\cite{kaspi2018,chung2018}.
+
+Our setting sits in the probabilistic branch, with one departure that turns
+out to matter. Existing formulations assume a single crossover probability, or
+make it depend on a continuous query parameter. In an attribute catalogue the
+crossover is a property of the semantic category being probed and can vary by
+an order of magnitude across categories. That heterogeneity, rather than the
+presence of noise as such, is what drives the effect we report.
+
+\subsection{Active Learning and Experimental Design under Noise}
+
+Choosing the experiment that maximises expected information about a latent
+quantity is the central prescription of Bayesian experimental
+design~\cite{lindley1956,chaloner1995}, and in the noiseless binary case it
+reduces to maximising the entropy of the induced partition. Geman and
+Jedynak's active testing model~\cite{geman1996active} is an early application
+of the same principle to sequential narrowing. Jedynak et
+al.~\cite{jedynak2012} give the result most often invoked here: for twenty
+questions with noise under entropy loss, a greedy one-step policy is optimal
+over the whole horizon.
+
+That result is frequently cited as licence to select greedily and stop
+worrying, and it is worth being precise about what it does and does not cover.
+It is established under a stated observation model with a single noise level;
+it is not a statement about the heterogeneous, per-attribute channel studied
+here. The active-learning literature is in fact explicit that noise breaks
+naive greedy selection: Golovin, Krause and Ray show that generalised binary
+search, near-optimal without noise, ``can perform very poorly'' once
+observations are noisy, and give EC$^2$, a greedy algorithm over equivalence
+classes with a competitiveness guarantee under
+noise~\cite{golovin2010noisy}; the adaptive-submodularity framework supplies
+the general machinery~\cite{golovin2011adaptive}. Our position relative to
+this work should be stated plainly, since it is the closest technical prior
+art. EC$^2$ and its relatives take the noise model as given and construct a
+selection rule with guarantees against it. We take the selection rule as given
+--- greedy mutual information, which is what deployed systems actually use ---
+and make an empirical claim about the \emph{shape} of the noise model in real
+attribute catalogues, namely that it is heterogeneous across attributes,
+partly manufactured by preprocessing, and aligned against the naive
+criterion. The two are complementary: a practitioner adopting EC$^2$ would
+still need to know the per-attribute crossover probabilities, and
+Section~\ref{sec:reliability} is about how to get them.
+
+The broader active-learning
+literature~\cite{settles2009active} treats oracle fallibility under the
+heading of proactive learning, where oracles differ in cost and
+reliability and the learner chooses among them~\cite{donmez2008proactive}, and
+under label noise more generally~\cite{frenay2014label}. The structural
+difference in our setting is that there is one oracle whose reliability varies
+by \emph{question}, not several oracles of differing quality.
+
+\subsection{Estimating Reliability from Repeated Observations}
+
+The problem of recovering an annotator's error rate without ground truth is
+old and well solved. Dawid and Skene's EM procedure estimates per-observer
+confusion matrices jointly with the latent true labels~\cite{dawid1979}, and
+the crowdsourcing literature extends it to weighted aggregation and to
+labeller-quality models~\cite{sheng2008,whitehill2009}. This matters here for
+two reasons. First, it is the route by which we obtain the parameter our method
+consumes without assuming it. A deployed system accumulating interaction logs is
+in exactly the repeated-observation regime those methods assume, with one
+substitution: the latent label is the \emph{item the user has in mind} rather
+than the class of an annotated example, and the ``annotators'' are the questions
+about each attribute. Section~\ref{sec:reliability-em} makes that substitution
+and Section~\ref{sec:results-em} reports that the resulting estimate is good
+enough to replace the annotation outright. Second, it frames what our
+repeated-item estimator of
+Section~\ref{sec:reliability-empirical} is and is not: it applies the same
+logic---two independent observations of one underlying entity bound the
+instability of the labelling---to the \emph{catalogue} rather than to users,
+and therefore measures a lower bound on the quantity of interest rather than
+the quantity itself.
+
+\subsection{Interactive and Conversational Recommendation}
+
+Systems that alternate between asking about attributes and proposing items
+form a substantial literature, surveyed
+in~\cite{gao2021advances,jannach2021survey}, including policy learning over
+knowledge graphs~\cite{lei2020ear,lei2020cpr,deng2021unicorn}.
+Maximum-entropy attribute querying appears throughout as the standard baseline
+against which learned policies are compared. This positions our work
+carefully: we are not proposing a competitor to learned conversational
+policies but a correction to the baseline those policies are measured against,
+which is a modest claim and we make no larger one. The correction is
+orthogonal and could be applied inside a learned policy's action-scoring step.
+Because the claim that such policies inherit the bias is an empirical one
+about a family of systems, Section~\ref{sec:baselines} implements and trains a
+member of that family rather than citing it.
+
+\subsection{Question Asking in Language Models}
+
+Recent work evaluates and improves the information-seeking behaviour of
+language models, using twenty-questions style tasks as the
+testbed~\cite{debruyn2022,mazzaccara2024,hu2024uot}. These systems generate
+questions in open natural language rather than selecting from a fixed
+attribute-value grid, which makes them more flexible and considerably more
+expensive per turn. The bias we describe should apply to them as well, since
+expected-information-gain reranking of generated
+questions~\cite{mazzaccara2024} inherits the same blind spot, but verifying
+that is beyond the present scope and we flag it as future work rather than
+claiming it.
+
+\subsection{Positioning}
+
+Table~\ref{tab:related} places this work against the closest prior art. The
+honest summary is that the acquisition function we derive is standard mutual
+information under a stated observation model, and its derivation is
+unsurprising to anyone working in Bayesian experimental design. The
+contribution we claim is empirical and diagnostic: that the observation model
+in some attribute catalogues is heterogeneous in a specific and unfavourable
+way, that this is partly an artefact of preprocessing rather than of the
+domain, that it does not hold everywhere and we say where it fails, and that
+correcting it requires less knowledge than one might expect.
+
+\begin{table}[t]
+\caption{Positioning against the closest prior work. ``Heterog.\ $\varepsilon$''
+asks whether the noise level is allowed to differ per attribute.}
+\label{tab:related}
+\centering
+\tiny
+\begin{tabular}{@{}lccc@{}}
+\toprule
+\textbf{Work} & \textbf{Noise} & \textbf{Heterog.\ $\varepsilon$} & \textbf{Selection} \\
+\midrule
+R\'enyi~\cite{renyi1961}, Ulam~\cite{ulam1976} & yes & no & theory \\
+Pelc~\cite{pelc2002} (survey) & yes & no & optimal \\
+Jedynak et al.~\cite{jedynak2012} & yes & no & greedy entropy \\
+Karp \& Kleinberg~\cite{karp2007} & yes & no & noisy bisection \\
+Golovin et al.~\cite{golovin2010noisy} & yes & no & EC$^2$, guaranteed \\
+Kaspi et al.~\cite{kaspi2018} & yes & query-dep. & information-theoretic \\
+Dawid \& Skene~\cite{dawid1979} & yes & per-observer & n/a (estimation) \\
+EAR / CPR / UNICORN~\cite{lei2020ear,lei2020cpr,deng2021unicorn} & no & no & learned policy \\
+Max-entropy baseline & no & no & classical IG \\
+UoT~\cite{hu2024uot}, \cite{mazzaccara2024} & implicit & no & EIG over text \\
+\midrule
+\textbf{This work} & yes & \textbf{per-attribute} & \textbf{RAIG} \\
+\bottomrule
+\end{tabular}
+\end{table}
